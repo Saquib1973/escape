@@ -8,7 +8,7 @@ export function GoogleButton() {
   const router = useRouter()
   return (
     <button
-      onClick={() => signIn('google', { callbackUrl: router.back() ?? "/" })}
+      onClick={() => signIn('google', { callbackUrl: "/" })}
       className="bg-dark-gray text-gray-300 flex gap-1 py-4 cursor-pointer p-2 w-full justify-center items-center rounded"
     >
       <Image alt="google" height={32} width={32} src={'/google.png'} />

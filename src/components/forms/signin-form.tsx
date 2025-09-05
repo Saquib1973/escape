@@ -23,7 +23,7 @@ export function SignInForm() {
     if (result?.error) {
       setError(result.error)
     } else {
-      router.back()
+      router.push("/")
     }
   }
 
