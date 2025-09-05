@@ -1,0 +1,173 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(uuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?   // Hashed for local auth
+  role          String?   @default("user") // Extendable for RBAC
+  accounts      Account[]
+  sessions      Session[]
+
+  // User's posts and comments
+  posts         Post[]
+  comments      Comment[]
+
+  // User's interactions
+  likes         Like[]
+  dislikes      Dislike[]
+}
+
+model Account {
+  id                String  @id @default(uuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Movie {
+  id          String   @id
+  type        String   @default("movie") // "movie" or "tv_series"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  posts       Post[]
+}
+
+model Post {
+  id          String   @id @default(uuid())
+  title       String?
+  content     String
+  rating      Int?     // User's rating for the content (1-10)
+  isSpoiler   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Foreign keys
+  contentId   String   // Can be movieId or tvSeriesId
+  userId      String
+
+  // Relations
+  movie       Movie     @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Comments and interactions
+  comments    Comment[]
+  likes       Like[]
+  dislikes    Dislike[]
+
+  // Indexes for better performance
+  @@index([contentId])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model Comment {
+  id          String   @id @default(uuid())
+  content     String
+  isSpoiler   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Foreign keys
+  postId      String?
+  parentId    String?  // For nested comments
+  userId      String
+
+  // Relations
+  post        Post?     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  parent      Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies     Comment[] @relation("CommentReplies")
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Interactions
+  likes       Like[]
+  dislikes    Dislike[]
+
+  // Indexes for better performance
+  @@index([postId])
+  @@index([parentId])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model Like {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  // Foreign keys
+  userId    String
+  postId    String?
+  commentId String?
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  // Ensure one like per user per post/comment
+  @@unique([userId, postId])
+  @@unique([userId, commentId])
+}
+
+model Dislike {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  // Foreign keys
+  userId    String
+  postId    String?
+  commentId String?
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  // Ensure one dislike per user per post/comment
+  @@unique([userId, postId])
+  @@unique([userId, commentId])
+}
