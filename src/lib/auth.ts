@@ -4,9 +4,35 @@ import prisma from './prisma'
 import GoogleProvider from 'next-auth/providers/google'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import bcrypt from 'bcryptjs'
+import { generateUniqueUsernameFromEmail, generateRandomUsername } from './username'
+
+const customAdapter = {
+  ...PrismaAdapter(prisma),
+  async createUser(user: { id: string; name?: string | null; email?: string | null; emailVerified?: Date | null; image?: string | null; username?: string }) {
+    let username = user.username
+    if (!username && user.email) {
+      username = await generateUniqueUsernameFromEmail(user.email, prisma)
+    }
+
+    if (!username) {
+      username = await generateRandomUsername(prisma)
+    }
+
+    return prisma.user.create({
+      data: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        emailVerified: user.emailVerified,
+        image: user.image,
+        username: username,
+      },
+    })
+  },
+}
 
 export const authOptions: AuthOptions = {
-  adapter: PrismaAdapter(prisma),
+  adapter: customAdapter,
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -22,12 +48,13 @@ export const authOptions: AuthOptions = {
         if (!credentials?.email || !credentials?.password) {
           throw new Error('Missing credentials')
         }
+        console.log(credentials)
 
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
         })
 
-        if (!user || !user.password) {
+        if (!user?.password) {
           throw new Error('Invalid credentials')
         }
 
@@ -50,7 +77,7 @@ export const authOptions: AuthOptions = {
     }),
   ],
   session: {
-    strategy: 'database', // Use DB for sessions in production
+    strategy: 'jwt', // Use JWT for sessions with credentials provider
     maxAge: 30 * 24 * 60 * 60, // 30 days
     updateAge: 24 * 60 * 60, // Update every 24 hours
   },
@@ -62,10 +89,10 @@ export const authOptions: AuthOptions = {
       }
       return token
     },
-    async session({ session, user }) {
+    async session({ session, token }) {
       if (session.user) {
-        session.user.id = user.id
-        session.user.role = user.role
+        session.user.id = token.id
+        session.user.role = token.role
       }
       return session
     },

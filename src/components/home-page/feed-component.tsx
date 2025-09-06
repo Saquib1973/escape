@@ -140,23 +140,67 @@ const FeedComponent = () => {
             {Array.from({ length: 3 }, (_, i) => (
               <div
                 key={`loading-skeleton-${i}`}
-                className="bg-dark-gray-2 p-6 animate-pulse"
+                className="p-6 animate-pulse"
               >
                 <div className="flex gap-4">
-                  <div className="w-40 h-44 bg-light-gray"></div>
-                  <div className="flex flex-col w-full gap-1">
-                    <div className="h-4 bg-light-gray w-1/4"></div>
-                    <div className="h-6 bg-light-gray w-1/2"></div>
-                    <div className="h-4 bg-light-gray w-1/3"></div>
-                    <div className="flex flex-col gap-1">
-                      <div className="h-3 bg-light-gray"></div>
-                      <div className="h-3 bg-light-gray w-5/6"></div>
+                  {/* Movie Poster Skeleton */}
+                  <div className="flex-shrink-0">
+                    <div className="w-36 h-48 bg-dark-gray"></div>
+                  </div>
+
+                  {/* Review Content Skeleton */}
+                  <div className="flex flex-col min-w-0 w-full">
+                    {/* Reviewer Info Skeleton */}
+                    <div className="flex items-center gap-1 mb-2">
+                      <div className="w-8 h-8 bg-dark-gray rounded-full"></div>
+                      <div className="h-4 bg-dark-gray w-20"></div>
+                    </div>
+
+                    {/* Movie Title and Year Skeleton */}
+                    <div className="mb-1">
+                      <div className="h-6 bg-dark-gray w-48 mb-1"></div>
+                      <div className="h-4 bg-dark-gray w-12"></div>
+                    </div>
+
+                    {/* Rating and Comments Skeleton */}
+                    <div className="flex items-center gap-3 mb-1">
+                      <div className="flex gap-1">
+                        {Array.from({ length: 5 }, (_, j) => (
+                          <div key={j} className="w-4 h-4 bg-dark-gray"></div>
+                        ))}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <div className="w-4 h-4 bg-dark-gray"></div>
+                        <div className="h-4 bg-dark-gray w-6"></div>
+                      </div>
+                    </div>
+
+                    {/* Review Text Skeleton */}
+                    <div className="mb-4">
+                      <div className="h-3 bg-dark-gray w-full mb-1"></div>
+                      <div className="h-3 bg-dark-gray w-5/6 mb-1"></div>
+                      <div className="h-3 bg-dark-gray w-4/5"></div>
+                    </div>
+
+                    {/* Like Button and Count Skeleton */}
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 bg-dark-gray"></div>
+                        <div className="h-4 bg-dark-gray w-20"></div>
+                      </div>
+                      <div className="h-4 bg-dark-gray w-12"></div>
                     </div>
                   </div>
                 </div>
+                {/* Separator Line Skeleton */}
+                <div className="mt-6 w-[80%] mx-auto h-0.5 bg-dark-gray"></div>
               </div>
             ))}
           </div>
+        </div>
+        {/* Show More Link Skeleton */}
+        <div className="flex justify-self-end pt-2 px-3">
+          <div className="h-4 bg-dark-gray w-20 animate-pulse"></div>
         </div>
       </div>
     )
@@ -178,7 +222,7 @@ const FeedComponent = () => {
   return (
     <div className="flex flex-col items-center justify-center p-4 md:px-0">
       <div className="w-full">
-        <h1 className="pl-4 text-2xl text-gray-300">Reviews</h1>
+        <h1 className="ml-4 text-2xl text-gray-300">Reviews</h1>
 
         {reviews.length === 0 ? (
           <div className="py-6 text-center">
@@ -203,12 +247,12 @@ const FeedComponent = () => {
                     router.push(`/post/${review.movieId}`)
                   }}
                   key={review.id}
-                  className="bg-dark-gray-2 p-6"
+                  className="cursor-pointer transition-colors p-6 md:px-2"
                 >
                   <div className="flex gap-4">
                     {/* Movie Poster */}
                     <div className="flex-shrink-0">
-                      <div className="w-40 h-52 bg-light-gray flex items-center justify-center text-gray-400 text-xs overflow-hidden">
+                      <div className="w-36 h-48 bg-dark-gray flex items-center justify-center text-gray-400 text-xs overflow-hidden">
                         <Image
                           src={
                             review.moviePoster ||
@@ -234,7 +278,7 @@ const FeedComponent = () => {
                     {/* Review Content */}
                     <div className="flex flex-col min-w-0">
                       {/* Reviewer Info */}
-                      <div className="flex items-center gap-2 mb-2">
+                      <div className="flex items-center gap-1 mb-2">
                         {review.reviewer.avatar ? (
                           <Image
                             src={review.reviewer.avatar}
@@ -256,7 +300,7 @@ const FeedComponent = () => {
                       </div>
 
                       {/* Movie Title and Year */}
-                      <div className="mb-2 text-start">
+                      <div className="mb-1 text-start">
                         <h3 className="text-xl font-bold text-white">
                           {review.movieTitle}
                         </h3>
@@ -268,7 +312,7 @@ const FeedComponent = () => {
                       </div>
 
                       {/* Rating and Comments */}
-                      <div className="flex items-center gap-4 mb-3">
+                      <div className="flex items-center gap-3 mb-1">
                         {review.rating && (
                           <div className="flex items-center gap-1">
                             {renderStars(review.rating)}
@@ -297,6 +341,7 @@ const FeedComponent = () => {
                       </div>
                     </div>
                   </div>
+                  <div className='mt-6 w-[80%] mx-auto h-0.5 bg-dark-gray-2/30' />
                 </motion.div>
               ))}
             </AnimatePresence>

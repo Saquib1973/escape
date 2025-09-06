@@ -62,7 +62,7 @@ const RightSidebar = () => {
 
   if (loading) {
     return (
-      <div className="flex flex-col gap-2 w-[30%] sticky top-20 right-0 h-fit">
+      <div className="max-md:hidden flex flex-col gap-2 md:w-[30%] sticky top-20 right-0 h-fit">
         <div className="flex w-full flex-col gap-2">
           <div className="mx-auto px-4 py-8">
             <h1 className="text-gray-300 font-light text-xl pb-6">
@@ -112,7 +112,7 @@ const RightSidebar = () => {
   }
 
   return (
-    <div className="flex w-[30%] sticky top-20 right-0 flex-col gap-2 h-fit">
+    <div className="flex max-md:hidden md:w-[30%] sticky top-20 right-0 flex-col gap-2 h-fit">
       <div className=" mx-auto px-4 py-8">
         {/* Trending Movies Section */}
         <div className="mb-8">

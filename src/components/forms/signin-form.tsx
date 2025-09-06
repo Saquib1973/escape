@@ -5,15 +5,17 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 export function SignInForm() {
+  // states
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const router = useRouter()
 
+  // form submit function
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError('')
 
+    setError('')
     const result = await signIn('credentials', {
       redirect: false,
       email,
@@ -48,7 +50,7 @@ export function SignInForm() {
       {error && <p className="text-red-500">{error}</p>}
       <button
         type="submit"
-        className="bg-light-green text-lg text-white rounded p-4 w-full"
+        className="bg-light-green text-lg text-white cursor-pointer p-4 w-full"
       >
         Sign In
       </button>

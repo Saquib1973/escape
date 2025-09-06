@@ -74,22 +74,22 @@ const Footer = () => {
   return (
     <footer className="flex items-center justify-center w-full text-gray-300">
       <div className="max-w-6xl w-full mx-auto px-4 py-3">
-        <div className=" flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+        <div className=" flex justify-between items-center">
           <div className="text-sm text-gray-400">
             © 2025 Escape. All rights reserved.
           </div>
-          <div className="flex justify-center md:justify-start gap-2">
+          <div className="flex justify-center md:justify-start md:gap-2">
             {socialLinks.map((social, index) => (
-              <a
+              <Link
                 key={index + social.name}
                 href={social.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-white transition-colors duration-200 p-2 rounded-lg"
+                className="text-gray-400 hover:text-white transition-colors duration-200 p-1 md:p-2"
                 aria-label={social.name}
               >
                 {social.icon}
-              </a>
+              </Link>
             ))}
           </div>
         </div>

@@ -5,7 +5,8 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3'
-const TMDB_TOKEN = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiNWUyYjQxN2E1YTBlMmVjODMxMWI5MmI2MDFlNTc0NyIsIm5iZiI6MTc1NTIwOTI1Mi42MDYwMDAyLCJzdWIiOiI2ODllNWUyNGEyOTE4ZDdkZWM4ZGJmMWIiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.6j_ocxIEWOsbgjBG_eYv80kApJeZvlX2aEOCK2Roctk'
+const TMDB_TOKEN =
+  'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiNWUyYjQxN2E1YTBlMmVjODMxMWI5MmI2MDFlNTc0NyIsIm5iZiI6MTc1NTIwOTI1Mi42MDYwMDAyLCJzdWIiOiI2ODllNWUyNGEyOTE4ZDdkZWM4ZGJmMWIiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.6j_ocxIEWOsbgjBG_eYv80kApJeZvlX2aEOCK2Roctk'
 
 export interface Genre {
   id: number
@@ -123,8 +124,8 @@ async function saveTVSeriesIdToDatabase(seriesId: string): Promise<void> {
       update: {}, // No updates needed, just ensure it exists
       create: {
         id: seriesId,
-        type: "tv_series"
-      }
+        type: 'tv_series',
+      },
     })
   } catch (error) {
     console.error('Error saving TV series ID to database:', error)
@@ -132,15 +133,17 @@ async function saveTVSeriesIdToDatabase(seriesId: string): Promise<void> {
 }
 
 // Function to fetch TV series from TMDB
-async function fetchTVSeriesFromTMDB(seriesId: string): Promise<TVSeriesDetails | null> {
+async function fetchTVSeriesFromTMDB(
+  seriesId: string
+): Promise<TVSeriesDetails | null> {
   try {
     const url = `${TMDB_BASE_URL}/tv/${seriesId}?language=en-US`
     const response = await fetch(url, {
       method: 'GET',
       headers: {
-        'accept': 'application/json',
-        'Authorization': `Bearer ${TMDB_TOKEN}`
-      }
+        accept: 'application/json',
+        Authorization: `Bearer ${TMDB_TOKEN}`,
+      },
     })
 
     if (!response.ok) {
@@ -156,11 +159,13 @@ async function fetchTVSeriesFromTMDB(seriesId: string): Promise<TVSeriesDetails 
 }
 
 // Main function that checks if TV series exists in DB, then always fetches from TMDB
-export async function getTVSeriesDetails(seriesId: string): Promise<TVSeriesDetails | null> {
+export async function getTVSeriesDetails(
+  seriesId: string
+): Promise<TVSeriesDetails | null> {
   try {
     // Check if TV series exists in our database (for posts/comments)
     const existingSeries = await prisma.movie.findUnique({
-      where: { id: seriesId }
+      where: { id: seriesId },
     })
 
     // Always fetch fresh data from TMDB
@@ -189,38 +194,38 @@ export async function getPostsWithoutComments(seriesId: string) {
       where: {
         contentId: seriesId,
         comments: {
-          none: {} // Posts that have no comments
-        }
+          none: {}, // Posts that have no comments
+        },
       },
       include: {
         user: {
           select: {
             id: true,
             name: true,
-            image: true
-          }
+            image: true,
+          },
         },
         likes: {
           select: {
             id: true,
-            userId: true
-          }
+            userId: true,
+          },
         },
         dislikes: {
           select: {
             id: true,
-            userId: true
-          }
+            userId: true,
+          },
         },
         _count: {
           select: {
-            comments: true
-          }
-        }
+            comments: true,
+          },
+        },
       },
       orderBy: {
-        createdAt: 'desc'
-      }
+        createdAt: 'desc',
+      },
     })
 
     return posts
@@ -235,37 +240,37 @@ export async function getAllTVSeriesPosts(seriesId: string) {
   try {
     const posts = await prisma.post.findMany({
       where: {
-        contentId: seriesId
+        contentId: seriesId,
       },
       include: {
         user: {
           select: {
             id: true,
             name: true,
-            image: true
-          }
+            image: true,
+          },
         },
         likes: {
           select: {
             id: true,
-            userId: true
-          }
+            userId: true,
+          },
         },
         dislikes: {
           select: {
             id: true,
-            userId: true
-          }
+            userId: true,
+          },
         },
         _count: {
           select: {
-            comments: true
-          }
-        }
+            comments: true,
+          },
+        },
       },
       orderBy: {
-        createdAt: 'desc'
-      }
+        createdAt: 'desc',
+      },
     })
 
     return posts
@@ -311,7 +316,7 @@ export async function createPost(data: CreatePostData) {
     await prisma.movie.upsert({
       where: { id: data.contentId },
       update: {},
-      create: { id: data.contentId, type: "tv_series" }
+      create: { id: data.contentId, type: 'tv_series' },
     })
 
     // Create the post
@@ -322,17 +327,17 @@ export async function createPost(data: CreatePostData) {
         rating: data.rating,
         isSpoiler: data.isSpoiler,
         contentId: data.contentId,
-        userId: session.user.id
+        userId: session.user.id,
       },
       include: {
         user: {
           select: {
             id: true,
             name: true,
-            image: true
-          }
-        }
-      }
+            image: true,
+          },
+        },
+      },
     })
 
     return post

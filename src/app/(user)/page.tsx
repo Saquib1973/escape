@@ -1,7 +1,8 @@
 import AnimatePageWrapper from '@/components/animate-page-wrapper'
 import FeedComponent from '@/components/home-page/feed-component'
 import InCinemaComponent from '@/components/home-page/in-cinema-component'
-import TrendingComponent from '@/components/home-page/trending-component'
+import TrendingMovieComponent from '@/components/home-page/trending-movie-component'
+import TrendingWebSeriesComponent from '@/components/home-page/trending-web-series-component'
 import { getSession } from '@/lib/auth'
 import React from 'react'
 
@@ -17,7 +18,8 @@ const HomePage = async () => {
           </h1>
         </div>
       )}
-      <TrendingComponent />
+      <TrendingMovieComponent />
+      <TrendingWebSeriesComponent />
       <InCinemaComponent />
       <FeedComponent />
     </AnimatePageWrapper>

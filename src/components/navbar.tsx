@@ -71,10 +71,10 @@ const Navbar = () => {
 
 
   return (
-    <div className="sticky top-0 left-0 right-0 bg-dark-gray z-50 w-full">
+    <div className="sticky max-md:px-2 top-0 left-0 right-0 bg-dark-gray z-50 w-full ">
       <div className="w-full flex justify-center items-center">
         <div className="w-full max-w-5xl">
-          <div className="flex items-center justify-between gap-4 h-16">
+          <div className="flex items-center justify-between gap-2 md:gap-4 h-13 md:h-16 min-w-0">
             <Link href={'/'} className="flex items-center gap-2">
               <div className="flex space-x-1">
                 <Image
@@ -88,7 +88,7 @@ const Navbar = () => {
               <span className="text-xl text-white max-md:hidden">Escape</span>
             </Link>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 md:gap-2 min-w-0">
               <div
                 className={`flex items-center gap-2 md:gap-3 font-light transition-all duration-300 ${
                   isSearchOpen
@@ -114,7 +114,7 @@ const Navbar = () => {
                 ref={container}
                 className={`transition-all duration-300 ease-in-out ${
                   isSearchOpen
-                    ? 'w-64 opacity-100 scale-100'
+                    ? 'w-48 md:w-64 opacity-100 scale-100'
                     : 'w-0 opacity-0 scale-95 overflow-hidden'
                 }`}
               >
@@ -229,7 +229,7 @@ const RenderAuthSection = () => {
         </button>
 
         {/* Dropdown Menu */}
-        <div className={`absolute right-0 border border-dark-gray-2 top-1/2 translate-y-5 w-40 md:w-40 bg-dark-gray-2 transition-all duration-200 z-50 ${
+        <div className={`absolute right-0 z-[100] border border-dark-gray-2 top-1/2 translate-y-5 w-40 md:w-40 bg-dark-gray-2 transition-all duration-200 ${
           isDropdownOpen
             ? 'opacity-100 visible'
             : 'opacity-0 invisible md:group-hover:opacity-100 md:group-hover:visible'

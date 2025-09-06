@@ -29,7 +29,7 @@
   --color-light-green: var(--light-green);
 
 
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-atkinson-hyperlegible);
   --font-mono: var(--font-geist-mono);
 }
 
@@ -55,7 +55,7 @@
 }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-atkinson-hyperlegible), sans-serif;
 }
 
 @keyframes dash {

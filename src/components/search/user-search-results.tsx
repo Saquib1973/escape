@@ -1,6 +1,7 @@
 import React from 'react'
 import Image from 'next/image'
 import { type SearchUserResult } from '@/app/(user)/search/action'
+import Link from 'next/link'
 
 interface UserSearchResultsProps {
   users: SearchUserResult[]
@@ -23,7 +24,11 @@ const UserSearchResults = ({ users, query }: UserSearchResultsProps) => {
       <div className='flex flex-col gap-1 py-4'>
         {users.map((user, index) => {
           return (
-            <div key={index + user.id} className='hover:bg-dark-gray-hover p-3 cursor-pointer py-2  transition-colors'>
+            <Link
+              href={`/u/${user.username}`}
+              key={index + user.id}
+              className="hover:bg-dark-gray-hover p-3 cursor-pointer py-2  transition-colors"
+            >
               <div className="flex gap-2 items-center">
                 <Image
                   className="rounded-full"
@@ -34,10 +39,10 @@ const UserSearchResults = ({ users, query }: UserSearchResultsProps) => {
                 />
                 <div>
                   <h1 className="font-medium">{user.name}</h1>
-                  <p className='text-xs text-gray-400'>{user.email}</p>
+                  <p className="text-xs text-gray-400">{user.email}</p>
                 </div>
               </div>
-            </div>
+            </Link>
           )
         })}
       </div>

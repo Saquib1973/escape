@@ -6,6 +6,7 @@ export interface SearchUserResult {
   name: string | null
   email: string | null
   image: string | null
+  username: string | null
 }
 
 export async function searchUsers(query: string): Promise<SearchUserResult[]> {
@@ -35,6 +36,7 @@ export async function searchUsers(query: string): Promise<SearchUserResult[]> {
         name: true,
         email: true,
         image: true,
+        username:true,
       },
       take: 20,
     })

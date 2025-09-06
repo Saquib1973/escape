@@ -1,9 +1,14 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Atkinson_Hyperlegible } from 'next/font/google'
 import { AuthProvider } from '@/components/auth-provider'
 import './globals.css'
 
-const inter = Inter({ subsets: ['latin'] })
+const atkinsonHyperlegible = Atkinson_Hyperlegible({
+  subsets: ['latin'],
+  weight: ['400', '700'],
+  style: ['normal', 'italic'],
+  variable: '--font-atkinson-hyperlegible',
+})
 
 export const metadata: Metadata = {
   title: 'Escape',
@@ -19,7 +24,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className + "bg-black"}>
+      <body className={`${atkinsonHyperlegible.variable} bg-black`}>
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>

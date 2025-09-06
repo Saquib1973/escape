@@ -116,7 +116,7 @@ const SeriesRecommendation = ({ id }: { id: number }) => {
             <Link
               href={`/web-series/${show.id}`}
               key={show.id}
-              className="flex-shrink-0 w-48"
+              className="flex-shrink-0 w-36"
             >
               <div className="bg-dark-gray-2 overflow-hidden h-full">
                 <div className="flex flex-col w-full h-full">

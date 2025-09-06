@@ -15,21 +15,23 @@ interface Movie {
   vote_average: number
 }
 
-const InCinemaComponent = () => {
+const TrendingMovieComponent = () => {
   const [movies, setMovies] = useState<Movie[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const fetchNowPlayingMovies = async () => {
+    const fetchPopularMovies = async () => {
       try {
-        const url = 'https://api.themoviedb.org/3/movie/now_playing?language=en-US&page=1&region=IN'
+        const url =
+          'https://api.themoviedb.org/3/movie/popular?language=en-US&page=1&region=IN'
         const options = {
           method: 'GET',
           headers: {
             accept: 'application/json',
-            Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiNWUyYjQxN2E1YTBlMmVjODMxMWI5MmI2MDFlNTc0NyIsIm5iZiI6MTc1NTIwOTI1Mi42MDYwMDAyLCJzdWIiOiI2ODllNWUyNGEyOTE4ZDdkZWM4ZGJmMWIiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.6j_ocxIEWOsbgjBG_eYv80kApJeZvlX2aEOCK2Roctk'
-          }
+            Authorization:
+              'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiNWUyYjQxN2E1YTBlMmVjODMxMWI5MmI2MDFlNTc0NyIsIm5iZiI6MTc1NTIwOTI1Mi42MDYwMDAyLCJzdWIiOiI2ODllNWUyNGEyOTE4ZDdkZWM4ZGJmMWIiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.6j_ocxIEWOsbgjBG_eYv80kApJeZvlX2aEOCK2Roctk',
+          },
         }
 
         const response = await fetch(url, options)
@@ -38,6 +40,8 @@ const InCinemaComponent = () => {
         }
 
         const data = await response.json()
+
+        console.log('TRENDING DATA', data)
         setMovies(data.results || [])
       } catch (err) {
         console.error('Error fetching movies:', err)
@@ -47,11 +51,11 @@ const InCinemaComponent = () => {
       }
     }
 
-    fetchNowPlayingMovies()
+    fetchPopularMovies()
   }, [])
 
   const handleScroll = (direction: 'left' | 'right') => {
-    const container = document.querySelector('.cinema-scroll-container')
+    const container = document.querySelector('.trending-scroll-container')
     if (container) {
       const scrollAmount = direction === 'left' ? -400 : 400
       container.scrollBy({ left: scrollAmount, behavior: 'smooth' })
@@ -60,7 +64,7 @@ const InCinemaComponent = () => {
 
   const renderHeader = () => (
     <div className="flex justify-between items-center">
-      <h1 className="text-2xl text-gray-300">Now in Cinema</h1>
+      <h1 className="text-2xl text-gray-300">Trending Movies</h1>
       <div className="flex gap-2">
         <button
           onClick={() => handleScroll('left')}
@@ -108,7 +112,7 @@ const InCinemaComponent = () => {
     if (loading) {
       return (
         <div className="w-full h-72 flex items-center justify-center">
-          <Loader text="Loading movies.." />
+          <Loader text="Loading trending movies.." />
         </div>
       )
     }
@@ -125,7 +129,7 @@ const InCinemaComponent = () => {
       <>
         {/* Movies Grid */}
         <div className="w-full h-fit">
-          <div className="cinema-scroll-container flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+          <div className="trending-scroll-container flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
             {movies.map((movie) => (
               <Link
                 href={`/movie/${movie.id}`}
@@ -134,7 +138,7 @@ const InCinemaComponent = () => {
               >
                 <div className="bg-dark-gray-2 overflow-hidden h-full">
                   <div className="flex flex-col w-full h-full">
-                    <div className="h-full flex items-center justify-center">
+                    <div className="h-full   flex items-center justify-center">
                       {movie.poster_path ? (
                         <Image
                           src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
@@ -167,7 +171,7 @@ const InCinemaComponent = () => {
 
         <div className="flex justify-end pt-2 px-3">
           <Link
-            href="/cinema"
+            href="/trending"
             className="text-gray-300 hover:text-white text-sm transition-all flex gap-1 items-center justify-center"
           >
             Show More
@@ -186,4 +190,4 @@ const InCinemaComponent = () => {
   )
 }
 
-export default InCinemaComponent
+export default TrendingMovieComponent

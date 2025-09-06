@@ -5,7 +5,7 @@ import TrendingListComponent from '@/components/trending/trending-list-component
 const TrendingPage = () => {
   return (
     <AnimatePageWrapper className="flex">
-      <div className="w-[70%] p-6">
+      <div className="w-full md:w-[70%] p-6 md:pl-0">
         <div className="py-8">
           <h1 className="text-3xl text-gray-300 font-light mb-2">
             Trending List
