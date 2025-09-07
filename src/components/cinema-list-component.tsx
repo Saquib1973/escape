@@ -140,9 +140,8 @@ const CinemaListComponent: React.FC<CinemaListComponentProps> = ({
 
     return (
       <>
-        {/* Items Grid */}
         <div className="w-full h-fit">
-          <div className={`${scrollContainerClass} flex gap-3 overflow-x-auto pb-2 scrollbar-hide`}>
+          <div className={`${scrollContainerClass} flex gap-3 overflow-x-auto scrollbar-hide`}>
             {items.map((item) => (
               <Link
                 href={linkPath(item.id)}
@@ -185,12 +184,12 @@ const CinemaListComponent: React.FC<CinemaListComponentProps> = ({
         </div>
 
         {showMoreLink && (
-          <div className="flex justify-end pt-2 px-3">
+          <div className="flex justify-end">
             <Link
               href={showMoreLink}
               className="text-gray-300 hover:text-white text-sm transition-all flex gap-1 items-center justify-center"
             >
-              Show More
+              See more
               <MoveRight className="size-5" />
             </Link>
           </div>
@@ -200,7 +199,7 @@ const CinemaListComponent: React.FC<CinemaListComponentProps> = ({
   }
 
   return (
-    <div className="w-full max-w-6xl py-6 mx-auto p-4 md:px-0 flex flex-col gap-4">
+    <div className="w-full max-w-6xl py-4 mx-auto p-4 md:px-0 flex flex-col gap-4">
       {renderHeader()}
       {renderContent()}
     </div>

@@ -2,9 +2,10 @@ import { getSession } from '@/lib/auth'
 import Image from 'next/image'
 import { redirect } from 'next/navigation'
 import UserProfileTabSection from '@/components/user-profile-tab-section'
+import prisma from '@/lib/prisma'
 
 //temporary data
-const userData = {
+const tempUserData = {
   follower: 10,
   following: 12,
   Watched: 3,
@@ -16,67 +17,100 @@ const userData = {
 export default async function ProfileLayout({
   children,
 }: {
-  children: React.ReactNode
+  readonly children: React.ReactNode
 }) {
+  const session = await getSession()
+
+  if (!session) {
+    redirect('/signin')
+  }
+  const userData = await prisma.user.findUnique({
+    where: {
+      id: session.user.id,
+    },
+    select: {
+      name: true,
+      username: true,
+      image: true,
+      _count: {
+        select: {
+          followers: true,
+          following: true,
+        },
+      },
+    },
+  })
+
+  // Merge with actual follower/following counts from database
+  const userDataWithCounts = userData ? {
+    ...userData,
+    follower: userData._count.followers,
+    following: userData._count.following,
+    Watched: 0, // You can add actual watched count logic here
+  } : null
+
   return (
     <div className="flex justify-center">
       <div className="max-w-5xl w-full mx-auto py-8">
-        <HeaderComponent />
+        <HeaderComponent userData={userDataWithCounts} />
         <UserProfileTabSection />
         {children}
       </div>
     </div>
   )
 }
+interface UserData {
+  name: string | null
+  username: string
+  image: string | null
+  follower?: number
+  following?: number
+  Watched?: number
+}
 
-const HeaderComponent = async () => {
-  const session = await getSession()
-
-  if (!session) {
-    redirect('/signin')
-  }
+const HeaderComponent = ({ userData }: { userData: UserData | null }) => {
   return (
-    <div className="flex justify-between p-6 px-0">
+    <div className="flex gap-3 max-md:flex-col items-start justify-between p-6 px-2 md:px-0">
       <div className="flex items-center gap-4">
-        {session.user.image ? (
+        {userData?.image ? (
           <div className="w-16 h-16 rounded-full overflow-hidden">
             <Image
-              src={session.user.image}
-              alt={`${session.user.name || 'User'}'s profile picture`}
+              src={userData.image}
+              alt={`user profile picture`}
               width={64}
               height={64}
-              className="w-full h-full object-cover"
+              unoptimized={!userData.image.includes("dicebar")}
+              className="w-full bg-light-green h-full object-cover"
             />
           </div>
         ) : (
           <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center text-white text-lg font-medium">
-            {session.user.name?.charAt(0).toUpperCase() || 'U'}
+            {userData?.name?.charAt(0).toUpperCase() || 'U'}
           </div>
         )}
-        <div className="flex-1">
-          <h1 className="text-2xl font-semibold text-white mb-1">
-            {session.user.name || 'User'}
+        <div className="flex flex-col ">
+          <h1 className="text-2xl font-semibold text-white">
+            {userData?.name || 'User'}
           </h1>
           <p className="text-sm text-gray-300 capitalize">
-            {session.user.role || 'user'}
+            @{userData?.username || 'username'}
           </p>
-          <p className="text-sm text-gray-400 mt-1">{session.user.email}</p>
         </div>
       </div>
-      <div className="flex text-sm text-gray-300 items-center justify-center gap-4">
-        <div className="flex flex-col items-center">
-          <span>{userData.follower}</span>
-          Follower
+      <div className="flex text-sm max-md:p-2 text-gray-300 items-center justify-center gap-4">
+        <div className="flex max-md:gap-2 md:flex-col items-center">
+          <span>{userData?.follower || 0}</span>
+          <span>Follower</span>
         </div>
-        <div className="h-12 w-0.5 bg-dark-gray-2" />
-        <div className="flex flex-col items-center">
-          <span>{userData.following}</span>
-          Following
+        <div className="h-12 w-0.5 max-md:hidden bg-dark-gray-2" />
+        <div className="flex max-md:gap-2 md:flex-col items-center">
+          <span>{userData?.following || 0}</span>
+          <span>Following</span>
         </div>
-        <div className="h-12 w-0.5 bg-dark-gray-2" />
-        <div className="flex flex-col items-center">
-          <span>{userData.Watched}</span>
-          Watched
+        <div className="h-12 w-0.5 max-md:hidden bg-dark-gray-2" />
+        <div className="flex max-md:gap-2 md:flex-col items-center">
+          <span>{userData?.Watched || 0}</span>
+          <span>Watched</span>
         </div>
       </div>
     </div>

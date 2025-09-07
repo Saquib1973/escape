@@ -19,7 +19,7 @@ const UserProfileTabSection = () => {
   }
 
   return (
-    <div className="w-full py-6">
+    <div className="w-full py-6 scrollbar-hide overflow-x-scroll">
       <div className="flex text-gray-300 text-lg">
         {sections.map((section, index) => {
           const isActive =

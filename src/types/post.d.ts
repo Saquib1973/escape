@@ -6,6 +6,7 @@ export interface SimplerPost {
   isSpoiler: boolean
   createdAt: string | Date
   contentId: string
+  movieType?: string
 }
 
 export interface PaginatedPostsResponse {

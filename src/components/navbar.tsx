@@ -213,6 +213,7 @@ const RenderAuthSection = () => {
                 'https://api.dicebear.com/9.x/lorelei/svg?seed=' +
                   session.user.username
               }
+              className='rounded-full'
               alt="Profile"
               width={28}
               height={28}

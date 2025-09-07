@@ -32,9 +32,9 @@ const UserSearchResults = ({ users, query }: UserSearchResultsProps) => {
               key={index + user.id}
               className="hover:bg-dark-gray-hover p-3 cursor-pointer py-2  transition-colors"
             >
-              <div className="flex gap-2 items-center">
+              <div className="flex gap-2 bg-light items-center">
                 <Image
-                  className="rounded-full"
+                  className="rounded-full bg-light-green"
                   src={user.image}
                   alt="user image"
                   width={48}
