@@ -40,8 +40,8 @@
   }
 }
 
-.input {
-  @apply text-white placeholder:text-gray-300 bg-dark-gray outline-none p-4 w-full;
+.auth-form-input {
+  @apply text-white placeholder:text-gray-300 bg-dark-gray outline-none p-2 px-4 w-full;
 }
 
 * {

@@ -9,10 +9,6 @@ import { useEffect, useRef, useState } from 'react'
 
 const navbarItems = [
   {
-    name: 'cinema',
-    link: '/cinema',
-  },
-  {
     name: 'lists',
     link: '/lists',
   },
@@ -31,10 +27,10 @@ const Navbar = () => {
       setSearchQuery('')
     }
   }
-  const router = useRouter();
+  const router = useRouter()
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    router.push("/search?q="+searchQuery)
+    router.push('/search?q=' + searchQuery)
   }
 
   const searchInputRef = useRef<HTMLInputElement>(null)
@@ -69,9 +65,8 @@ const Navbar = () => {
     }
   }, [isSearchOpen])
 
-
   return (
-    <div className="sticky max-md:px-2 top-0 left-0 right-0 bg-dark-gray z-50 w-full ">
+    <div className="sticky max-md:px-2 max-md:pl-4 top-0 left-0 right-0 bg-dark-gray z-50 w-full ">
       <div className="w-full flex justify-center items-center">
         <div className="w-full max-w-5xl">
           <div className="flex items-center justify-between gap-2 md:gap-4 h-13 md:h-16 min-w-0">
@@ -153,24 +148,24 @@ const Navbar = () => {
 const RenderAuthSection = () => {
   const dropdownItems = [
     {
-      name: "profile",
-      link:"/profile"
+      name: 'profile',
+      link: '/profile',
     },
     {
-      name: "watchlist",
-      link:"/profile/watchlist"
+      name: 'watchlist',
+      link: '/profile/watchlist',
     },
     {
-      name: "lists",
-      link:"/profile/lists"
+      name: 'lists',
+      link: '/profile/lists',
     },
     {
-      name: "reviews",
-      link:"/profile/reviews"
+      name: 'reviews',
+      link: '/profile/reviews',
     },
     {
-      name: "notifications",
-      link:"/profile/notifications"
+      name: 'notifications',
+      link: '/profile/notifications',
     },
   ]
   const { data: session, status } = useSession()
@@ -196,44 +191,48 @@ const RenderAuthSection = () => {
 
   if (status === 'loading') {
     return (
-      <div className="cursor-not-allowed w-20 md:w-40 h-10 bg-dark-gray-hover flex items-center justify-center text-gray-600 animate-pulse">
+      <div className="cursor-not-allowed w-20 md:w-36 h-10 bg-dark-gray-hover flex items-center justify-center text-gray-600 animate-pulse">
         Loading
       </div>
     )
   }
 
   if (session) {
+    console.log(session)
+    const username = session.user?.name?.split(' ')[0]
     return (
-      <div className="relative w-20 md:w-40 group dropdown-container">
+      <div className="relative w-20 md:w-36 group dropdown-container">
         <button
-          className="flex w-full h-10 justify-around items-center space-x-2 px-4 group-hover:bg-dark-gray-2 bg-dark-gray-hover py-4 transition-colors"
+          className="flex w-full h-10 justify-around items-center md:space-x-2 px-2 md:px-4 group-hover:bg-dark-gray-2 bg-dark-gray-hover py-4 transition-colors"
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
         >
-          <div className="w-7 h-7 bg-green-600 rounded-full flex items-center justify-center">
-            {session.user?.image ? (
-              <Image
-                src={session.user.image}
-                alt="Profile"
-                width={28}
-                height={28}
-                className="rounded-full"
-              />
-            ) : (
-              <User className="w-4 h-4 text-white" />
-            )}
+          <div className="w-7 h-7 bg-light-green rounded-full flex items-center justify-center">
+            <Image
+              src={
+                session.user.image ??
+                'https://api.dicebear.com/9.x/lorelei/svg?seed=' +
+                  session.user.username
+              }
+              alt="Profile"
+              width={28}
+              height={28}
+              unoptimized
+            />
           </div>
           <span className="text-gray-300 text-sm hidden md:block">
-            {session.user?.name || 'Profile'}
+            {username || 'Profile'}
           </span>
           <ChevronDown className="w-4 h-4 text-gray-300" />
         </button>
 
         {/* Dropdown Menu */}
-        <div className={`absolute right-0 z-[100] border border-dark-gray-2 top-1/2 translate-y-5 w-40 md:w-40 bg-dark-gray-2 transition-all duration-200 ${
-          isDropdownOpen
-            ? 'opacity-100 visible'
-            : 'opacity-0 invisible md:group-hover:opacity-100 md:group-hover:visible'
-        }`}>
+        <div
+          className={`absolute right-0 z-[100] border border-dark-gray-2 top-1/2 translate-y-5 w-36 md:w-36 bg-dark-gray-2 transition-all duration-200 ${
+            isDropdownOpen
+              ? 'opacity-100 visible'
+              : 'opacity-0 invisible md:group-hover:opacity-100 md:group-hover:visible'
+          }`}
+        >
           <div className="">
             {dropdownItems.map((item, index) => {
               return (
@@ -264,10 +263,10 @@ const RenderAuthSection = () => {
   }
 
   return (
-    <div className="flex w-20 md:w-40 items-center space-x-3">
+    <div className="flex w-20 md:w-36 items-center">
       <Link
         href="/signin"
-        className="md:hidden w-full h-10 text-gray-300 bg-dark-gray-hover transition-colors px-4 flex items-center justify-center"
+        className="md:hidden w-full h-10 text-gray-300 bg-dark-gray-hover transition-colors px-2 flex items-center justify-center"
       >
         SignIn
       </Link>

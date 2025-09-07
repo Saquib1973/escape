@@ -32,7 +32,7 @@ const SearchPage = async ({ searchParams }: SearchPageProps) => {
 
   return (
     <AnimatePageWrapper>
-      <div className="py-8">
+      <div className="py-8 max-md:px-2">
         <h1 className="text-3xl text-gray-300 font-light mb-2">
           Search Results
         </h1>
@@ -46,7 +46,7 @@ const SearchPage = async ({ searchParams }: SearchPageProps) => {
       </div>
 
       {query.trim() ? (
-        <div className="flex w-full text-gray-300 gap-6">
+        <div className="flex max-md:flex-col-reverse w-full text-gray-300 gap-6">
           {/* Main content area for movies and TV shows */}
           <SearchResultsWrapper
             movies={movieSearchResults}

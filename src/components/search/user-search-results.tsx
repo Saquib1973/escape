@@ -1,3 +1,4 @@
+"use client"
 import React from 'react'
 import Image from 'next/image'
 import { type SearchUserResult } from '@/app/(user)/search/action'
@@ -11,18 +12,20 @@ interface UserSearchResultsProps {
 const UserSearchResults = ({ users, query }: UserSearchResultsProps) => {
   if (users.length === 0) {
     return (
-      <div className="w-[30%] px-4">
+      <div className="w-[30%] px-2 md:px-4">
         <h1 className="text-lg font-medium mb-4">Users related to &apos;{query}&apos;</h1>
         <p className="text-gray-400 text-sm">No users found</p>
       </div>
     )
   }
 
+  console.log(users)
   return (
-    <div className="w-[30%] px-4">
-      <h1 className="text-lg font-medium mb-4">Users related to &apos;{query}&apos;</h1>
+    <div className="md:w-[30%] md:px-4 px-2">
+      <h1 className="text-xl font-medium mb-4">Users related to &apos;{query}&apos;</h1>
       <div className='flex flex-col gap-1 py-4'>
         {users.map((user, index) => {
+          console.log(user.image)
           return (
             <Link
               href={`/u/${user.username}`}
@@ -32,10 +35,11 @@ const UserSearchResults = ({ users, query }: UserSearchResultsProps) => {
               <div className="flex gap-2 items-center">
                 <Image
                   className="rounded-full"
-                  src={user.image ?? ''}
+                  src={user.image}
                   alt="user image"
                   width={48}
                   height={48}
+                  unoptimized
                 />
                 <div>
                   <h1 className="font-medium">{user.name}</h1>

@@ -24,6 +24,7 @@ export async function signup(formData: FormData) {
         name,
         email,
         password: hashedPassword,
+        image: 'https://api.dicebear.com/9.x/lorelei/svg?seed=' + username,
       },
     })
   } catch (error) {

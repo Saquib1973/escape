@@ -29,6 +29,21 @@ export function SignInForm() {
     }
   }
 
+  const handleGuestLogin = async () => {
+    setError('')
+    const result = await signIn('credentials', {
+      redirect: false,
+      email: 'guest@welcome.com',
+      password: 'guest@welcome.com',
+    })
+
+    if (result?.error) {
+      setError(result.error)
+    } else {
+      router.push("/")
+    }
+  }
+
   return (
     <form onSubmit={handleSubmit} className="w-full flex flex-col gap-2">
       <input
@@ -37,7 +52,7 @@ export function SignInForm() {
         onChange={(e) => setEmail(e.target.value)}
         placeholder="Email"
         required
-        className="input"
+        className="auth-form-input"
       />
       <input
         type="password"
@@ -45,14 +60,21 @@ export function SignInForm() {
         onChange={(e) => setPassword(e.target.value)}
         placeholder="Password"
         required
-        className="input"
+        className="auth-form-input"
       />
       {error && <p className="text-red-500">{error}</p>}
       <button
         type="submit"
-        className="bg-light-green text-lg text-white cursor-pointer p-4 w-full"
+        className="bg-light-green mt-2 text-white cursor-pointer p-2 w-full"
       >
         Sign In
+      </button>
+      <button
+        type="button"
+        onClick={handleGuestLogin}
+        className="bg-dark-gray-2 text-white cursor-pointer p-2 w-full"
+      >
+        Login as guest
       </button>
     </form>
   )

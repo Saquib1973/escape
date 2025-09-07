@@ -164,7 +164,7 @@ const TrendingListComponent = () => {
       ) : (
         <>
           {/* Trending List */}
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-4 md:gap-2">
             {trendingItems.map((item, index) => (
           <Link
             href={
@@ -175,15 +175,15 @@ const TrendingListComponent = () => {
             key={item.id + index}
             className="group bg-dark-gray-2 overflow-hidden border border-dark-gray-2 hover:bg-dark-gray-hover transition-all duration-300 cursor-pointer"
           >
-            <div className="flex">
+            <div className="flex max-sm:flex-col">
               {/* Poster Image */}
-              <div className="relative w-40 h-52 flex-shrink-0">
+              <div className="relative w-40 max-sm:w-full aspect-square md:h-52 flex-shrink-0">
                 {item.poster_path ? (
                   <Image
                     src={`https://image.tmdb.org/t/p/w500${item.poster_path}`}
                     alt={getTitle(item)}
                     fill
-                    className="object-cover"
+                    className="object-center max-sm:object-scale-down"
                   />
                 ) : (
                   <div className="w-full h-full bg-dark-gray flex items-center justify-center">

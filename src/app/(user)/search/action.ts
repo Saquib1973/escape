@@ -5,7 +5,7 @@ export interface SearchUserResult {
   id: string
   name: string | null
   email: string | null
-  image: string | null
+  image: string
   username: string | null
 }
 
@@ -40,7 +40,7 @@ export async function searchUsers(query: string): Promise<SearchUserResult[]> {
       },
       take: 20,
     })
-    return users
+    return users as SearchUserResult[]
   } catch (error) {
     console.error('Error searching users: ', error)
     return []

@@ -123,7 +123,7 @@ export function SignUpForm() {
         name="name"
         placeholder="Name"
         required
-        className="input"
+        className="auth-form-input"
       />
       <div className="relative">
         <input
@@ -133,7 +133,7 @@ export function SignUpForm() {
           required
           value={username}
           onChange={handleUsernameChange}
-          className="input"
+          className="auth-form-input"
         />
 
         {/* Username status indicator */}
@@ -192,20 +192,20 @@ export function SignUpForm() {
         name="email"
         placeholder="Email"
         required
-        className="input"
+        className="auth-form-input"
       />
       <input
         type="password"
         name="password"
         placeholder="Password"
         required
-        className="input"
+        className="auth-form-input"
       />
       {error && <p className="text-red-500">{error}</p>}
       <button
         type="submit"
         disabled={isLoading}
-        className="bg-light-green text-lg text-white p-4 w-full disabled:cursor-not-allowed disabled:opacity-50"
+        className="bg-light-green my-2 text-white p-2 w-full disabled:cursor-not-allowed disabled:opacity-50"
       >
         {isLoading ? 'Creating Account...' : 'Sign Up'}
       </button>

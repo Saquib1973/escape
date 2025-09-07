@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { ChevronDown, Heart, MessageCircle, Star } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { getAllFeedPosts } from '@/app/(user)/movie/actions'
+import { getAllFeedPosts } from '@/app/(user)/(cinema)/movie/actions'
 import {
   getMultipleMoviePosterInfo,
   getMultipleTVSeriesPosterInfo,
@@ -244,7 +244,7 @@ const FeedComponent = () => {
                     },
                   }}
                   onClick={() => {
-                    router.push(`/post/${review.movieId}`)
+                    router.push(`/post/${review.id}`)
                   }}
                   key={review.id}
                   className="cursor-pointer transition-colors p-6 md:px-2"
@@ -285,7 +285,8 @@ const FeedComponent = () => {
                             alt={review.reviewer.username || 'User'}
                             width={32}
                             height={32}
-                            className="w-8 h-8 rounded-full object-cover"
+                            unoptimized
+                            className="w-8 h-8 bg-light-green rounded-full object-cover"
                           />
                         ) : (
                           <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center text-white text-sm">

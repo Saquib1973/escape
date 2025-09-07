@@ -31,8 +31,11 @@ model User {
   // User's interactions
   likes         Like[]
   dislikes      Dislike[]
-}
 
+  // Follows
+  followers     Follow[]  @relation("UserFollowedBy")
+  following     Follow[]  @relation("UserFollows")
+}
 model Account {
   id                String  @id @default(uuid())
   userId            String
@@ -171,4 +174,22 @@ model Dislike {
   // Ensure one dislike per user per post/comment
   @@unique([userId, postId])
   @@unique([userId, commentId])
+}
+
+model Follow {
+  id           String   @id @default(uuid())
+  followerId   String
+  followingId  String
+  createdAt    DateTime @default(now())
+
+  // Relations
+  follower     User     @relation("UserFollows", fields: [followerId], references: [id], onDelete: Cascade)
+  following    User     @relation("UserFollowedBy", fields: [followingId], references: [id], onDelete: Cascade)
+
+  // Ensure a user can follow another user only once
+  @@unique([followerId, followingId])
+
+  // Helpful indexes
+  @@index([followerId])
+  @@index([followingId])
 }

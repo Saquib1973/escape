@@ -1,6 +1,6 @@
 'use client'
 
-import { createPost } from '@/app/(user)/movie/actions'
+import { createPost } from '@/app/(user)/(cinema)/movie/actions'
 import { motion } from 'framer-motion'
 import { Star, X } from 'lucide-react'
 import { useEffect, useState } from 'react'

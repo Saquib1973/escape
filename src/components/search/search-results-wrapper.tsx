@@ -13,7 +13,7 @@ interface SearchResultsWrapperProps {
 
 const SearchResultsWrapper = ({ movies, tvShows, query }: SearchResultsWrapperProps) => {
   return (
-    <div className="flex-1">
+    <div className="flex-1 px-2 md:px-4">
       <div className="flex flex-col gap-4">
         <MovieSearchResults movies={movies} query={query} />
         <TVSearchResults tvShows={tvShows} query={query} />

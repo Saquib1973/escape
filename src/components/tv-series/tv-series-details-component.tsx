@@ -1,9 +1,9 @@
 'use client'
-import { TVSeriesDetails } from '@/app/(user)/web-series/actions'
+import { TVSeriesDetails } from '@/app/(user)/(cinema)/web-series/actions'
 import Image from 'next/image'
 import React, { useState, useRef, useEffect } from 'react'
 import { CreatePostForm } from '@/components/forms/create-post-form'
-import { PostsSection } from '@/components/movie/posts-section'
+import { PostsSection } from '@/components/posts-section'
 import { AnimatePresence, motion } from 'framer-motion'
 import AnimatePageWrapper from '../animate-page-wrapper'
 import { Bookmark, Bug, Menu, Plus } from 'lucide-react'
@@ -89,12 +89,12 @@ const TVSeriesDetailsComponent: React.FC<TVSeriesDetailsComponentProps> = ({
       <div className="px-4 md:px-0 py-8">
         <div className="flex flex-col w-full lg:flex-row gap-8">
           {/* Poster */}
-          <div className="sticky top-[70px] left-0 max-w-1/3 w-full h-full">
+          <div className="sticky top-[70px] left-0 max-w-[40%] w-full h-full">
             <Image
               src={getImageUrl(series.poster_path)}
               alt={series.name}
-              height={250}
-              width={250}
+              height={300}
+              width={300}
               className="w-full"
             />
           </div>
@@ -145,7 +145,7 @@ const TVSeriesDetailsComponent: React.FC<TVSeriesDetailsComponentProps> = ({
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.2, ease: 'easeOut' }}
-                        className="absolute top-8 -right-0 bg-dark-gray-2 z-50"
+                        className="absolute top-8 -right-0 bg-dark-gray-2 z-10"
                       >
                         <div className="flex flex-col gap-1 min-w-[160px]">
                           <motion.button

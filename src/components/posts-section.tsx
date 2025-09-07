@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { getAllMoviePosts } from '@/app/(user)/movie/actions'
+import { getAllMoviePosts } from '@/app/(user)/(cinema)/movie/actions'
 import { Star, MessageCircle, ThumbsUp, ThumbsDown } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
 
 interface Post {
   id: string
@@ -140,7 +141,7 @@ export function PostsSection({ movieId, refreshTrigger }: PostsSectionProps) {
       ) : (
         <div className="flex flex-col gap-3">
           {posts.map((post) => (
-            <div key={post.id} className="bg-dark-gray-2 p-6">
+            <Link href={`/post/${post.id}`} key={post.id} className="bg-dark-gray-2 p-6">
               <div className="flex gap-4">
                 <div className="flex-shrink-0">
                   <div className="w-12 h-12 bg-dark-gray flex items-center justify-center overflow-hidden">
@@ -150,6 +151,7 @@ export function PostsSection({ movieId, refreshTrigger }: PostsSectionProps) {
                         alt={post.user.name || 'User'}
                         width={48}
                         height={48}
+                        unoptimized
                         className="w-full h-full object-cover"
                       />
                     ) : (
@@ -219,7 +221,7 @@ export function PostsSection({ movieId, refreshTrigger }: PostsSectionProps) {
                   </div>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       )}
