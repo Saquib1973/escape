@@ -233,118 +233,124 @@ const FeedComponent = () => {
         ) : (
           <div className="flex flex-col gap-3 py-6">
             <AnimatePresence mode="wait">
-              {reviews.map((review, index) => (
-                <motion.div
-                  initial={{ opacity:0 , y: -5 }}
-                  animate={{
-                    opacity:1,
-                    y: 0,
-                    transition: {
-                      delay: (index + 1) * 0.1,
-                    },
-                  }}
-                  onClick={() => {
-                    router.push(`/post/${review.id}`)
-                  }}
-                  key={review.id}
-                  className="cursor-pointer transition-colors p-6 md:px-2"
-                >
-                  <div className="flex gap-4">
-                    {/* Movie Poster */}
-                    <div className="flex-shrink-0">
-                      <div className="w-36 h-48 bg-dark-gray flex items-center justify-center text-gray-400 text-xs overflow-hidden">
-                        <Image
-                          src={
-                            review.moviePoster ||
-                            (review.contentType === 'movie'
-                              ? '/placeholder-movie.jpg'
-                              : '/placeholder-tv.jpg')
-                          }
-                          alt={review.movieTitle}
-                          width={160}
-                          height={208}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement
-                            target.src =
-                              review.contentType === 'movie'
-                                ? '/placeholder-movie.jpg'
-                                : '/placeholder-tv.jpg'
-                          }}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Review Content */}
-                    <div className="flex flex-col min-w-0">
-                      {/* Reviewer Info */}
-                      <div className="flex items-center gap-1 mb-2">
-                        {review.reviewer.avatar ? (
+                {reviews.map((review, index) => {
+                  return (
+                  <motion.div
+                    initial={{ opacity: 0, y: -5 }}
+                    animate={{
+                      opacity: 1,
+                      y: 0,
+                      transition: {
+                        delay: (index + 1) * 0.1,
+                      },
+                    }}
+                    onClick={() => {
+                      router.push(`/post/${review.id}`)
+                    }}
+                    key={review.id}
+                    className="cursor-pointer transition-colors p-6 md:px-2"
+                  >
+                    <div className="flex gap-4">
+                      {/* Movie Poster */}
+                      <div className="flex-shrink-0">
+                        <div className="w-36 h-48 bg-dark-gray flex items-center justify-center text-gray-400 text-xs overflow-hidden">
                           <Image
-                            src={review.reviewer.avatar}
-                            alt={review.reviewer.username || 'User'}
-                            width={32}
-                            height={32}
-                            unoptimized
-                            className="w-8 h-8 bg-light-green rounded-full object-cover"
+                            src={
+                              review.moviePoster ||
+                              (review.contentType === 'movie'
+                                ? '/placeholder-movie.jpg'
+                                : '/placeholder-tv.jpg')
+                            }
+                            alt={review.movieTitle}
+                            width={160}
+                            height={208}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement
+                              target.src =
+                                review.contentType === 'movie'
+                                  ? '/placeholder-movie.jpg'
+                                  : '/placeholder-tv.jpg'
+                            }}
                           />
-                        ) : (
-                          <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center text-white text-sm">
-                            {review.reviewer.username
-                              ?.charAt(0)
-                              .toUpperCase() || 'U'}
-                          </div>
-                        )}
-                        <span className="text-gray-300 text-sm">
-                          {review.reviewer.username || 'Anonymous'}
-                        </span>
-                      </div>
-
-                      {/* Movie Title and Year */}
-                      <div className="mb-1 text-start">
-                        <h3 className="text-xl font-bold text-white">
-                          {review.movieTitle}
-                        </h3>
-                        {review.year && (
-                          <span className="text-gray-400 text-sm">
-                            {review.year}
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Rating and Comments */}
-                      <div className="flex items-center gap-3 mb-1">
-                        {review.rating && (
-                          <div className="flex items-center gap-1">
-                            {renderStars(review.rating)}
-                          </div>
-                        )}
-                        <div className="flex items-center gap-1 text-gray-400">
-                          <MessageCircle className="w-4 h-4" />
-                          <span className="text-sm">{review.commentCount}</span>
                         </div>
                       </div>
 
-                      {/* Review Text */}
-                      <p className="text-gray-300 text-sm leading-relaxed mb-4">
-                        {review.reviewText}
-                      </p>
+                      {/* Review Content */}
+                      <div className="flex flex-col min-w-0">
+                        {/* Reviewer Info */}
+                        <div className="flex items-center gap-1 mb-2">
+                          {review.reviewer.avatar ? (
+                            <Image
+                              src={review.reviewer.avatar}
+                              alt={review.reviewer.username || 'User'}
+                              width={32}
+                              height={32}
+                              unoptimized={review.reviewer.avatar.includes(
+                                'dicebear'
+                              )}
+                              className="w-8 h-8 bg-light-green rounded-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center text-white text-sm">
+                              {review.reviewer.username
+                                ?.charAt(0)
+                                .toUpperCase() || 'U'}
+                            </div>
+                          )}
+                          <span className="text-gray-300 text-sm">
+                            {review.reviewer.username || 'Anonymous'}
+                          </span>
+                        </div>
 
-                      {/* Like Button */}
-                      <div className="flex items-center gap-2">
-                        <button className="flex items-center gap-2 text-gray-400 hover:text-red-400 transition-colors">
-                          <Heart className="w-4 h-4" />
-                          <span className="text-sm">Like review</span>
-                        </button>
-                        <span className="text-gray-400 text-sm">
-                          {review.likeCount} likes
-                        </span>
+                        {/* Movie Title and Year */}
+                        <div className="mb-1 text-start">
+                          <h3 className="text-xl font-bold text-white">
+                            {review.movieTitle}
+                          </h3>
+                          {review.year && (
+                            <span className="text-gray-400 text-sm">
+                              {review.year}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Rating and Comments */}
+                        <div className="flex items-center gap-3 mb-1">
+                          {review.rating && (
+                            <div className="flex items-center gap-1">
+                              {renderStars(review.rating)}
+                            </div>
+                          )}
+                          <div className="flex items-center gap-1 text-gray-400">
+                            <MessageCircle className="w-4 h-4" />
+                            <span className="text-sm">
+                              {review.commentCount}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Review Text */}
+                        <p className="text-gray-300 text-sm leading-relaxed mb-4">
+                          {review.reviewText}
+                        </p>
+
+                        {/* Like Button */}
+                        <div className="flex items-center gap-2">
+                          <button className="flex items-center gap-2 text-gray-400 hover:text-red-400 transition-colors">
+                            <Heart className="w-4 h-4" />
+                            <span className="text-sm">Like review</span>
+                          </button>
+                          <span className="text-gray-400 text-sm">
+                            {review.likeCount} likes
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div className='mt-6 w-[80%] mx-auto h-0.5 bg-dark-gray-2/30' />
-                </motion.div>
-              ))}
+                    <div className="mt-6 w-[80%] mx-auto h-0.5 bg-dark-gray-2/30" />
+                  </motion.div>
+                )
+              })}
             </AnimatePresence>
           </div>
         )}

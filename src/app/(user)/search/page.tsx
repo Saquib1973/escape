@@ -1,7 +1,12 @@
 import AnimatePageWrapper from '@/components/animate-page-wrapper'
 import React from 'react'
 import { searchUsers, type SearchUserResult } from './action'
-import { searchMovies, searchTVShows, type Movie, type TVShow } from './tmdb-actions'
+import {
+  searchMovies,
+  searchTVShows,
+  type Movie,
+  type TVShow,
+} from './tmdb-actions'
 import { UserSearchResults } from '@/components/search'
 import SearchResultsWrapper from '@/components/search/search-results-wrapper'
 
@@ -22,7 +27,7 @@ const SearchPage = async ({ searchParams }: SearchPageProps) => {
     const [users, movies, tvShows] = await Promise.all([
       searchUsers(query),
       searchMovies(query),
-      searchTVShows(query)
+      searchTVShows(query),
     ])
 
     userSearchResults = users
@@ -33,16 +38,9 @@ const SearchPage = async ({ searchParams }: SearchPageProps) => {
   return (
     <AnimatePageWrapper>
       <div className="py-8 max-md:px-2">
-        <h1 className="text-3xl text-gray-300 font-light mb-2">
+        <h1 className="text-3xl text-gray-300 font-light">
           Search Results
         </h1>
-        {query ? (
-          <p className="text-gray-400 text-sm">
-            You searched for: <span className="text-white">{query}</span>
-          </p>
-        ) : (
-          <p className="text-gray-400 text-sm pl-1">No search query provided</p>
-        )}
       </div>
 
       {query.trim() ? (
@@ -59,7 +57,9 @@ const SearchPage = async ({ searchParams }: SearchPageProps) => {
         </div>
       ) : (
         <div className="text-center py-12">
-          <p className="text-gray-400">Enter a search query to find movies, TV shows, and users</p>
+          <p className="text-gray-400">
+            Enter a search query to find movies, TV shows, and users
+          </p>
         </div>
       )}
     </AnimatePageWrapper>

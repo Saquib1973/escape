@@ -78,6 +78,7 @@ const UserDetailScreen: React.FC<Props> = ({
             src={image ?? ''}
             alt={username}
             width={64}
+            className='bg-light-green rounded-full'
             height={64}
             unoptimized
           />

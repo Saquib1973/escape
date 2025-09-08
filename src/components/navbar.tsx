@@ -1,6 +1,6 @@
 'use client'
 
-import { ChevronDown, LogOut, Search, User } from 'lucide-react'
+import { ChevronDown, LogOut, Search } from 'lucide-react'
 import { signOut, useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -69,7 +69,7 @@ const Navbar = () => {
     <div className="sticky max-md:px-2 max-md:pl-4 top-0 left-0 right-0 bg-dark-gray z-50 w-full ">
       <div className="w-full flex justify-center items-center">
         <div className="w-full max-w-5xl">
-          <div className="flex items-center justify-between gap-2 md:gap-4 h-13 md:h-16 min-w-0">
+          <div className="flex items-center justify-between gap-2 md:gap-4 h-13 md:h-14 min-w-0">
             <Link href={'/'} className="flex items-center gap-2">
               <div className="flex space-x-1">
                 <Image
@@ -198,7 +198,7 @@ const RenderAuthSection = () => {
   }
 
   if (session) {
-    console.log(session)
+    const userImage = session.user.image ?? ""
     const username = session.user?.name?.split(' ')[0]
     return (
       <div className="relative w-20 md:w-36 group dropdown-container">
@@ -208,16 +208,12 @@ const RenderAuthSection = () => {
         >
           <div className="w-7 h-7 bg-light-green rounded-full flex items-center justify-center">
             <Image
-              src={
-                session.user.image ??
-                'https://api.dicebear.com/9.x/lorelei/svg?seed=' +
-                  session.user.username
-              }
-              className='rounded-full'
+              src={userImage}
+              className="rounded-full"
               alt="Profile"
               width={28}
               height={28}
-              unoptimized
+              unoptimized={userImage.includes("dicebar")}
             />
           </div>
           <span className="text-gray-300 text-sm hidden md:block">
@@ -225,7 +221,6 @@ const RenderAuthSection = () => {
           </span>
           <ChevronDown className="w-4 h-4 text-gray-300" />
         </button>
-
         {/* Dropdown Menu */}
         <div
           className={`absolute right-0 z-[100] border border-dark-gray-2 top-1/2 translate-y-5 w-36 md:w-36 bg-dark-gray-2 transition-all duration-200 ${

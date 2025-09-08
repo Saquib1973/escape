@@ -171,7 +171,7 @@ const CinemaListComponent: React.FC<CinemaListComponentProps> = ({
                       <div className="flex items-center p-2 justify-between text-xs text-gray-500">
                         <span>{getYear(item)}</span>
                         <span className="flex items-center gap-1">
-                          <Star className="size-4 fill-light-green text-light-green" />
+                          <Star className="size-3 fill-light-green text-light-green" />
                           {item.vote_average.toFixed(1)}
                         </span>
                       </div>

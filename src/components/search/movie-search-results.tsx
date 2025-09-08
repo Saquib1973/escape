@@ -1,5 +1,4 @@
-"use client"
-import React, { useState } from 'react'
+import React from 'react'
 import Image from 'next/image'
 import Loader from '../loader'
 import Link from 'next/link'
@@ -20,8 +19,6 @@ interface MovieSearchResultsProps {
 }
 
 const MovieSearchResults = ({ movies, query, isLoading = false }: MovieSearchResultsProps) => {
-  const [showAll, setShowAll] = useState(false)
-  const displayedMovies = showAll ? movies : movies.slice(0, 3)
 
   const renderContent = () => {
     if (isLoading) {
@@ -41,48 +38,35 @@ const MovieSearchResults = ({ movies, query, isLoading = false }: MovieSearchRes
     }
 
     return (
-      <>
-        <div className="flex flex-col gap-1">
-          {displayedMovies.map((movie) => (
-            <Link href={`/movie/${movie.id}`} key={movie.id} className="flex gap-3 hover:bg-dark-gray-hover transition-colors cursor-pointer group">
-              <div className="relative w-20 h-32 flex-shrink-0">
-                <Image
-                  src={movie.poster_path
-                    ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
-                    : '/placeholder-movie.jpg'
-                  }
-                  alt={movie.title}
-                  fill
-                  className="object-cover"
-                />
+      <div className="flex flex-col gap-1">
+        {movies.map((movie) => (
+          <Link href={`/movie/${movie.id}`} key={movie.id} className="flex gap-3 hover:bg-dark-gray-hover transition-colors cursor-pointer group">
+            <div className="relative w-20 h-32 flex-shrink-0">
+              <Image
+                src={movie.poster_path
+                  ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+                  : '/placeholder-movie.jpg'
+                }
+                alt={movie.title}
+                fill
+                className="object-cover"
+              />
+            </div>
+            <div className="flex-1 min-w-0 p-2">
+              <h3 className="font-medium text-white mb-1 group-hover:text-gray-200 transition-colors line-clamp-1">
+                {movie.title}
+              </h3>
+              <p className="text-gray-400 text-sm mb-2 line-clamp-2 leading-relaxed">
+                {movie.overview}
+              </p>
+              <div className="flex items-center gap-4 text-xs text-gray-500">
+                <span>{movie.release_date?.split('-')[0] || 'N/A'}</span>
+                <span className="text-yellow-400">★ {movie.vote_average.toFixed(1)}</span>
               </div>
-              <div className="flex-1 min-w-0 p-2">
-                <h3 className="font-medium text-white mb-1 group-hover:text-gray-200 transition-colors line-clamp-1">
-                  {movie.title}
-                </h3>
-                <p className="text-gray-400 text-sm mb-2 line-clamp-2 leading-relaxed">
-                  {movie.overview}
-                </p>
-                <div className="flex items-center gap-4 text-xs text-gray-500">
-                  <span>{movie.release_date?.split('-')[0] || 'N/A'}</span>
-                  <span className="text-yellow-400">★ {movie.vote_average.toFixed(1)}</span>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-
-        {movies.length > 3 && (
-          <div className="mt-4">
-            <button
-              onClick={() => setShowAll(!showAll)}
-              className="text-sm text-gray-400 hover:text-white transition-colors px-4 py-2 flex justify-self-end cursor-pointer "
-            >
-              {showAll ? 'Show Less' : `Show ${movies.length - 3} More`}
-            </button>
-          </div>
-        )}
-      </>
+            </div>
+          </Link>
+        ))}
+      </div>
     )
   }
 

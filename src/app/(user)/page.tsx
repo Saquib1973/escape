@@ -11,10 +11,10 @@ const HomePage = async () => {
   return (
     <AnimatePageWrapper className="py-6">
       {session && (
-        <div className="text-center py-2 pb-10">
+        <div className="text-center py-2 pb-6">
           <h1 className="text-xl font-light text-gray-400">
-            Welcome back, {session?.user?.name}. Enjoy reviewing , rating and
-            watching...
+            Welcome back, <span className='text-light-green'>{session?.user?.name}</span>. Enjoy reviewing ,
+            rating and watching...
           </h1>
         </div>
       )}

@@ -5,7 +5,7 @@ import AnimatePageWrapper from '@/components/animate-page-wrapper'
 
 const UserLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <AnimatePageWrapper className=" page-gradient">
+    <AnimatePageWrapper className="page-gradient">
       <Navbar />
       <div className="flex justify-center w-full">
         <main className="w-full max-w-5xl py-4 min-h-[calc(100vh-104px)] md:min-h-[calc(100vh-124px)]">
