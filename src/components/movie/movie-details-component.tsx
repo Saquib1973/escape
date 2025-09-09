@@ -10,7 +10,9 @@ import { Bookmark, Bug, Menu, Plus } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import MovieRecommendation from './movie-recommendation'
-import AiRecommendationComponent from './../ai-recommendation-component';
+import AiRecommendationComponent from './../ai-recommendation-component'
+import ShareButton from '../buttons/share-button'
+import { useCurrentUrl } from '@/hooks/useCurrentUrl'
 
 interface MovieDetailsComponentProps {
   movie: MovieDetails
@@ -25,6 +27,7 @@ const MovieDetailsComponent: React.FC<MovieDetailsComponentProps> = ({
   const menuRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
   const { data: session, status } = useSession()
+  const currentUrl = useCurrentUrl()
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -169,6 +172,13 @@ const MovieDetailsComponent: React.FC<MovieDetailsComponentProps> = ({
                             <Bookmark className="size-4" />
                             Add to Watchlist
                           </motion.button>
+                          <motion.div
+                            initial={{ opacity: 0, x: -5 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.175, duration: 0.15 }}
+                          >
+                            <ShareButton url={currentUrl} />
+                          </motion.div>
                           <motion.button
                             initial={{ opacity: 0, x: -5 }}
                             animate={{ opacity: 1, x: 0 }}

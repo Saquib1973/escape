@@ -6,6 +6,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 const navbarItems = [
   {
@@ -170,24 +171,35 @@ const RenderAuthSection = () => {
   ]
   const { data: session, status } = useSession()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [isHovered, setIsHovered] = useState(false)
 
-  // Close dropdown when clicking outside
+  // Handle click outside behavior
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Element
+      const isMobile = window.innerWidth < 768
+
+      if (isMobile) {
+        // On mobile: close dropdown when clicking anywhere
+        setIsDropdownOpen(false)
+        return
+      }
+
+      // On desktop: close dropdown when clicking outside the container
       if (!target.closest('.dropdown-container')) {
         setIsDropdownOpen(false)
+        setIsHovered(false)
       }
     }
 
-    if (isDropdownOpen) {
+    if (isDropdownOpen || isHovered) {
       document.addEventListener('mousedown', handleClickOutside)
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
-  }, [isDropdownOpen])
+  }, [isDropdownOpen, isHovered])
 
   if (status === 'loading') {
     return (
@@ -203,10 +215,36 @@ const RenderAuthSection = () => {
     console.log("USER IMAGE",userImage)
     const username = session.user?.name?.split(' ')[0]
     return (
-      <div className="relative w-20 md:w-36 group dropdown-container">
+      <div
+        className="relative w-20 md:w-36 group dropdown-container"
+        onMouseEnter={() => {
+          // Keep dropdown open when hovering over the entire container
+          if (window.innerWidth >= 768) {
+            setIsHovered(true)
+          }
+        }}
+        onMouseLeave={() => {
+          // Close on hover leave for desktop
+          if (window.innerWidth >= 768) {
+            setIsHovered(false)
+          }
+        }}
+        role="menu"
+        aria-label="User profile dropdown"
+        tabIndex={-1}
+      >
         <button
-          className="flex w-full h-10 justify-around items-center md:space-x-2 px-2 md:px-4 group-hover:bg-dark-gray-2 bg-dark-gray-hover py-4 transition-colors"
-          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+          className={`flex w-full h-10 justify-around items-center md:space-x-2 px-2 md:px-4 py-4 transition-colors ${
+            isDropdownOpen || isHovered
+              ? 'bg-dark-gray-2'
+              : 'bg-dark-gray-hover group-hover:bg-dark-gray-2'
+          }`}
+          onClick={() => {
+            // Only toggle on mobile devices
+            if (window.innerWidth < 768) {
+              setIsDropdownOpen(!isDropdownOpen)
+            }
+          }}
         >
           <div className="w-7 h-7 bg-light-green rounded-full flex items-center justify-center">
             <Image
@@ -221,41 +259,90 @@ const RenderAuthSection = () => {
           <span className="text-gray-300 text-sm hidden md:block">
             {username || 'Profile'}
           </span>
-          <ChevronDown className="w-4 h-4 text-gray-300" />
+          <motion.div
+            animate={{ rotate: (isDropdownOpen || isHovered) ? 180 : 0 }}
+            transition={{ duration: 0.2, ease: "easeInOut" }}
+          >
+            <ChevronDown className="w-4 h-4 text-gray-300" />
+          </motion.div>
         </button>
         {/* Dropdown Menu */}
-        <div
-          className={`absolute right-0 z-[100] border border-dark-gray-2 top-1/2 translate-y-5 w-36 md:w-36 bg-dark-gray-2 transition-all duration-200 ${
-            isDropdownOpen
-              ? 'opacity-100 visible'
-              : 'opacity-0 invisible md:group-hover:opacity-100 md:group-hover:visible'
-          }`}
-        >
-          <div className="">
-            {dropdownItems.map((item, index) => {
-              return (
-                <Link
-                  key={item.name + index}
-                  href={item.link}
-                  className="block capitalize px-3 py-2 text-sm text-gray-300 hover:bg-dark-gray-hover hover:text-white transition-colors"
-                  onClick={() => setIsDropdownOpen(false)}
-                >
-                  {item.name}
-                </Link>
-              )
-            })}
-            <button
-              onClick={() => {
-                signOut({ callbackUrl: '/' })
-                setIsDropdownOpen(false)
+        <AnimatePresence>
+          {(isDropdownOpen || isHovered) && (
+            <motion.div
+              initial={{ opacity: 0, y: -10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.95 }}
+              transition={{
+                duration: 0.2,
+                ease: "easeOut",
+                type: "spring",
+                stiffness: 300,
+                damping: 30
               }}
-              className="w-full cursor-pointer text-left px-3 py-2 text-sm text-gray-300 hover:bg-dark-gray-hover hover:text-white transition-colors flex items-center space-x-2"
+              className="absolute right-0 z-[100] border border-dark-gray-2 top-1/2 translate-y-5 w-36 md:w-36 bg-dark-gray-2"
             >
-              <LogOut className="w-4 h-4" />
-              <span>Sign Out</span>
-            </button>
-          </div>
-        </div>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.1, duration: 0.15 }}
+              >
+                {dropdownItems.map((item, index) => {
+                  return (
+                    <motion.div
+                      key={item.name + index}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.05, duration: 0.15 }}
+                    >
+                      <Link
+                        href={item.link}
+                        className="block capitalize px-3 py-2 text-sm text-gray-300 hover:bg-dark-gray-hover hover:text-white transition-colors"
+                        onClick={() => {
+                          const isMobile = window.innerWidth < 768
+                          if (isMobile) {
+                            // On mobile: close dropdown when clicking any item
+                            setIsDropdownOpen(false)
+                          } else {
+                            // On desktop: close both hover and click states
+                            setIsDropdownOpen(false)
+                            setIsHovered(false)
+                          }
+                        }}
+                      >
+                        {item.name}
+                      </Link>
+                    </motion.div>
+                  )
+                })}
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: dropdownItems.length * 0.05, duration: 0.15 }}
+                >
+                  <button
+                    onClick={() => {
+                      signOut({ callbackUrl: '/' })
+                      const isMobile = window.innerWidth < 768
+                      if (isMobile) {
+                        // On mobile: close dropdown when clicking sign out
+                        setIsDropdownOpen(false)
+                      } else {
+                        // On desktop: close both hover and click states
+                        setIsDropdownOpen(false)
+                        setIsHovered(false)
+                      }
+                    }}
+                    className="w-full cursor-pointer text-left px-3 py-2 text-sm text-gray-300 hover:bg-dark-gray-hover hover:text-white transition-colors flex items-center space-x-2"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>Sign Out</span>
+                  </button>
+                </motion.div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     )
   }

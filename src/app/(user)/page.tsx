@@ -4,8 +4,6 @@ import InCinemaComponent from '@/components/home-page/in-cinema-component'
 import TrendingMovieComponent from '@/components/home-page/trending-movie-component'
 import TrendingWebSeriesComponent from '@/components/home-page/trending-web-series-component'
 import { getSession } from '@/lib/auth'
-import React from 'react'
-import AiRecommendationComponent from './../../components/ai-recommendation-component';
 
 const HomePage = async () => {
   const session = await getSession()
@@ -19,7 +17,6 @@ const HomePage = async () => {
           </h1>
         </div>
       )}
-      <AiRecommendationComponent />
       <TrendingMovieComponent />
       <TrendingWebSeriesComponent />
       <InCinemaComponent />

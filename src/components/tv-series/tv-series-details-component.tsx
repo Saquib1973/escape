@@ -10,6 +10,8 @@ import { Bookmark, Bug, Menu, Plus } from 'lucide-react'
 import SeriesRecommendation from './series-recommendation'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import ShareButton from '../buttons/share-button'
+import { useCurrentUrl } from '@/hooks/useCurrentUrl'
 
 interface TVSeriesDetailsComponentProps {
   series: TVSeriesDetails
@@ -24,6 +26,7 @@ const TVSeriesDetailsComponent: React.FC<TVSeriesDetailsComponentProps> = ({
   const menuRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
   const { data: session, status } = useSession()
+  const currentUrl = useCurrentUrl()
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -168,6 +171,13 @@ const TVSeriesDetailsComponent: React.FC<TVSeriesDetailsComponentProps> = ({
                             <Bookmark className="size-4" />
                             Add to Watchlist
                           </motion.button>
+                          <motion.div
+                            initial={{ opacity: 0, x: -5 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.175, duration: 0.15 }}
+                          >
+                            <ShareButton url={currentUrl} />
+                          </motion.div>
                           <motion.button
                             initial={{ opacity: 0, x: -5 }}
                             animate={{ opacity: 1, x: 0 }}

@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import MovieSearchResults from './movie-search-results'
 import TVSearchResults from './tv-search-results'
 import { type Movie, type TVShow } from '@/app/(user)/search/tmdb-actions'
@@ -9,15 +10,24 @@ interface SearchResultsWrapperProps {
   movies: Movie[]
   tvShows: TVShow[]
   query: string
+  activeTab: 'movies' | 'shows'
 }
 
 const SearchResultsWrapper = ({
   movies,
   tvShows,
   query,
+  activeTab,
 }: SearchResultsWrapperProps) => {
-  const [activeTab, setActiveTab] = React.useState<'movies' | 'tv'>('movies')
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const containerRef = useRef<HTMLDivElement | null>(null)
+
+  const handleTabChange = (tab: 'movies' | 'shows') => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('tab', tab)
+    router.push(`/search?${params.toString()}`)
+  }
   const movieBtnRef = useRef<HTMLButtonElement | null>(null)
   const tvBtnRef = useRef<HTMLButtonElement | null>(null)
   const [indicator, setIndicator] = useState<{ left: number; width: number }>({
@@ -57,7 +67,7 @@ const SearchResultsWrapper = ({
               type="button"
               name='movies'
               ref={movieBtnRef}
-              onClick={() => setActiveTab('movies')}
+              onClick={() => handleTabChange('movies')}
               className={'py-2 text-sm md:text-base transition-colors ' + `${activeTab==="movies" ? "text-white" : "text-gray-300"}`}
               aria-selected={activeTab === 'movies'}
               role="tab"
@@ -68,9 +78,9 @@ const SearchResultsWrapper = ({
               name='web-series'
               type="button"
               ref={tvBtnRef}
-              onClick={() => setActiveTab('tv')}
+              onClick={() => handleTabChange('shows')}
               className={'py-2 text-sm md:text-base transition-colors ' + `${activeTab!=="movies" ? "text-white" : "text-gray-300"}`}
-              aria-selected={activeTab === 'tv'}
+              aria-selected={activeTab === 'shows'}
               role="tab"
             >
               TV Shows

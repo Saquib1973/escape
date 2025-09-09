@@ -4,6 +4,7 @@ import { MoveRight, Star } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
+import { motion } from 'framer-motion'
 import { MediaItem } from '../types/media'
 import CinemaListLoadingSkeleton from './skeletons/cinema-list-loading-skeleton'
 
@@ -34,6 +35,34 @@ const CinemaListComponent: React.FC<CinemaListComponentProps> = ({
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2,
+      },
+    },
+  }
+
+  const itemVariants = {
+    hidden: {
+      opacity: 0,
+      x: 10,
+    },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: {
+        type: 'spring' as const,
+        stiffness: 100,
+        damping: 12,
+      },
+    },
+  }
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -41,8 +70,9 @@ const CinemaListComponent: React.FC<CinemaListComponentProps> = ({
           method: 'GET',
           headers: {
             accept: 'application/json',
-            Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiNWUyYjQxN2E1YTBlMmVjODMxMWI5MmI2MDFlNTc0NyIsIm5iZiI6MTc1NTIwOTI1Mi42MDYwMDAyLCJzdWIiOiI2ODllNWUyNGEyOTE4ZDdkZWM4ZGJmMWIiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.6j_ocxIEWOsbgjBG_eYv80kApJeZvlX2aEOCK2Roctk'
-          }
+            Authorization:
+              'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiNWUyYjQxN2E1YTBlMmVjODMxMWI5MmI2MDFlNTc0NyIsIm5iZiI6MTc1NTIwOTI1Mi42MDYwMDAyLCJzdWIiOiI2ODllNWUyNGEyOTE4ZDdkZWM4ZGJmMWIiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.6j_ocxIEWOsbgjBG_eYv80kApJeZvlX2aEOCK2Roctk',
+          },
         }
 
         const response = await fetch(apiUrl, options)
@@ -141,46 +171,52 @@ const CinemaListComponent: React.FC<CinemaListComponentProps> = ({
     return (
       <>
         <div className="w-full h-fit">
-          <div className={`${scrollContainerClass} flex gap-3 overflow-x-auto scrollbar-hide`}>
+          <motion.div
+            className={`${scrollContainerClass} flex gap-2 h-full overflow-x-auto scrollbar-hide`}
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
             {items.map((item) => (
-              <Link
-                href={linkPath(item.id)}
-                key={item.id}
-                className="flex-shrink-0 w-36"
-              >
-                <div className="bg-dark-gray-2 overflow-hidden h-full">
-                  <div className="flex flex-col w-full h-full">
-                    <div className="h-full flex items-center justify-center">
-                      {item.poster_path ? (
-                        <Image
-                          src={`https://image.tmdb.org/t/p/w500${item.poster_path}`}
-                          alt={getTitle(item)}
-                          width={160}
-                          height={240}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="text-center text-gray-400">
-                          <div className="w-16 h-40 mb-2 mx-auto bg-gray-700"></div>
-                          <p className="text-sm font-medium">No Image</p>
+              <motion.div key={item.id} variants={itemVariants}>
+                <Link
+                  href={linkPath(item.id)}
+                  className="flex-shrink-0 group w-36 block h-full"
+                >
+                  <div className="bg-dark-gray-2 overflow-hidden h-full">
+                    <div className="flex flex-col w-full h-full">
+                      <div className="h-full flex items-center justify-center overflow-hidden">
+                        {item.poster_path ? (
+                          <Image
+                            src={`https://image.tmdb.org/t/p/w500${item.poster_path}`}
+                            alt={getTitle(item)}
+                            width={160}
+                            height={240}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                          />
+                        ) : (
+                          <div className="text-center text-gray-400">
+                            <div className="w-16 h-40 mb-2 mx-auto bg-gray-700"></div>
+                            <p className="text-sm font-medium">No Image</p>
+                          </div>
+                        )}
+                      </div>
+
+                      {showRating && (
+                        <div className="flex items-center p-2 justify-between text-xs text-gray-500">
+                          <span>{getYear(item)}</span>
+                          <span className="flex items-center gap-1">
+                            <Star className="size-3 fill-light-green text-light-green" />
+                            {item.vote_average.toFixed(1)}
+                          </span>
                         </div>
                       )}
                     </div>
-
-                    {showRating && (
-                      <div className="flex items-center p-2 justify-between text-xs text-gray-500">
-                        <span>{getYear(item)}</span>
-                        <span className="flex items-center gap-1">
-                          <Star className="size-3 fill-light-green text-light-green" />
-                          {item.vote_average.toFixed(1)}
-                        </span>
-                      </div>
-                    )}
                   </div>
-                </div>
-              </Link>
+                </Link>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
 
         {showMoreLink && (

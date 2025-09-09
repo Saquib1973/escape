@@ -11,12 +11,13 @@ import { UserSearchResults } from '@/components/search'
 import SearchResultsWrapper from '@/components/search/search-results-wrapper'
 
 interface SearchPageProps {
-  searchParams: Promise<{ q?: string }>
+  searchParams: Promise<{ q?: string; tab?: string }>
 }
 
 const SearchPage = async ({ searchParams }: SearchPageProps) => {
   const params = await searchParams
   const query = params.q || ''
+  const activeTab = (params.tab === 'shows' || params.tab === 'movies') ? params.tab : 'movies'
 
   let userSearchResults: SearchUserResult[] = []
   let movieSearchResults: Movie[] = []
@@ -50,6 +51,7 @@ const SearchPage = async ({ searchParams }: SearchPageProps) => {
             movies={movieSearchResults}
             tvShows={tvSearchResults}
             query={query}
+            activeTab={activeTab}
           />
 
           {/* Right sidebar for user results */}
