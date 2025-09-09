@@ -8,7 +8,7 @@ const UserLayout = ({ children }: { children: React.ReactNode }) => {
     <AnimatePageWrapper className="page-gradient">
       <Navbar />
       <div className="flex justify-center w-full">
-        <main className="w-full max-w-5xl py-4 min-h-[calc(100vh-104px)] md:min-h-[calc(100vh-124px)]">
+        <main className="w-full max-w-5xl py-4 min-h-[calc(100vh-104px)] md:min-h-[calc(100vh-112px)]">
           {children}
         </main>
       </div>

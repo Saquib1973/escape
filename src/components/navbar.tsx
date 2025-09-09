@@ -1,6 +1,6 @@
 'use client'
 
-import { ChevronDown, LogOut, Search } from 'lucide-react'
+import { ChevronDown, LogOut, Search, X } from 'lucide-react'
 import { signOut, useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -173,33 +173,29 @@ const RenderAuthSection = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
 
-  // Handle click outside behavior
+  // Handle click outside behavior (only for mobile)
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Element
       const isMobile = window.innerWidth < 768
 
       if (isMobile) {
-        // On mobile: close dropdown when clicking anywhere
-        setIsDropdownOpen(false)
-        return
+        // On mobile: close dropdown when clicking outside the container
+        if (!target.closest('.dropdown-container')) {
+          setIsDropdownOpen(false)
+        }
       }
-
-      // On desktop: close dropdown when clicking outside the container
-      if (!target.closest('.dropdown-container')) {
-        setIsDropdownOpen(false)
-        setIsHovered(false)
-      }
+      // On desktop: no automatic closing on click outside
     }
 
-    if (isDropdownOpen || isHovered) {
+    if (isDropdownOpen) {
       document.addEventListener('mousedown', handleClickOutside)
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
-  }, [isDropdownOpen, isHovered])
+  }, [isDropdownOpen])
 
   if (status === 'loading') {
     return (
@@ -260,8 +256,8 @@ const RenderAuthSection = () => {
             {username || 'Profile'}
           </span>
           <motion.div
-            animate={{ rotate: (isDropdownOpen || isHovered) ? 180 : 0 }}
-            transition={{ duration: 0.2, ease: "easeInOut" }}
+            animate={{ rotate: isDropdownOpen || isHovered ? 180 : 0 }}
+            transition={{ duration: 0.2, ease: 'easeInOut' }}
           >
             <ChevronDown className="w-4 h-4 text-gray-300" />
           </motion.div>
@@ -275,18 +271,36 @@ const RenderAuthSection = () => {
               exit={{ opacity: 0, y: -10, scale: 0.95 }}
               transition={{
                 duration: 0.2,
-                ease: "easeOut",
-                type: "spring",
+                ease: 'easeOut',
+                type: 'spring',
                 stiffness: 300,
-                damping: 30
+                damping: 30,
               }}
-              className="absolute right-0 z-[100] border border-dark-gray-2 top-1/2 translate-y-5 w-36 md:w-36 bg-dark-gray-2"
+              className="fixed md:absolute right-0 z-[100] border border-dark-gray-2 top-0 md:top-full inset-0 md:inset-auto h-screen md:h-auto w-screen md:w-36 bg-dark-gray-2"
             >
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.1, duration: 0.15 }}
+                className="flex flex-col h-full md:h-auto pt-4 md:pt-0 px-0"
               >
+                {/* Close Button */}
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0, duration: 0.15 }}
+                  className="flex justify-end mb-4 md:hidden pr-4"
+                >
+                  <button
+                    onClick={() => {
+                      setIsDropdownOpen(false)
+                      setIsHovered(false)
+                    }}
+                    className="p-2 text-gray-300 hover:text-white hover:bg-dark-gray-hover transition-colors"
+                  >
+                    <X className="w-6 h-6" />
+                  </button>
+                </motion.div>
                 {dropdownItems.map((item, index) => {
                   return (
                     <motion.div
@@ -297,17 +311,11 @@ const RenderAuthSection = () => {
                     >
                       <Link
                         href={item.link}
-                        className="block capitalize px-3 py-2 text-sm text-gray-300 hover:bg-dark-gray-hover hover:text-white transition-colors"
+                        className="block capitalize px-4 py-4 md:py-2 text-lg md:text-sm text-gray-300 hover:bg-dark-gray-hover hover:text-white transition-colors border-b border-dark-gray-hover md:border-b-0 max-md:text-3xl"
                         onClick={() => {
-                          const isMobile = window.innerWidth < 768
-                          if (isMobile) {
-                            // On mobile: close dropdown when clicking any item
-                            setIsDropdownOpen(false)
-                          } else {
-                            // On desktop: close both hover and click states
-                            setIsDropdownOpen(false)
-                            setIsHovered(false)
-                          }
+                          // Close dropdown when clicking any menu item
+                          setIsDropdownOpen(false)
+                          setIsHovered(false)
                         }}
                       >
                         {item.name}
@@ -318,24 +326,21 @@ const RenderAuthSection = () => {
                 <motion.div
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: dropdownItems.length * 0.05, duration: 0.15 }}
+                  transition={{
+                    delay: dropdownItems.length * 0.05,
+                    duration: 0.15,
+                  }}
                 >
                   <button
                     onClick={() => {
                       signOut({ callbackUrl: '/' })
-                      const isMobile = window.innerWidth < 768
-                      if (isMobile) {
-                        // On mobile: close dropdown when clicking sign out
-                        setIsDropdownOpen(false)
-                      } else {
-                        // On desktop: close both hover and click states
-                        setIsDropdownOpen(false)
-                        setIsHovered(false)
-                      }
+                      // Close dropdown when clicking sign out
+                      setIsDropdownOpen(false)
+                      setIsHovered(false)
                     }}
-                    className="w-full cursor-pointer text-left px-3 py-2 text-sm text-gray-300 hover:bg-dark-gray-hover hover:text-white transition-colors flex items-center space-x-2"
+                    className="w-full cursor-pointer text-left px-4 py-4 md:py-2 text-lg md:text-sm text-gray-300 hover:bg-dark-gray-hover hover:text-white transition-colors flex items-center space-x-2 border-b border-dark-gray-hover md:border-b-0 max-md:text-3xl"
                   >
-                    <LogOut className="w-4 h-4" />
+                    <LogOut className="size-6 md:w-4 md:h-4" />
                     <span>Sign Out</span>
                   </button>
                 </motion.div>
