@@ -10,6 +10,7 @@ import { Bookmark, Bug, Menu, Plus } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import MovieRecommendation from './movie-recommendation'
+import AiRecommendationComponent from './../ai-recommendation-component';
 
 interface MovieDetailsComponentProps {
   movie: MovieDetails
@@ -332,6 +333,7 @@ const MovieDetailsComponent: React.FC<MovieDetailsComponentProps> = ({
           </div>
         </div>
       </div>
+      <AiRecommendationComponent title={movie.title} />
       <MovieRecommendation id={movie.id} />
 
       {/* Posts Section */}

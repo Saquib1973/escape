@@ -73,6 +73,7 @@ export const authOptions: AuthOptions = {
           email: user.email,
           role: user.role || undefined,
           username: user.username || undefined,
+          image: user.image || undefined,
         }
       },
     }),
@@ -88,12 +89,26 @@ export const authOptions: AuthOptions = {
         token.id = user.id
         token.role = user.role
         token.username = user.username
-      } else if (!token.username && token.id) {
-        const dbUser = await prisma.user.findUnique({
-          where: { id: token.id as string },
-          select: { username: true },
-        })
-        token.username = dbUser?.username
+        token.image = user.image ?? token.image ?? null
+      } else if (token.id) {
+        // Ensure image (and username) are present on token when missing
+        const needsImage = token.image == null
+        const needsUsername = !token.username
+        if (needsImage || needsUsername) {
+          const dbUser = await prisma.user.findUnique({
+            where: { id: token.id as string },
+            select: { username: true, image: true },
+          })
+          if (needsUsername) {
+            token.username = dbUser?.username
+          }
+          if (needsImage) {
+            const dicebear = token.username
+              ? `https://api.dicebear.com/9.x/lorelei/svg?seed=${token.username}`
+              : null
+            token.image = dbUser?.image ?? token.image ?? dicebear
+          }
+        }
       }
       return token
     },
@@ -102,6 +117,7 @@ export const authOptions: AuthOptions = {
         session.user.id = token.id as string
         session.user.role = token.role as string | undefined
         session.user.username = token.username as string | undefined
+        session.user.image = token.image ?? undefined
       }
       return session
     },

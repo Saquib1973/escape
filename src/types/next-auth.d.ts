@@ -12,6 +12,7 @@ declare module 'next-auth' {
   interface User {
     role?: string
     username?: string
+    image?: string | null
   }
 }
 
@@ -20,5 +21,6 @@ declare module 'next-auth/jwt' {
     id: string
     role?: string
     username?: string
+    image?: string | null
   }
 }

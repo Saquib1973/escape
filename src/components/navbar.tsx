@@ -198,7 +198,9 @@ const RenderAuthSection = () => {
   }
 
   if (session) {
+    console.log("SESSION",session)
     const userImage = session.user.image ?? ""
+    console.log("USER IMAGE",userImage)
     const username = session.user?.name?.split(' ')[0]
     return (
       <div className="relative w-20 md:w-36 group dropdown-container">
@@ -213,7 +215,7 @@ const RenderAuthSection = () => {
               alt="Profile"
               width={28}
               height={28}
-              unoptimized={userImage.includes("dicebar")}
+              unoptimized={userImage.includes('dicebear')}
             />
           </div>
           <span className="text-gray-300 text-sm hidden md:block">
