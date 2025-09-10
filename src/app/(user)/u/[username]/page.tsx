@@ -2,6 +2,8 @@ import React from 'react'
 import prisma from '@/lib/prisma'
 import { getSession } from '@/lib/auth'
 import UserDetailScreen from '@/components/user/user-detail-screen'
+import type { GenericPost } from '@/components/post-list'
+import { getMoviePosterInfo, getTVSeriesPosterInfo } from '@/lib/tmdb'
 
 const page = async ({ params }: { params: Promise<{ username: string }> }) => {
   const { username } = await params
@@ -24,7 +26,10 @@ const page = async ({ params }: { params: Promise<{ username: string }> }) => {
           rating: true,
           isSpoiler: true,
           createdAt: true,
-          contentId: true,
+          user: { select: { name: true, image: true } },
+          likes: { select: { id: true, userId: true } },
+          _count: { select: { comments: true } },
+          movie: { select: { id: true, type: true } },
         },
         orderBy: { createdAt: 'desc' },
         take: 20,
@@ -50,6 +55,37 @@ const page = async ({ params }: { params: Promise<{ username: string }> }) => {
     initialIsFollowing = Boolean(rel)
   }
 
+  // Enrich posts with posterUrl
+  const postsWithPosters: GenericPost[] = await Promise.all(
+    user.posts.map(async (post) => {
+      let posterUrl: string | null = null
+      try {
+        const posterInfo = post.movie.type === 'tv_series'
+          ? await getTVSeriesPosterInfo(post.movie.id)
+          : await getMoviePosterInfo(post.movie.id)
+        posterUrl = posterInfo?.posterUrl ?? null
+      } catch {}
+
+      const mapped: GenericPost = {
+        id: post.id,
+        title: post.title,
+        content: post.content,
+        rating: post.rating as GenericPost['rating'],
+        isSpoiler: post.isSpoiler,
+        createdAt: post.createdAt,
+        posterUrl,
+        user: {
+          name: post.user?.name ?? null,
+          image: post.user?.image ?? null,
+        },
+        likes: post.likes,
+        _count: { comments: post._count.comments },
+      }
+
+      return mapped
+    })
+  )
+
   return (
     <UserDetailScreen
       userId={user.id}
@@ -60,7 +96,7 @@ const page = async ({ params }: { params: Promise<{ username: string }> }) => {
       followersCount={user._count.followers}
       followingCount={user._count.following}
       initialIsFollowing={initialIsFollowing}
-      posts={user.posts}
+      posts={postsWithPosters}
     />
   )
 }

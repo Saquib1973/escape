@@ -79,7 +79,7 @@ const AiRecommendationComponent = ({
   }
 
   if (status !== 'loading' && status !== 'authenticated')
-    return <p className="text-red-400 text-3xl">Not authenticated</p>
+    return null
 
   return (
     <div className="my-4 text-gray-300 max-md:px-4">

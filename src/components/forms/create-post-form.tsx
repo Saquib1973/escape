@@ -1,9 +1,9 @@
 'use client'
 
-import { createPost } from '@/app/(user)/(cinema)/movie/actions'
+import { createPost, type RatingEnum } from '@/app/(user)/(cinema)/movie/actions'
 import { motion } from 'framer-motion'
-import { Star, X } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { X } from 'lucide-react'
+import { useState } from 'react'
 interface CreatePostFormProps {
   movieId: string
   movieTitle: string
@@ -19,34 +19,12 @@ export function CreatePostForm({
 }: Readonly<CreatePostFormProps>) {
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
-  const [rating, setRating] = useState(0)
+  const [rating, setRating] = useState<RatingEnum | null>(null)
   const [isSpoiler, setIsSpoiler] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const [displayRating, setDisplayRating] = useState(0)
-  const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null)
-
-  useEffect(() => {
-    // Set the display rating to the actual rating initially
-    setDisplayRating(rating)
-  }, [rating])
-
-  const handleStarHover = (starIndex: number) => {
-    if (hoverTimeout) {
-      clearTimeout(hoverTimeout)
-    }
-
-    setDisplayRating(starIndex + 1)
-  }
-
-  const handleStarLeave = () => {
-    const timeout = setTimeout(() => {
-      setDisplayRating(rating)
-    }, 500)
-
-    setHoverTimeout(timeout)
-  }
+  const ratingOptions: RatingEnum[] = ['TRASH','TIMEPASS','ONE_TIME_WATCH','MUST_WATCH','LEGENDARY']
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -71,22 +49,20 @@ export function CreatePostForm({
     }
   }
 
-  const renderStars = () => {
-    return Array.from({ length: 10 }, (_, i) => (
-      <button
-        key={i}
-        type="button"
-        onClick={() => setRating(i + 1)}
-        onMouseEnter={() => handleStarHover(i)}
-        onMouseLeave={handleStarLeave}
-        className={`w-6 h-6 transition-colors ${
-          i < displayRating ? 'text-yellow-400' : 'text-gray-400 hover:text-yellow-300'
-        }`}
-      >
-        <Star className={`w-full h-full ${i < displayRating ? 'fill-current' : ''}`} />
-      </button>
-    ))
-  }
+  const renderRatingSelect = () => (
+    <select
+      value={rating ?? ''}
+      onChange={(e) => setRating((e.target.value || null) as RatingEnum | null)}
+      className="w-full px-3 py-2 bg-dark-gray-hover text-white focus:outline-none focus:ring-2 focus:ring-light-green focus:border-transparent"
+    >
+      <option value="">No rating</option>
+      {ratingOptions.map((opt) => (
+        <option key={opt} value={opt}>
+          {opt.replaceAll('_',' ')}
+        </option>
+      ))}
+    </select>
+  )
 
   return (
     <motion.div
@@ -135,16 +111,11 @@ export function CreatePostForm({
 
             {/* Rating */}
             <div className="flex flex-col gap-1 py-2">
-              <div className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="rating" className="block text-sm font-medium text-gray-300 mb-2">
                 Your Rating
-              </div>
-              <div className="flex items-center gap-1">
-                {renderStars()}
-                {rating > 0 && (
-                  <span className="ml-2 text-sm text-gray-400">
-                    {rating}/10
-                  </span>
-                )}
+              </label>
+              <div id="rating">
+                {renderRatingSelect()}
               </div>
             </div>
 

@@ -2,8 +2,8 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import SimplerPostList from '@/components/simpler-post-list'
-import type { SimplerPost } from '@/types/post'
+import PostList from '@/components/post-list'
+import type { GenericPost } from '@/components/post-list'
 
 type Props = {
   userId: string
@@ -14,7 +14,7 @@ type Props = {
   followersCount: number
   followingCount: number
   initialIsFollowing: boolean
-  posts: SimplerPost[]
+  posts: GenericPost[]
 }
 
 const UserDetailScreen: React.FC<Props> = ({
@@ -70,7 +70,7 @@ const UserDetailScreen: React.FC<Props> = ({
     <div className="flex max-md:flex-col-reverse max-md:px-2 items-start gap-4 text-gray-300">
       <div className="w-full md:w-[70%]">
         <div className="text-2xl font-light mb-4">Reviews</div>
-        <SimplerPostList posts={posts} hrefFor={(post) => `/post/${post.id}`} />
+        <PostList posts={posts} />
       </div>
       <div className="w-full md:w-[30%] md:sticky top-20 self-start right-0 flex flex-col items-center gap-4">
         <div className="flex items-center w-full gap-4">
@@ -80,7 +80,7 @@ const UserDetailScreen: React.FC<Props> = ({
             width={64}
             className='bg-light-green rounded-full'
             height={64}
-            unoptimized
+            unoptimized={image?.includes("dicebear")}
           />
           <div className="flex flex-col gap-1">
             <div>

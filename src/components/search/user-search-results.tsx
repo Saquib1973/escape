@@ -39,7 +39,7 @@ const UserSearchResults = ({ users, query }: UserSearchResultsProps) => {
                   alt="user image"
                   width={48}
                   height={48}
-                  unoptimized
+                  unoptimized={user.image.includes("dicebear")}
                 />
                 <div>
                   <h1 className="font-medium">{user.name}</h1>

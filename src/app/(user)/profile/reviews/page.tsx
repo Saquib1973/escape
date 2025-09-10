@@ -1,20 +1,11 @@
 import AnimatePageWrapper from '@/components/animate-page-wrapper'
-import SimplerPostList from '@/components/simpler-post-list'
 import Link from 'next/link'
 import React from 'react'
 import { getUserReviews } from './actions'
-import type { SimplerPost } from '@/types/post'
+import PostList from '@/components/post-list'
 
 const ReviewsPage = async () => {
   const reviews = await getUserReviews()
-
-  const hrefFor = (post: SimplerPost) => {
-    // Determine the correct route based on movie type
-    const movieType = post.movieType || 'movie'
-    return movieType === 'tv_series'
-      ? `/web-series/${post.contentId}`
-      : `/movie/${post.contentId}`
-  }
 
   return (
     <AnimatePageWrapper className="text-gray-300 p-2">
@@ -29,12 +20,7 @@ const ReviewsPage = async () => {
       ) : (
         <div>
           <h2 className="text-xl font-semibold mb-4">Your Reviews</h2>
-          <SimplerPostList
-            cols={2}
-            posts={reviews}
-            emptyText="No reviews yet"
-            hrefFor={hrefFor}
-          />
+          <PostList posts={reviews} emptyText="No reviews yet" />
         </div>
       )}
     </AnimatePageWrapper>

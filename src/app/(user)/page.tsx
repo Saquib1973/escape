@@ -8,10 +8,10 @@ import { getSession } from '@/lib/auth'
 const HomePage = async () => {
   const session = await getSession()
   return (
-    <AnimatePageWrapper className="py-6">
+    <AnimatePageWrapper className="py-4">
       {session && (
-        <div className="text-center py-2 pb-6">
-          <h1 className="text-xl font-light text-gray-400">
+        <div className="text-center pb-4">
+          <h1 className="text-lg font-light text-gray-400">
             Welcome back, <span className='text-light-green'>{session?.user?.name}</span>. Enjoy reviewing ,
             rating and watching...
           </h1>

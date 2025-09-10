@@ -85,7 +85,7 @@ model Post {
   id          String   @id @default(uuid())
   title       String?
   content     String
-  rating      Int?     // User's rating for the content (1-10)
+  rating      Rating?
   isSpoiler   Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -192,4 +192,12 @@ model Follow {
   // Helpful indexes
   @@index([followerId])
   @@index([followingId])
+}
+
+enum Rating {
+  TRASH
+  TIMEPASS
+  ONE_TIME_WATCH
+  MUST_WATCH
+  LEGENDARY
 }

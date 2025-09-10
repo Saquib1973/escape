@@ -281,10 +281,17 @@ export async function getAllTVSeriesPosts(seriesId: string) {
 }
 
 // Interface for creating a post
+export type RatingEnum =
+  | 'TRASH'
+  | 'TIMEPASS'
+  | 'ONE_TIME_WATCH'
+  | 'MUST_WATCH'
+  | 'LEGENDARY'
+
 export interface CreatePostData {
   title?: string | null
   content: string
-  rating?: number | null
+  rating?: RatingEnum | null
   isSpoiler: boolean
   contentId: string
 }
@@ -307,9 +314,10 @@ export async function createPost(data: CreatePostData) {
       throw new Error('Content ID is required')
     }
 
-    // Validate rating if provided
-    if (data.rating && (data.rating < 1 || data.rating > 10)) {
-      throw new Error('Rating must be between 1 and 10')
+    // Validate enum rating if provided
+    const validRatings: RatingEnum[] = ['TRASH','TIMEPASS','ONE_TIME_WATCH','MUST_WATCH','LEGENDARY']
+    if (data.rating && !validRatings.includes(data.rating)) {
+      throw new Error('Invalid rating value')
     }
 
     // Ensure the TV series exists in our database

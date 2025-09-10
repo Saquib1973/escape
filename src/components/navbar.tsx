@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import Loader from './loader'
 
 const navbarItems = [
   {
@@ -97,7 +98,7 @@ const Navbar = () => {
                     <Link
                       key={index + item.name}
                       href={item.link}
-                      className="text-gray-300 capitalize hover:text-white transition-colors text-sm md:text-base"
+                      className={`text-gray-300 capitalize hover:text-white transition-colors text-sm md:text-base ${isSearchOpen ? "hidden":""}`}
                     >
                       {item.name}
                     </Link>
@@ -128,7 +129,7 @@ const Navbar = () => {
               </div>
 
               <button
-                className={`flex gap-1 justify-center items-center p-2 transition-all duration-300 ${
+                className={`flex gap-1 justify-center h-full items-center p-2 transition-all duration-300 ${
                   isSearchOpen ? 'bg-light-green text-white' : 'text-gray-300'
                 }`}
                 onClick={
@@ -173,19 +174,17 @@ const RenderAuthSection = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
 
-  // Handle click outside behavior (only for mobile)
+  // Handle click outside behavior for mobile
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Element
       const isMobile = window.innerWidth < 768
 
       if (isMobile) {
-        // On mobile: close dropdown when clicking outside the container
         if (!target.closest('.dropdown-container')) {
           setIsDropdownOpen(false)
         }
       }
-      // On desktop: no automatic closing on click outside
     }
 
     if (isDropdownOpen) {
@@ -199,16 +198,15 @@ const RenderAuthSection = () => {
 
   if (status === 'loading') {
     return (
-      <div className="cursor-not-allowed w-20 md:w-36 h-10 bg-dark-gray-hover flex items-center justify-center text-gray-600 animate-pulse">
-        Loading
+      <div className="cursor-not-allowed w-20 md:w-36 h-10 bg-dark-gray-hover flex items-center justify-center text-gray-600 gap-1 animate-pulse">
+        <span className='max-md:hidden'>Loading</span>
+        <Loader size="sm" />
       </div>
     )
   }
 
   if (session) {
-    console.log("SESSION",session)
     const userImage = session.user.image ?? ""
-    console.log("USER IMAGE",userImage)
     const username = session.user?.name?.split(' ')[0]
     return (
       <div
@@ -263,14 +261,13 @@ const RenderAuthSection = () => {
           </motion.div>
         </button>
         {/* Dropdown Menu */}
-        <AnimatePresence>
+        <AnimatePresence mode='wait'>
           {(isDropdownOpen || isHovered) && (
             <motion.div
-              initial={{ opacity: 0, y: -10, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -10, scale: 0.95 }}
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0}}
               transition={{
-                duration: 0.2,
                 ease: 'easeOut',
                 type: 'spring',
                 stiffness: 300,
@@ -281,14 +278,14 @@ const RenderAuthSection = () => {
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.1, duration: 0.15 }}
+                transition={{ delay: 0.1 }}
                 className="flex flex-col h-full md:h-auto pt-4 md:pt-0 px-0"
               >
                 {/* Close Button */}
                 <motion.div
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0, duration: 0.15 }}
+                  transition={{ delay: 0 }}
                   className="flex justify-end mb-4 md:hidden pr-4"
                 >
                   <button
@@ -296,7 +293,7 @@ const RenderAuthSection = () => {
                       setIsDropdownOpen(false)
                       setIsHovered(false)
                     }}
-                    className="p-2 text-gray-300 hover:text-white hover:bg-dark-gray-hover transition-colors"
+                    className="p-2 mr-2 text-gray-300 hover:text-white hover:bg-dark-gray-hover transition-colors"
                   >
                     <X className="w-6 h-6" />
                   </button>
@@ -307,11 +304,15 @@ const RenderAuthSection = () => {
                       key={item.name + index}
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.05, duration: 0.15 }}
+                      transition={{ delay: index * 0.05 }}
+                      exit={{
+                        opacity: 0,
+                        x:-10
+                      }}
                     >
                       <Link
                         href={item.link}
-                        className="block capitalize px-4 py-4 md:py-2 text-lg md:text-sm text-gray-300 hover:bg-dark-gray-hover hover:text-white transition-colors border-b border-dark-gray-hover md:border-b-0 max-md:text-3xl"
+                        className="block capitalize px-4 py-4 md:py-2 text-lg md:text-sm text-gray-300 hover:bg-dark-gray-hover hover:text-white transition-colors border-b border-dark-gray-hover md:border-b-0 max-md:text-2xl"
                         onClick={() => {
                           // Close dropdown when clicking any menu item
                           setIsDropdownOpen(false)
@@ -328,7 +329,7 @@ const RenderAuthSection = () => {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{
                     delay: dropdownItems.length * 0.05,
-                    duration: 0.15,
+
                   }}
                 >
                   <button
@@ -338,9 +339,9 @@ const RenderAuthSection = () => {
                       setIsDropdownOpen(false)
                       setIsHovered(false)
                     }}
-                    className="w-full cursor-pointer text-left px-4 py-4 md:py-2 text-lg md:text-sm text-gray-300 hover:bg-dark-gray-hover hover:text-white transition-colors flex items-center space-x-2 border-b border-dark-gray-hover md:border-b-0 max-md:text-3xl"
+                    className="w-full cursor-pointer text-left px-4 py-4 md:py-2 text-lg md:text-sm text-gray-300 hover:bg-dark-gray-hover hover:text-white transition-colors flex items-center space-x-2 border-b border-dark-gray-hover md:border-b-0 max-md:text-2xl"
                   >
-                    <LogOut className="size-6 md:w-4 md:h-4" />
+                    <LogOut className="size-5 md:w-4 md:h-4" />
                     <span>Sign Out</span>
                   </button>
                 </motion.div>

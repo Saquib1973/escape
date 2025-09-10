@@ -79,7 +79,7 @@ const HeaderComponent = ({ userData }: { userData: UserData | null }) => {
               alt={`user profile picture`}
               width={64}
               height={64}
-              unoptimized={!userData.image.includes("dicebar")}
+              unoptimized={userData.image.includes("dicebear")}
               className="w-full bg-light-green h-full object-cover"
             />
           </div>
