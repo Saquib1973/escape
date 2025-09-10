@@ -1,6 +1,6 @@
 'use client'
 
-import { createPost, type RatingEnum } from '@/app/(user)/(cinema)/movie/actions'
+import { createPost, type RatingEnum } from '@/app/(user)/post/actions'
 import { motion } from 'framer-motion'
 import { X } from 'lucide-react'
 import { useState } from 'react'

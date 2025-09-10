@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { getAllMoviePosts } from '@/app/(user)/(cinema)/movie/actions'
+import { getAllContentPosts as getAllMoviePosts } from '@/app/(user)/post/actions'
 import PostList from '@/components/post-list'
 
 type RatingEnum = 'TRASH' | 'TIMEPASS' | 'ONE_TIME_WATCH' | 'MUST_WATCH' | 'LEGENDARY'
