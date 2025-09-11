@@ -1,7 +1,4 @@
 'use client'
-
-import Loader from '@/components/loader'
-import { useScrollPosition } from '@/hooks/useScrollPosition'
 import { TrendingItem } from '@/types/trending'
 import { Calendar, Star } from 'lucide-react'
 import Image from 'next/image'
@@ -23,22 +20,11 @@ const TrendingListComponent = () => {
     fetchTrendingItems(1, true)
   }, [])
 
-  const { scrollPosition, windowHeight } = useScrollPosition();
-
   const handleLoadMore = useCallback(() => {
     if (!loadingMore && hasMore) {
       fetchTrendingItems(currentPage + 1, false)
     }
   }, [loadingMore, hasMore, currentPage])
-
-  useEffect(() => {
-    const documentHeight = document.documentElement.scrollHeight
-    const threshold = 200 // pixels from bottom
-
-    if (scrollPosition + windowHeight >= documentHeight - threshold) {
-      handleLoadMore()
-    }
-  }, [scrollPosition, windowHeight, handleLoadMore])
 
 
   // function to fetch trending data
@@ -51,16 +37,8 @@ const TrendingListComponent = () => {
         setLoadingMore(true)
       }
 
-      const url = `https://api.themoviedb.org/3/trending/all/day?language=en-US&page=${page}`
-      const options = {
-        method: 'GET',
-        headers: {
-          accept: 'application/json',
-          Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiNWUyYjQxN2E1YTBlMmVjODMxMWI5MmI2MDFlNTc0NyIsIm5iZiI6MTc1NTIwOTI1Mi42MDYwMDAyLCJzdWIiOiI2ODllNWUyNGEyOTE4ZDdkZWM4ZGJmMWIiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.6j_ocxIEWOsbgjBG_eYv80kApJeZvlX2aEOCK2Roctk'
-        }
-      }
-
-      const response = await fetch(url, options)
+      const url = `/api/trending-all?page=${page}&time_window=day`
+      const response = await fetch(url)
       if (!response.ok) {
         throw new Error('Failed to fetch trending items')
       }
@@ -247,48 +225,21 @@ const TrendingListComponent = () => {
           </div>
 
           {/* Load More Button */}
-          {loadingMore && (
-            <div className="mt-8 text-center">
-              <Loader text="Loading..." />
-            </div>
-          )}
           {hasMore && (
-            <LoadMoreTrigger
-              onLoadMore={handleLoadMore}
-              hasMore={hasMore}
-              loadingMore={loadingMore}
-            />
+            <div className="mt-8 flex items-center justify-center">
+              <button
+                onClick={handleLoadMore}
+                disabled={loadingMore}
+                className={`px-4 py-2 rounded border border-dark-gray-2 bg-dark-gray-hover text-gray-200 hover:bg-dark-gray transition disabled:opacity-60 disabled:cursor-not-allowed`}
+              >
+                {loadingMore ? 'Loading…' : 'Load more'}
+              </button>
+            </div>
           )}
         </>
       )}
     </div>
   )
-}
-
-const LoadMoreTrigger = ({ onLoadMore, hasMore, loadingMore }: {
-  onLoadMore: () => void
-  hasMore: boolean
-  loadingMore: boolean
-}) => {
-  const [ref, setRef] = useState<HTMLDivElement | null>(null)
-
-  useEffect(() => {
-    if (!ref || !hasMore || loadingMore) return
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          onLoadMore()
-        }
-      },
-      { threshold: 0.1 }
-    )
-
-    observer.observe(ref)
-    return () => observer.disconnect()
-  }, [ref, hasMore, loadingMore, onLoadMore])
-
-  return <div ref={setRef} className="h-10" />
 }
 
 export default TrendingListComponent

@@ -21,23 +21,13 @@ const RightSidebar = () => {
       setLoading(true)
 
       // Fetch trending movies
-      const moviesUrl = 'https://api.themoviedb.org/3/trending/movie/day?language=en-US'
-      const moviesResponse = await fetch(moviesUrl, {
-        method: 'GET',
-        headers: {
-          accept: 'application/json',
-          Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiNWUyYjQxN2E1YTBlMmVjODMxMWI5MmI2MDFlNTc0NyIsIm5iZiI6MTc1NTIwOTI1Mi42MDYwMDAyLCJzdWIiOiI2ODllNWUyNGEyOTE4ZDdkZWM4ZGJmMWIiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.6j_ocxIEWOsbgjBG_eYv80kApJeZvlX2aEOCK2Roctk'
-        }
+      const moviesResponse = await fetch('/api/trending-movie?time_window=day', {
+        method: 'GET'
       })
 
       // Fetch trending TV shows
-      const tvUrl = 'https://api.themoviedb.org/3/trending/tv/day?language=en-US'
-      const tvResponse = await fetch(tvUrl, {
-        method: 'GET',
-        headers: {
-          accept: 'application/json',
-          Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiNWUyYjQxN2E1YTBlMmVjODMxMWI5MmI2MDFlNTc0NyIsIm5iZiI6MTc1NTIwOTI1Mi42MDYwMDAyLCJzdWIiOiI2ODllNWUyNGEyOTE4ZDdkZWM4ZGJmMWIiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.6j_ocxIEWOsbgjBG_eYv80kApJeZvlX2aEOCK2Roctk'
-        }
+      const tvResponse = await fetch('/api/trending-series?time_window=day', {
+        method: 'GET'
       })
 
       if (moviesResponse.ok && tvResponse.ok) {
