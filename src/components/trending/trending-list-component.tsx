@@ -83,7 +83,7 @@ const TrendingListComponent = () => {
     <div className="flex flex-col gap-2">
       {Array.from({ length: 10 }).map((_, index) => (
         <div
-          key={index}
+          key={index+"skeleton"}
           className="bg-dark-gray-hover overflow-hidden border border-dark-gray-2 animate-pulse"
         >
           <div className="flex">

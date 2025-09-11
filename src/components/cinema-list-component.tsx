@@ -3,14 +3,15 @@
 import { MoveRight, Star } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { MediaItem } from '../types/media'
 import CinemaListLoadingSkeleton from './skeletons/cinema-list-loading-skeleton'
 
 interface CinemaListComponentProps {
   title: string
-  apiUrl: string
+  items?: MediaItem[]
+  apiUrl?: string
   linkPath: (id: number) => string
   scrollContainerClass: string
   showMoreLink?: string
@@ -22,6 +23,7 @@ interface CinemaListComponentProps {
 
 const CinemaListComponent: React.FC<CinemaListComponentProps> = ({
   title,
+  items: itemsProp,
   apiUrl,
   linkPath,
   scrollContainerClass,
@@ -31,9 +33,42 @@ const CinemaListComponent: React.FC<CinemaListComponentProps> = ({
   showRating = true,
   showEmptyState = false,
 }) => {
-  const [items, setItems] = useState<MediaItem[]>([])
-  const [loading, setLoading] = useState(true)
+  const [fetchedItems, setFetchedItems] = useState<MediaItem[]>([])
+  const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
+
+  const items: MediaItem[] = useMemo(() => {
+    return (itemsProp && itemsProp.length > 0) ? itemsProp : fetchedItems
+  }, [itemsProp, fetchedItems])
+
+  useEffect(() => {
+    let isCancelled = false
+    const fetchData = async () => {
+      if (!apiUrl) return
+      try {
+        setLoading(true)
+        setError(null)
+        const res = await fetch(apiUrl, { method: 'GET' })
+        if (!res.ok) {
+          const body = await res.text()
+          throw new Error(body || 'Failed to fetch list')
+        }
+        const data = await res.json()
+        if (!isCancelled) {
+          setFetchedItems(data.results || [])
+        }
+      } catch (error) {
+        if (!isCancelled) {
+          console.error(error)
+          setError('Failed to load data')
+        }
+      } finally {
+        if (!isCancelled) setLoading(false)
+      }
+    }
+    fetchData()
+    return () => { isCancelled = true }
+  }, [apiUrl])
 
   // Animation variants
   const containerVariants = {
@@ -62,36 +97,6 @@ const CinemaListComponent: React.FC<CinemaListComponentProps> = ({
       },
     },
   }
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const options = {
-          method: 'GET',
-          headers: {
-            accept: 'application/json',
-            Authorization:
-              'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiNWUyYjQxN2E1YTBlMmVjODMxMWI5MmI2MDFlNTc0NyIsIm5iZiI6MTc1NTIwOTI1Mi42MDYwMDAyLCJzdWIiOiI2ODllNWUyNGEyOTE4ZDdkZWM4ZGJmMWIiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.6j_ocxIEWOsbgjBG_eYv80kApJeZvlX2aEOCK2Roctk',
-          },
-        }
-
-        const response = await fetch(apiUrl, options)
-        if (!response.ok) {
-          throw new Error('Failed to fetch data')
-        }
-
-        const data = await response.json()
-        setItems(data.results || [])
-      } catch (err) {
-        console.error('Error fetching data:', err)
-        setError('Failed to load data')
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchData()
-  }, [apiUrl])
 
   const handleScroll = (direction: 'left' | 'right') => {
     const container = document.querySelector(`.${scrollContainerClass}`)
@@ -151,7 +156,6 @@ const CinemaListComponent: React.FC<CinemaListComponentProps> = ({
     if (loading) {
       return <CinemaListLoadingSkeleton itemCount={8} />
     }
-
     if (error) {
       return (
         <div className="w-full h-72 flex items-center justify-center">
@@ -159,7 +163,6 @@ const CinemaListComponent: React.FC<CinemaListComponentProps> = ({
         </div>
       )
     }
-
     if (showEmptyState && items.length === 0) {
       return (
         <div className="w-full h-72 flex items-center justify-center">

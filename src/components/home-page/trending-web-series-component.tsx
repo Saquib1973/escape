@@ -16,12 +16,13 @@ const TrendingWebSeriesComponent = () => {
   return (
     <CinemaListComponent
       title="Trending Web Series"
-      apiUrl="https://api.themoviedb.org/3/trending/tv/day?language=en-US"
+      apiUrl="/api/trending-series"
       linkPath={(id) => `/web-series/${id}`}
       scrollContainerClass="trending-tv-scroll-container"
       showMoreLink="/trending"
       getYear={getYear}
       getTitle={getTitle}
+      showEmptyState={true}
     />
   )
 }

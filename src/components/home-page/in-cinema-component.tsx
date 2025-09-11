@@ -16,12 +16,13 @@ const InCinemaComponent = () => {
   return (
     <CinemaListComponent
       title="Now in Cinema"
-      apiUrl="https://api.themoviedb.org/3/movie/now_playing?language=en-US&page=1&region=IN"
+      apiUrl="/api/now-playing"
       linkPath={(id) => `/movie/${id}`}
       scrollContainerClass="cinema-scroll-container"
       showMoreLink="/cinema"
       getYear={getYear}
       getTitle={getTitle}
+      showEmptyState={true}
     />
   )
 }

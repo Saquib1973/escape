@@ -16,12 +16,13 @@ const TrendingMovieComponent = () => {
   return (
     <CinemaListComponent
       title="Trending Movies"
-      apiUrl="https://api.themoviedb.org/3/movie/popular?language=en-US&page=1&region=IN"
+      apiUrl="/api/popular-movie"
       linkPath={(id) => `/movie/${id}`}
       scrollContainerClass="trending-scroll-container"
       showMoreLink="/trending"
       getYear={getYear}
       getTitle={getTitle}
+      showEmptyState={true}
     />
   )
 }
