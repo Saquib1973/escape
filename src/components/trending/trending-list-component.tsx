@@ -1,10 +1,10 @@
 'use client'
 import { TrendingItem } from '@/types/trending'
-import { Calendar, Star } from 'lucide-react'
+import { Calendar, ChevronDown, Star } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
-
+import Loader from '../loader'
 
 const TrendingListComponent = () => {
   const [trendingItems, setTrendingItems] = useState<TrendingItem[]>([])
@@ -26,9 +26,11 @@ const TrendingListComponent = () => {
     }
   }, [loadingMore, hasMore, currentPage])
 
-
   // function to fetch trending data
-  const fetchTrendingItems = async (page: number, isInitial: boolean = false) => {
+  const fetchTrendingItems = async (
+    page: number,
+    isInitial: boolean = false
+  ) => {
     try {
       if (isInitial) {
         setLoading(true)
@@ -52,7 +54,7 @@ const TrendingListComponent = () => {
           setShowSkeleton(false)
         }, 500)
       } else {
-        setTrendingItems(prev => [...prev, ...(data.results || [])])
+        setTrendingItems((prev) => [...prev, ...(data.results || [])])
       }
 
       setHasMore(page < data.total_pages)
@@ -83,7 +85,7 @@ const TrendingListComponent = () => {
     <div className="flex flex-col gap-2">
       {Array.from({ length: 10 }).map((_, index) => (
         <div
-          key={index+"skeleton"}
+          key={index + 'skeleton'}
           className="bg-dark-gray-hover overflow-hidden border border-dark-gray-2 animate-pulse"
         >
           <div className="flex">
@@ -144,84 +146,84 @@ const TrendingListComponent = () => {
           {/* Trending List */}
           <div className="flex flex-col gap-4 md:gap-2">
             {trendingItems.map((item, index) => (
-          <Link
-            href={
-              item.media_type === 'movie'
-                ? `/movie/${item.id}`
-                : `/web-series/${item.id}`
-            }
-            key={item.id + index}
-            className="group bg-dark-gray-2 overflow-hidden border border-dark-gray-2 hover:bg-dark-gray-hover transition-all duration-300 cursor-pointer"
-          >
-            <div className="flex max-sm:flex-col">
-              {/* Poster Image */}
-              <div className="relative w-40 max-sm:w-full aspect-square md:h-52 flex-shrink-0">
-                {item.poster_path ? (
-                  <Image
-                    src={`https://image.tmdb.org/t/p/w500${item.poster_path}`}
-                    alt={getTitle(item)}
-                    fill
-                    className="object-center max-sm:object-scale-down"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-dark-gray flex items-center justify-center">
-                    <div className="text-center text-gray-400">
-                      <div className="w-16 h-24 mb-2 mx-auto bg-dark-gray-2 rounded"></div>
-                      <p className="text-sm">No Image</p>
+              <Link
+                href={
+                  item.media_type === 'movie'
+                    ? `/movie/${item.id}`
+                    : `/web-series/${item.id}`
+                }
+                key={item.id + index}
+                className="group bg-dark-gray-2 overflow-hidden border border-dark-gray-2 hover:bg-dark-gray-hover transition-all duration-300 cursor-pointer"
+              >
+                <div className="flex max-sm:flex-col">
+                  {/* Poster Image */}
+                  <div className="relative w-40 max-sm:w-full aspect-square md:h-52 flex-shrink-0">
+                    {item.poster_path ? (
+                      <Image
+                        src={`https://image.tmdb.org/t/p/w500${item.poster_path}`}
+                        alt={getTitle(item)}
+                        fill
+                        className="object-center max-sm:object-scale-down"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-dark-gray flex items-center justify-center">
+                        <div className="text-center text-gray-400">
+                          <div className="w-16 h-24 mb-2 mx-auto bg-dark-gray-2 rounded"></div>
+                          <p className="text-sm">No Image</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Media Type Badge */}
+                    <div className="absolute top-2 left-2">
+                      <span
+                        className={`px-2 py-1 text-xs font-medium ${
+                          item.media_type === 'movie'
+                            ? 'bg-light-green text-white'
+                            : 'bg-blue-600 text-white'
+                        }`}
+                      >
+                        {item.media_type === 'movie' ? 'Movie' : 'TV'}
+                      </span>
                     </div>
                   </div>
-                )}
 
-                {/* Media Type Badge */}
-                <div className="absolute top-2 left-2">
-                  <span
-                    className={`px-2 py-1 text-xs font-medium ${
-                      item.media_type === 'movie'
-                        ? 'bg-light-green text-white'
-                        : 'bg-blue-600 text-white'
-                    }`}
-                  >
-                    {item.media_type === 'movie' ? 'Movie' : 'TV'}
-                  </span>
-                </div>
-              </div>
+                  {/* Content Info */}
+                  <div className="flex-1 p-6">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center gap-4">
+                        <span className="text-4xl font-extrabold text-dark-gray-hover group-hover:text-light-green transition-colors">
+                          #{index + 1}
+                        </span>
+                        <h3 className="text-xl text-gray-300 font-medium group-hover:text-white transition-colors">
+                          {getTitle(item)}
+                        </h3>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Star className="w-5 h-5 fill-light-green text-light-green" />
+                        <span className="text-gray-300 font-medium">
+                          {item.vote_average.toFixed(1)}
+                        </span>
+                      </div>
+                    </div>
 
-              {/* Content Info */}
-              <div className="flex-1 p-6">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-4">
-                    <span className="text-4xl font-extrabold text-dark-gray-hover group-hover:text-light-green transition-colors">
-                      #{index + 1}
-                    </span>
-                    <h3 className="text-xl text-gray-300 font-medium group-hover:text-white transition-colors">
-                      {getTitle(item)}
-                    </h3>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Star className="w-5 h-5 fill-light-green text-light-green" />
-                    <span className="text-gray-300 font-medium">
-                      {item.vote_average.toFixed(1)}
-                    </span>
-                  </div>
-                </div>
+                    <p className="text-gray-400 text-sm mb-4 line-clamp-3 leading-relaxed">
+                      {item.overview || 'No description available'}
+                    </p>
 
-                <p className="text-gray-400 text-sm mb-4 line-clamp-3 leading-relaxed">
-                  {item.overview || 'No description available'}
-                </p>
-
-                <div className="flex items-center gap-6 text-sm text-gray-500">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4" />
-                    <span>{getReleaseYear(item)}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="capitalize">{item.media_type}</span>
+                    <div className="flex items-center gap-6 text-sm text-gray-500">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4" />
+                        <span>{getReleaseYear(item)}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="capitalize">{item.media_type}</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
-          </Link>
-                    ))}
+              </Link>
+            ))}
           </div>
 
           {/* Load More Button */}
@@ -230,9 +232,16 @@ const TrendingListComponent = () => {
               <button
                 onClick={handleLoadMore}
                 disabled={loadingMore}
-                className={`px-4 py-2 rounded border border-dark-gray-2 bg-dark-gray-hover text-gray-200 hover:bg-dark-gray transition disabled:opacity-60 disabled:cursor-not-allowed`}
+                className={`px-4 py-2 text-gray-200 transition disabled:opacity-60 disabled:cursor-not-allowed`}
               >
-                {loadingMore ? 'Loading…' : 'Load more'}
+                {loadingMore ? (
+                  <Loader />
+                ) : (
+                  <div className="flex gap-1 items-center cursor-pointer">
+                    Load more
+                    <ChevronDown className="size-5" />
+                  </div>
+                )}
               </button>
             </div>
           )}

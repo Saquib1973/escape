@@ -3,7 +3,7 @@
 import { MoveRight, Star } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { MediaItem } from '../types/media'
 import CinemaListLoadingSkeleton from './skeletons/cinema-list-loading-skeleton'
@@ -41,34 +41,29 @@ const CinemaListComponent: React.FC<CinemaListComponentProps> = ({
     return (itemsProp && itemsProp.length > 0) ? itemsProp : fetchedItems
   }, [itemsProp, fetchedItems])
 
-  useEffect(() => {
-    let isCancelled = false
-    const fetchData = async () => {
+  const fetchData = useCallback(async () => {
+    try {
       if (!apiUrl) return
-      try {
-        setLoading(true)
-        setError(null)
-        const res = await fetch(apiUrl, { method: 'GET' })
-        if (!res.ok) {
-          const body = await res.text()
-          throw new Error(body || 'Failed to fetch list')
-        }
-        const data = await res.json()
-        if (!isCancelled) {
-          setFetchedItems(data.results || [])
-        }
-      } catch (error) {
-        if (!isCancelled) {
-          console.error(error)
-          setError('Failed to load data')
-        }
-      } finally {
-        if (!isCancelled) setLoading(false)
+      setLoading(true)
+      setError(null)
+      const res = await fetch(apiUrl, { method: 'GET' })
+      if (!res.ok) {
+        const body = await res.text()
+        throw new Error(body || 'Failed to fetch list')
       }
+      const data = await res.json()
+      setFetchedItems(data.results || [])
+    } catch (error) {
+      console.error(error)
+      setError('Failed to load data')
+    } finally {
+      setLoading(false)
     }
-    fetchData()
-    return () => { isCancelled = true }
   }, [apiUrl])
+
+  useEffect(() => {
+    void fetchData()
+  }, [fetchData])
 
   // Animation variants
   const containerVariants = {
@@ -158,8 +153,17 @@ const CinemaListComponent: React.FC<CinemaListComponentProps> = ({
     }
     if (error) {
       return (
-        <div className="w-full h-72 flex items-center justify-center">
+        <div className="w-full h-72 flex flex-col items-center justify-center gap-3">
           <div className="text-red-400">{error}</div>
+          <button
+            onClick={() => {
+              if (!loading) void fetchData()
+            }}
+            disabled={loading}
+            className={`px-4 py-2 bg-dark-gray hover:bg-dark-gray-hover text-gray-200 disabled:opacity-60 disabled:cursor-not-allowed transition-colors`}
+          >
+            {loading ? 'Retrying...' : 'Retry'}
+          </button>
         </div>
       )
     }

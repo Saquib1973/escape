@@ -4,9 +4,11 @@ import React from 'react'
 import { getUserReviews } from './actions'
 import PostList from '@/components/post-list'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 const ReviewsPage = async () => {
   const reviews = await getUserReviews()
-
   return (
     <AnimatePageWrapper className="text-gray-300 p-2">
       {reviews.length <= 0 ? (
