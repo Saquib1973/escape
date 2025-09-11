@@ -3,9 +3,6 @@
 import prisma from '@/lib/prisma'
 // Post actions now live under `src/app/(user)/post/actions.ts`
 
-const TMDB_BASE_URL = 'https://api.themoviedb.org/3'
-const TMDB_TOKEN = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiNWUyYjQxN2E1YTBlMmVjODMxMWI5MmI2MDFlNTc0NyIsIm5iZiI6MTc1NTIwOTI1Mi42MDYwMDAyLCJzdWIiOiI2ODllNWUyNGEyOTE4ZDdkZWM4ZGJmMWIiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.6j_ocxIEWOsbgjBG_eYv80kApJeZvlX2aEOCK2Roctk'
-
 export interface Genre {
   id: number
   name: string
@@ -75,12 +72,12 @@ async function saveMovieIdToDatabase(movieId: string): Promise<void> {
 
 async function fetchMovieFromTMDB(movieId: string): Promise<MovieDetails | null> {
   try {
-    const url = `${TMDB_BASE_URL}/movie/${movieId}?language=en-US`
+    const url = `${process.env.TMDB_BASE_URL}/movie/${movieId}?language=en-US&api_key=${process.env.TMDB_TOKEN}`
     const response = await fetch(url, {
       method: 'GET',
       headers: {
         'accept': 'application/json',
-        'Authorization': `Bearer ${TMDB_TOKEN}`
+        'Authorization': `Bearer ${process.env.TMDB_TOKEN}`
       }
     })
 
