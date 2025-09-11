@@ -1,8 +1,6 @@
 'use server'
 
 import prisma from '@/lib/prisma'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
 
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3'
 const TMDB_TOKEN =
@@ -187,53 +185,6 @@ export async function getTVSeriesDetails(
   }
 }
 
-// Function to get posts without comments for a specific TV series
-export async function getPostsWithoutComments(seriesId: string) {
-  try {
-    const posts = await prisma.post.findMany({
-      where: {
-        contentId: seriesId,
-        comments: {
-          none: {}, // Posts that have no comments
-        },
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
-          },
-        },
-        likes: {
-          select: {
-            id: true,
-            userId: true,
-          },
-        },
-        dislikes: {
-          select: {
-            id: true,
-            userId: true,
-          },
-        },
-        _count: {
-          select: {
-            comments: true,
-          },
-        },
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    })
-
-    return posts
-  } catch (error) {
-    console.error('Error fetching posts without comments:', error)
-    return []
-  }
-}
 
 // Function to get all posts for a TV series (with comment counts)
 export async function getAllTVSeriesPosts(seriesId: string) {
@@ -277,80 +228,5 @@ export async function getAllTVSeriesPosts(seriesId: string) {
   } catch (error) {
     console.error('Error fetching TV series posts:', error)
     return []
-  }
-}
-
-// Interface for creating a post
-export type RatingEnum =
-  | 'TRASH'
-  | 'TIMEPASS'
-  | 'ONE_TIME_WATCH'
-  | 'MUST_WATCH'
-  | 'LEGENDARY'
-
-export interface CreatePostData {
-  title?: string | null
-  content: string
-  rating?: RatingEnum | null
-  isSpoiler: boolean
-  contentId: string
-}
-
-// Function to create a new post (Server Action)
-export async function createPost(data: CreatePostData) {
-  try {
-    const session = await getServerSession(authOptions)
-
-    if (!session?.user?.id) {
-      throw new Error('You must be logged in to create a post')
-    }
-
-    // Validate required fields
-    if (!data.content.trim()) {
-      throw new Error('Post content is required')
-    }
-
-    if (!data.contentId) {
-      throw new Error('Content ID is required')
-    }
-
-    // Validate enum rating if provided
-    const validRatings: RatingEnum[] = ['TRASH','TIMEPASS','ONE_TIME_WATCH','MUST_WATCH','LEGENDARY']
-    if (data.rating && !validRatings.includes(data.rating)) {
-      throw new Error('Invalid rating value')
-    }
-
-    // Ensure the TV series exists in our database
-    await prisma.movie.upsert({
-      where: { id: data.contentId },
-      update: {},
-      create: { id: data.contentId, type: 'tv_series' },
-    })
-
-    // Create the post
-    const post = await prisma.post.create({
-      data: {
-        title: data.title,
-        content: data.content.trim(),
-        rating: data.rating,
-        isSpoiler: data.isSpoiler,
-        contentId: data.contentId,
-        userId: session.user.id,
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
-          },
-        },
-      },
-    })
-
-    return post
-  } catch (error) {
-    console.error('Error creating post:', error)
-    throw error
   }
 }

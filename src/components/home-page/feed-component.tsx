@@ -1,15 +1,8 @@
-import React, { Suspense } from 'react'
+import { getAllFeedPosts, getPostsWithPosters } from '@/app/(user)/post/actions'
+import PostList from '@/components/post-list'
 import { ChevronDown } from 'lucide-react'
 import Link from 'next/link'
-import { getAllFeedPosts } from '@/app/(user)/post/actions'
-import {
-  getMultipleMoviePosterInfo,
-  getMultipleTVSeriesPosterInfo,
-} from '@/lib/tmdb'
-import type { TMDBMoviePoster, TMDBTVSeriesPoster } from '@/lib/tmdb'
-import PostList, { type GenericPost } from '@/components/post-list'
-
-type RatingEnum = 'TRASH' | 'TIMEPASS' | 'ONE_TIME_WATCH' | 'MUST_WATCH' | 'LEGENDARY'
+import { Suspense } from 'react'
 
 function FeedSkeleton() {
   return (
@@ -73,41 +66,7 @@ async function FeedServer() {
       )
     }
 
-    const moviePosts = posts.filter((post) => post.movie.type === 'movie')
-    const tvSeriesPosts = posts.filter((post) => post.movie.type === 'tv_series')
-
-    const movieIds = [...new Set(moviePosts.map((post) => post.movie.id))]
-    const tvSeriesIds = [...new Set(tvSeriesPosts.map((post) => post.movie.id))]
-
-    const [moviePosterMap, tvSeriesPosterMap] = await Promise.all([
-      movieIds.length > 0 ? getMultipleMoviePosterInfo(movieIds) : Promise.resolve(new Map()),
-      tvSeriesIds.length > 0 ? getMultipleTVSeriesPosterInfo(tvSeriesIds) : Promise.resolve(new Map()),
-    ])
-
-    const genericPosts: GenericPost[] = posts.map((post) => {
-      let contentInfo: TMDBMoviePoster | TMDBTVSeriesPoster | undefined
-      if (post.movie.type === 'movie') {
-        contentInfo = moviePosterMap.get(post.movie.id)
-      } else {
-        contentInfo = tvSeriesPosterMap.get(post.movie.id)
-      }
-      return {
-        id: post.id,
-        title: post.title ?? null,
-        content: post.content,
-        rating: post.rating as RatingEnum | null,
-        isSpoiler: post.isSpoiler,
-        createdAt: post.createdAt,
-        posterUrl: contentInfo?.posterUrl ?? '/logo.png',
-        user: {
-          name: post.user.name,
-          image: post.user.image,
-        },
-        likes: post.likes,
-        dislikes: post.dislikes,
-        _count: { comments: post._count.comments },
-      }
-    })
+    const genericPosts = await getPostsWithPosters(posts)
 
     return <PostList posts={genericPosts} emptyText="No reviews yet. Be the first to share your thoughts!" />
   } catch (error) {

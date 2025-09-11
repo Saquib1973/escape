@@ -2,7 +2,7 @@
 import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Heart, MessageCircle, ThumbsDown, ThumbsUp } from 'lucide-react'
+import { MessageCircle, ThumbsDown, ThumbsUp } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
 
 type RatingEnum = 'TRASH' | 'TIMEPASS' | 'ONE_TIME_WATCH' | 'MUST_WATCH' | 'LEGENDARY'
@@ -31,36 +31,18 @@ type Props = {
   emptyText?: string
 }
 
-const ratingConfig: Record<RatingEnum, { percent: number; emoji: string; label: string; barClass: string }> = {
-  TRASH: { percent: 10, emoji: '😖', label: 'Trash', barClass: 'bg-red-500' },
-  TIMEPASS: { percent: 40, emoji: '🙂', label: 'Timepass', barClass: 'bg-yellow-400' },
-  ONE_TIME_WATCH: { percent: 60, emoji: '👍', label: 'One-time watch', barClass: 'bg-blue-400' },
-  MUST_WATCH: { percent: 80, emoji: '🔥', label: 'Must watch', barClass: 'bg-green-500' },
-  LEGENDARY: { percent: 100, emoji: '🏆', label: 'Legendary', barClass: 'bg-purple-500' },
+const ratingConfig: Record<RatingEnum, { label: string }> = {
+  TRASH: { label: 'Trash' },
+  TIMEPASS: { label: 'Timepass' },
+  ONE_TIME_WATCH: { label: 'One-time watch' },
+  MUST_WATCH: { label: 'Must watch' },
+  LEGENDARY: { label: 'Legendary' },
 }
 
 const RatingBar: React.FC<{ rating: RatingEnum }> = ({ rating }) => {
   const cfg = ratingConfig[rating]
   return (
-    <div className="flex max-md:flex-col md:items-center gap-3 w-full">
-      <div className="relative w-2/3 md:w-1/2 h-2 bg-dark-gray/70 rounded">
-        <motion.div
-          className={`h-2 rounded ${cfg.barClass}`}
-          initial={{ width: 0 }}
-          animate={{ width: `${cfg.percent}%` }}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
-        />
-        <motion.span
-          className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 text-2xl select-none"
-          initial={{ left: 0, opacity: 0, y: -6 }}
-          animate={{ left: `${cfg.percent}%`, opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
-        >
-          {cfg.emoji}
-        </motion.span>
-      </div>
-      <span className="text-gray-300 text-sm whitespace-nowrap">{cfg.label}</span>
-    </div>
+    <span className="text-gray-300 text-sm">{cfg.label}</span>
   )
 }
 
@@ -104,7 +86,7 @@ const PostList: React.FC<Props> = ({ posts, emptyText = 'No posts yet' }) => {
                           target &&
                           target.src !== window.location.origin + '/logo.png'
                         ) {
-                          target.src = '/logo.png'
+                          target.src = ''
                         }
                       }}
                     />
@@ -130,7 +112,7 @@ const PostList: React.FC<Props> = ({ posts, emptyText = 'No posts yet' }) => {
                   </div>
 
                   {/* Rating */}
-                  <div className="flex items-center md:max-w-[50%] gap-3 mb-2">
+                  <div className="flex items-center bg-dark-gray-2 w-fit px-3 gap-3 mb-2">
                     {post.rating ? <RatingBar rating={post.rating} /> : null}
                   </div>
 

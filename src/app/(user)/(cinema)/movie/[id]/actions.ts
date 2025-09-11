@@ -119,53 +119,6 @@ export async function getMovieDetails(movieId: string): Promise<MovieDetails | n
   }
 }
 
-export async function getPostsWithoutComments(movieId: string) {
-  try {
-    const posts = await prisma.post.findMany({
-      where: {
-        contentId: movieId,
-        comments: {
-          none: {} // Posts that have no comments
-        }
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            image: true
-          }
-        },
-        likes: {
-          select: {
-            id: true,
-            userId: true
-          }
-        },
-        dislikes: {
-          select: {
-            id: true,
-            userId: true
-          }
-        },
-        _count: {
-          select: {
-            comments: true
-          }
-        }
-      },
-      orderBy: {
-        createdAt: 'desc'
-      }
-    })
-
-    return posts
-  } catch (error) {
-    console.error('Error fetching posts without comments:', error)
-    return []
-  }
-}
-
 // Function to get all posts for a movie (with comment counts)
 export async function getAllMoviePosts(movieId: string) {
   try {

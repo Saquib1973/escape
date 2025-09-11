@@ -38,7 +38,7 @@ const socialLinks = [
 const Footer = () => {
   return (
     <footer className="flex items-center justify-center w-full text-gray-300">
-      <div className="max-w-6xl w-full mx-auto px-4 py-3">
+      <div className="max-w-5xl w-full mx-auto px-4 md:px-0 py-3">
         <div className=" flex justify-between items-center">
           <div className="text-sm text-gray-400">
             © 2025 Escape. All rights reserved.

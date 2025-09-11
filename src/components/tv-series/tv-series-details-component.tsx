@@ -1,5 +1,5 @@
 'use client'
-import { TVSeriesDetails } from '@/app/(user)/(cinema)/web-series/actions'
+import { TVSeriesDetails } from '@/app/(user)/(cinema)/web-series/[id]/actions'
 import Image from 'next/image'
 import React, { useState, useRef, useEffect } from 'react'
 import { CreatePostForm } from '@/components/forms/create-post-form'

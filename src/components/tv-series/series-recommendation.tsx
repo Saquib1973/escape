@@ -16,7 +16,7 @@ const SeriesRecommendation = ({ id }: { id: number }) => {
   return (
     <CinemaListComponent
       title="Recommended Series"
-      apiUrl={`https://api.themoviedb.org/3/tv/${id}/recommendations?language=en-US&page=1`}
+      apiUrl={`/api/recommendation/series?id=${id}&page=1`}
       linkPath={(seriesId) => `/web-series/${seriesId}`}
       scrollContainerClass="recommendations-scroll-container"
       getYear={getYear}

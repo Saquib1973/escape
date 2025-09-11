@@ -2,11 +2,11 @@ import React from 'react'
 import prisma from '@/lib/prisma'
 import { getSession } from '@/lib/auth'
 import UserDetailScreen from '@/components/user/user-detail-screen'
-import type { GenericPost } from '@/components/post-list'
-import { getMoviePosterInfo, getTVSeriesPosterInfo } from '@/lib/tmdb'
+import { getPostsWithPosters } from '@/app/(user)/post/actions'
 
 const page = async ({ params }: { params: Promise<{ username: string }> }) => {
   const { username } = await params
+
   const session = await getSession()
   const viewerId = session?.user?.id || null
 
@@ -42,6 +42,7 @@ const page = async ({ params }: { params: Promise<{ username: string }> }) => {
       },
     },
   })
+
   if (!user) {
     return <div>User not found</div>
   }
@@ -55,36 +56,7 @@ const page = async ({ params }: { params: Promise<{ username: string }> }) => {
     initialIsFollowing = Boolean(rel)
   }
 
-  // Enrich posts with posterUrl
-  const postsWithPosters: GenericPost[] = await Promise.all(
-    user.posts.map(async (post) => {
-      let posterUrl: string | null = null
-      try {
-        const posterInfo = post.movie.type === 'tv_series'
-          ? await getTVSeriesPosterInfo(post.movie.id)
-          : await getMoviePosterInfo(post.movie.id)
-        posterUrl = posterInfo?.posterUrl ?? null
-      } catch {}
-
-      const mapped: GenericPost = {
-        id: post.id,
-        title: post.title,
-        content: post.content,
-        rating: post.rating as GenericPost['rating'],
-        isSpoiler: post.isSpoiler,
-        createdAt: post.createdAt,
-        posterUrl,
-        user: {
-          name: post.user?.name ?? null,
-          image: post.user?.image ?? null,
-        },
-        likes: post.likes,
-        _count: { comments: post._count.comments },
-      }
-
-      return mapped
-    })
-  )
+  const postsWithPosters = await getPostsWithPosters(user.posts)
 
   return (
     <UserDetailScreen

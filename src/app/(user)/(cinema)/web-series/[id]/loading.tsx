@@ -1,12 +1,12 @@
 import Loader from '@/components/loader'
 import React from 'react'
 
-const LoadingMovie = () => {
+const LoadingSeries = () => {
   return (
     <div className="flex items-center justify-center h-full">
-      <Loader text="Loading movie details..." />
+      <Loader text="Loading webseries details..." />
     </div>
   )
 }
 
-export default LoadingMovie
+export default LoadingSeries

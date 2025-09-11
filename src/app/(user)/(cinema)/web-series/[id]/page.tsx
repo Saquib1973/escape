@@ -1,5 +1,5 @@
 import React from 'react'
-import { getTVSeriesDetails } from '../actions'
+import { getTVSeriesDetails } from './actions'
 import TVSeriesDetailsComponent from '@/components/tv-series/tv-series-details-component'
 import Link from 'next/link'
 

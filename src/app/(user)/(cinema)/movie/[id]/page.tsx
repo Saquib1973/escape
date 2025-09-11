@@ -1,5 +1,5 @@
 import React from 'react'
-import { getMovieDetails } from '../actions'
+import { getMovieDetails } from './actions'
 import MovieDetailsComponent from '@/components/movie/movie-details-component'
 import Link from 'next/link'
 

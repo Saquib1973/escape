@@ -1,68 +1,28 @@
-const TMDB_BASE_URL = 'https://api.themoviedb.org/3'
+import type { TMDBMovieDetails, TMDBMoviePoster, TMDBTVSeriesDetails, TMDBTVSeriesPoster } from '@/types/tmdb'
+
 const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p'
-const TMDB_TOKEN = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiNWUyYjQxN2E1YTBlMmVjODMxMWI5MmI2MDFlNTc0NyIsIm5iZiI6MTc1NTIwOTI1Mi42MDYwMDAyLCJzdWIiOiI2ODllNWUyNGEyOTE4ZDdkZWM4ZGJmMWIiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.6j_ocxIEWOsbgjBG_eYv80kApJeZvlX2aEOCK2Roctk'
 
-export interface TMDBMovieDetails {
-  id: number
-  title: string
-  original_title: string
-  overview: string
-  poster_path: string | null
-  backdrop_path: string | null
-  release_date: string
-  vote_average: number
-  vote_count: number
-  runtime: number | null
-  genres: Array<{
-    id: number
-    name: string
-  }>
-  production_companies: Array<{
-    id: number
-    name: string
-    logo_path: string | null
-  }>
-}
 
-export interface TMDBMoviePoster {
-  movieId: string
-  title: string
-  posterUrl: string | null
-  releaseYear: string | null
-}
+/* ===========================
+ * Movies
+ * =========================== */
 
-export interface TMDBTVSeriesDetails {
-  id: number
-  name: string
-  original_name: string
-  overview: string
-  poster_path: string | null
-  backdrop_path: string | null
-  first_air_date: string
-  vote_average: number
-  vote_count: number
-  genres: Array<{
-    id: number
-    name: string
-  }>
-}
-
-export interface TMDBTVSeriesPoster {
-  seriesId: string
-  title: string
-  posterUrl: string | null
-  releaseYear: string | null
-}
-
-// Function to fetch movie details from TMDB
+/**
+ * Fetch full movie details from TMDB.
+ *
+ * - **Does**: Calls TMDB `/movie/{movieId}` with `language=en-US`.
+ * - **Takes**: `movieId` (string TMDB movie ID).
+ * - **Returns**: `TMDBMovieDetails` on success, otherwise `null` and logs error.
+ *
+ */
 export async function fetchMovieDetails(movieId: string): Promise<TMDBMovieDetails | null> {
   try {
-    const url = `${TMDB_BASE_URL}/movie/${movieId}?language=en-US`
+    const url = `${process.env.TMDB_BASE_URL}/movie/${movieId}?language=en-US`
     const response = await fetch(url, {
       method: 'GET',
       headers: {
         'accept': 'application/json',
-        'Authorization': `Bearer ${TMDB_TOKEN}`
+        'Authorization': `Bearer ${process.env.TMDB_TOKEN}`
       }
     })
 
@@ -78,19 +38,47 @@ export async function fetchMovieDetails(movieId: string): Promise<TMDBMovieDetai
   }
 }
 
-// Function to get movie poster URL
-export function getMoviePosterUrl(posterPath: string | null, size: 'w92' | 'w154' | 'w185' | 'w342' | 'w500' | 'w780' | 'original' = 'w500'): string | null {
+/**
+ * Build a TMDB movie poster URL for a given path.
+ *
+ * - **Does**: Concatenates TMDB image base with `posterPath` and size.
+ * - **Takes**:
+ *    - `posterPath`: Path from TMDB responses (may be `null`).
+ *    - `size`: TMDB size key (default `'w500'`).
+ * - **Returns**: Full poster URL string or `null` if no path.
+ */
+export function getMoviePosterUrl(
+  posterPath: string | null,
+  size: 'w92' | 'w154' | 'w185' | 'w342' | 'w500' | 'w780' | 'original' = 'w500'
+): string | null {
   if (!posterPath) return null
   return `${TMDB_IMAGE_BASE_URL}/${size}${posterPath}`
 }
 
-// Function to get movie backdrop URL
-export function getMovieBackdropUrl(backdropPath: string | null, size: 'w300' | 'w780' | 'w1280' | 'original' = 'w1280'): string | null {
+/**
+ * Build a TMDB movie backdrop URL for a given path.
+ *
+ * - **Does**: Concatenates TMDB image base with `backdropPath` and size.
+ * - **Takes**:
+ *    - `backdropPath`: Path from TMDB responses (may be `null`).
+ *    - `size`: TMDB size key (default `'w1280'`).
+ * - **Returns**: Full backdrop URL string or `null` if no path.
+ */
+export function getMovieBackdropUrl(
+  backdropPath: string | null,
+  size: 'w300' | 'w780' | 'w1280' | 'original' = 'w1280'
+): string | null {
   if (!backdropPath) return null
   return `${TMDB_IMAGE_BASE_URL}/${size}${backdropPath}`
 }
 
-// Function to get movie poster info for feed
+/**
+ * Fetch movie details and map into a lightweight poster info object.
+ *
+ * - **Does**: Fetches details → extracts title, year, poster URL.
+ * - **Takes**: `movieId` (string TMDB movie ID).
+ * - **Returns**: `TMDBMoviePoster` on success, otherwise `null`.
+ */
 export async function getMoviePosterInfo(movieId: string): Promise<TMDBMoviePoster | null> {
   try {
     const movieDetails = await fetchMovieDetails(movieId)
@@ -114,15 +102,27 @@ export async function getMoviePosterInfo(movieId: string): Promise<TMDBMoviePost
   }
 }
 
-// Function to fetch TV series details from TMDB
+
+/* ===========================
+ * TV Series
+ * =========================== */
+
+/**
+ * Fetch full TV series details from TMDB.
+ *
+ * - **Does**: Calls TMDB `/tv/{seriesId}` with `language=en-US`.
+ * - **Takes**: `seriesId` (string TMDB TV series ID).
+ * - **Returns**: `TMDBTVSeriesDetails` on success, otherwise `null` and logs error.
+ *
+ */
 export async function fetchTVSeriesDetails(seriesId: string): Promise<TMDBTVSeriesDetails | null> {
   try {
-    const url = `${TMDB_BASE_URL}/tv/${seriesId}?language=en-US`
+    const url = `${process.env.TMDB_BASE_URL}/tv/${seriesId}?language=en-US`
     const response = await fetch(url, {
       method: 'GET',
       headers: {
         'accept': 'application/json',
-        'Authorization': `Bearer ${TMDB_TOKEN}`
+        'Authorization': `Bearer ${process.env.TMDB_TOKEN}`
       }
     })
 
@@ -138,7 +138,13 @@ export async function fetchTVSeriesDetails(seriesId: string): Promise<TMDBTVSeri
   }
 }
 
-// Function to get TV series poster info for feed
+/**
+ * Fetch TV series details and map into a lightweight poster info object.
+ *
+ * - **Does**: Fetches details → extracts name, first air year, poster URL.
+ * - **Takes**: `seriesId` (string TMDB TV series ID).
+ * - **Returns**: `TMDBTVSeriesPoster` on success, otherwise `null`.
+ */
 export async function getTVSeriesPosterInfo(seriesId: string): Promise<TMDBTVSeriesPoster | null> {
   try {
     const seriesDetails = await fetchTVSeriesDetails(seriesId)
@@ -162,56 +168,46 @@ export async function getTVSeriesPosterInfo(seriesId: string): Promise<TMDBTVSer
   }
 }
 
-// Function to get multiple movie poster info (for batch processing)
+
+/* ===========================
+ * helpers
+ * =========================== */
+
+/**
+ * Fetch multiple movie poster infos in small batches.
+ *
+ * - **Does**: Processes IDs in batches to avoid spiking TMDB; adds a short delay between batches.
+ * - **Takes**: `movieIds` (array of TMDB movie IDs).
+ * - **Returns**: `Map<string, TMDBMoviePoster>` where key is `movieId`. Missing/failed IDs are omitted.
+ */
 export async function getMultipleMoviePosterInfo(movieIds: string[]): Promise<Map<string, TMDBMoviePoster>> {
+  const uniqueMovieIds = [...new Set(movieIds)]
   const moviePosterMap = new Map<string, TMDBMoviePoster>()
-
-  // Process in batches to avoid overwhelming the API
-  const batchSize = 5
-  for (let i = 0; i < movieIds.length; i += batchSize) {
-    const batch = movieIds.slice(i, i + batchSize)
-
-    const promises = batch.map(async (movieId) => {
-      const posterInfo = await getMoviePosterInfo(movieId)
-      if (posterInfo) {
-        moviePosterMap.set(movieId, posterInfo)
-      }
+  await Promise.all(
+    uniqueMovieIds.map(async (id) => {
+      const info = await getMoviePosterInfo(id)
+      if (info) moviePosterMap.set(id, info)
     })
-
-    await Promise.all(promises)
-
-    // Add a small delay between batches to be respectful to the API
-    if (i + batchSize < movieIds.length) {
-      await new Promise(resolve => setTimeout(resolve, 100))
-    }
-  }
-
+  )
   return moviePosterMap
 }
 
-// Function to get multiple TV series poster info (for batch processing)
+/**
+ * Fetch multiple TV series poster infos in small batches.
+ *
+ * - **Does**: Processes IDs in batches to avoid spiking TMDB; adds a short delay between batches.
+ * - **Takes**: `seriesIds` (array of TMDB TV series IDs).
+ * - **Returns**: `Map<string, TMDBTVSeriesPoster>` where key is `seriesId`. Missing/failed IDs are omitted.
+ *
+ */
 export async function getMultipleTVSeriesPosterInfo(seriesIds: string[]): Promise<Map<string, TMDBTVSeriesPoster>> {
+  const uniqueSeriesIds = [...new Set(seriesIds)]
   const seriesPosterMap = new Map<string, TMDBTVSeriesPoster>()
-
-  // Process in batches to avoid overwhelming the API
-  const batchSize = 5
-  for (let i = 0; i < seriesIds.length; i += batchSize) {
-    const batch = seriesIds.slice(i, i + batchSize)
-
-    const promises = batch.map(async (seriesId) => {
-      const posterInfo = await getTVSeriesPosterInfo(seriesId)
-      if (posterInfo) {
-        seriesPosterMap.set(seriesId, posterInfo)
-      }
+  await Promise.all(
+    uniqueSeriesIds.map(async (id) => {
+      const info = await getTVSeriesPosterInfo(id)
+      if (info) seriesPosterMap.set(id, info)
     })
-
-    await Promise.all(promises)
-
-    // Add a small delay between batches to be respectful to the API
-    if (i + batchSize < seriesIds.length) {
-      await new Promise(resolve => setTimeout(resolve, 100))
-    }
-  }
-
+  )
   return seriesPosterMap
 }

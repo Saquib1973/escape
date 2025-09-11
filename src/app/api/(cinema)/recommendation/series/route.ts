@@ -1,19 +1,21 @@
 import { NextResponse } from 'next/server'
 
-
-/**
- * @description Get trending all from TMDB
- * @query page: number
- * @query time_window: string
- * @returns
- */
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
+    const seriesId = searchParams.get('id')
     const page = searchParams.get('page') || '1'
-    const timeWindow = searchParams.get('time_window') || 'day'
+
+    if (!seriesId) {
+      return NextResponse.json(
+        { error: 'Series ID is required' },
+        { status: 400 }
+      )
+    }
 
     const token = process.env.TMDB_TOKEN
+    const baseUrl = process.env.TMDB_BASE_URL || 'https://api.themoviedb.org/3'
+
     if (!token) {
       return NextResponse.json(
         { error: 'Server misconfiguration: TMDB_TOKEN is not set' },
@@ -21,7 +23,7 @@ export async function GET(request: Request) {
       )
     }
 
-    const url = `${process.env.TMDB_BASE_URL}/trending/all/${timeWindow}?language=en-US&page=${page}`
+    const url = `${baseUrl}/tv/${seriesId}/recommendations?language=en-US&page=${page}`
 
     const response = await fetch(url, {
       method: 'GET',
@@ -29,7 +31,6 @@ export async function GET(request: Request) {
         accept: 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      // Avoid serving cached errors while paginating
       cache: 'no-store',
     })
 
@@ -41,21 +42,17 @@ export async function GET(request: Request) {
         details = await response.text()
       }
       return NextResponse.json(
-        { error: 'Failed to fetch trending from TMDB', details },
+        { error: 'Failed to fetch series recommendations from TMDB', details },
         { status: response.status }
       )
     }
 
     const data = await response.json()
-    return NextResponse.json(data, {
-      status: 200,
-    })
+    return NextResponse.json(data, { status: 200 })
   } catch (error: unknown) {
     return NextResponse.json(
-      { error: 'Unexpected error fetching trending', details: error instanceof Error ? error.message : String(error) },
+      { error: 'Unexpected error fetching series recommendations', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     )
   }
 }
-
-

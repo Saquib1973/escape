@@ -1,5 +1,5 @@
 'use client'
-import { MovieDetails } from '@/app/(user)/(cinema)/movie/actions'
+import { MovieDetails } from '@/app/(user)/(cinema)/movie/[id]/actions'
 import Image from 'next/image'
 import React, { useState, useRef, useEffect } from 'react'
 import { CreatePostForm } from '@/components/forms/create-post-form'
