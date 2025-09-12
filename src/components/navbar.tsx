@@ -208,6 +208,24 @@ const RenderAuthSection = () => {
   if (session) {
     const userImage = session.user.image ?? ""
     const username = session.user?.name?.split(' ')[0]
+    const menuVariants = {
+      open: {
+        transition: {
+          staggerChildren: 0.05,
+          delayChildren: 0,
+        },
+      },
+      closed: {
+        transition: {
+          staggerChildren: 0.05,
+          staggerDirection: -1,
+        },
+      },
+    }
+    const itemVariants = {
+      closed: { opacity: 0, x: -10 },
+      open: { opacity: 1, x: 0 },
+    }
     return (
       <div
         className="relative w-20 md:w-36 group dropdown-container"
@@ -261,12 +279,12 @@ const RenderAuthSection = () => {
           </motion.div>
         </button>
         {/* Dropdown Menu */}
-        <AnimatePresence mode='wait'>
+        <AnimatePresence mode="wait">
           {(isDropdownOpen || isHovered) && (
             <motion.div
-              initial={{ opacity: 0, y: -10 }}
+              initial={{ opacity: 0 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0}}
+              exit={{ opacity: 0, transition: { delay: 0.4 } }}
               transition={{
                 ease: 'easeOut',
                 type: 'spring',
@@ -276,16 +294,14 @@ const RenderAuthSection = () => {
               className="fixed md:absolute right-0 z-[100] border border-dark-gray-2 top-0 md:top-full inset-0 md:inset-auto h-screen md:h-auto w-screen md:w-36 bg-dark-gray-2"
             >
               <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.1 }}
                 className="flex flex-col h-full md:h-auto pt-4 md:pt-0 px-0"
+                variants={menuVariants}
+                initial="closed"
+                animate="open"
+                exit="closed"
               >
                 {/* Close Button */}
                 <motion.div
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0 }}
                   className="flex justify-end mb-4 md:hidden pr-4"
                 >
                   <button
@@ -300,16 +316,7 @@ const RenderAuthSection = () => {
                 </motion.div>
                 {dropdownItems.map((item, index) => {
                   return (
-                    <motion.div
-                      key={item.name + index}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                      exit={{
-                        opacity: 0,
-                        x:-10
-                      }}
-                    >
+                    <motion.div key={item.name + index} variants={itemVariants}>
                       <Link
                         href={item.link}
                         className="block capitalize px-4 py-4 md:py-2 text-lg md:text-sm text-gray-300 hover:bg-dark-gray-hover hover:text-white transition-colors border-b border-dark-gray-hover md:border-b-0 max-md:text-2xl"
@@ -324,14 +331,7 @@ const RenderAuthSection = () => {
                     </motion.div>
                   )
                 })}
-                <motion.div
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{
-                    delay: dropdownItems.length * 0.05,
-
-                  }}
-                >
+                <motion.div variants={itemVariants}>
                   <button
                     onClick={() => {
                       signOut({ callbackUrl: '/' })
