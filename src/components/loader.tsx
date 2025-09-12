@@ -19,6 +19,12 @@ const Loader: React.FC<LoaderProps> = ({
     lg: 'w-8 h-8',
     xl: 'w-12 h-12',
   }
+  const textSize = {
+    sm: "text-xs",
+    md: "text-xs",
+    lg:"text-sm",
+    xl:"text-base"
+  }
 
   return (
     <div className={`inline-block w-fit ${sizeClasses[size]} ${className}`}>
@@ -40,7 +46,7 @@ const Loader: React.FC<LoaderProps> = ({
           className="animate-dash"
         />
       </svg>
-      <span className="text-gray-300">{text}</span>
+      <span className={`text-gray-300 ${textSize[size]}`}>{text}</span>
     </div>
   )
 }

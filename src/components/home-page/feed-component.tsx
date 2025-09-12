@@ -5,7 +5,9 @@ import { Suspense } from 'react'
 
 function FeedSkeleton() {
   return (
-    <div className="flex flex-col gap-3 py-6">
+    <div className="max-md:px-4 py-10">
+      <h1 className='text-2xl text-gray-300 mb-4'>Reviews</h1>
+      <div className="flex flex-col gap-3">
       {Array.from({ length: 3 }, (_, i) => (
         <div key={`loading-skeleton-${i}`} className="p-6 px-4 animate-pulse">
           <div className="flex gap-4">
@@ -49,6 +51,7 @@ function FeedSkeleton() {
           <div className="mt-6 w-[80%] mx-auto h-0.5 bg-dark-gray"></div>
         </div>
       ))}
+      </div>
     </div>
   )
 }
@@ -59,8 +62,10 @@ async function FeedServer() {
 
     if (posts.length === 0) {
       return (
-        <div className="py-6 text-center">
-          <p className="text-gray-400">No reviews yet. Be the first to share your thoughts!</p>
+        <div className="py-6 text-center max-md:px-4">
+          <p className="text-gray-400">
+            No reviews yet. Be the first to share your thoughts!
+          </p>
         </div>
       )
     }
@@ -120,8 +125,15 @@ async function FeedServer() {
         }
       })
     )
-
-    return <PostList posts={genericPosts} emptyText="No reviews yet. Be the first to share your thoughts!" />
+    return (
+      <div className="max-md:px-4 py-10">
+        <h1 className='text-2xl text-gray-300'>Reviews</h1>
+        <PostList
+          posts={genericPosts}
+          emptyText="No reviews yet. Be the first to share your thoughts!"
+        />
+      </div>
+    )
   } catch (error) {
     console.error('Error fetching feed data:', error)
     return (

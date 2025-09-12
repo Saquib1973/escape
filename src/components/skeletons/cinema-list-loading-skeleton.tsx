@@ -1,5 +1,6 @@
 
 import React from 'react'
+import Loader from '../loader'
 
 interface CinemaListLoadingSkeletonProps {
   itemCount?: number
@@ -18,7 +19,9 @@ const CinemaListLoadingSkeleton: React.FC<CinemaListLoadingSkeletonProps> = ({ i
               <div className="flex flex-col w-full h-60">
                 {/* Poster skeleton - large area for movie poster */}
                 <div className="flex-1 flex items-center justify-center">
-                  <div className="w-full h-full bg-gradient-to-tr from-dark-gray-2 to-dark-gray animate-pulse"></div>
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-tr from-dark-gray-2 to-dark-gray animate-pulse">
+                    <Loader size='md' text='Loading...' />
+                  </div>
                 </div>
 
                 {/* Rating section skeleton */}

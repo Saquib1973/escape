@@ -19,5 +19,16 @@ export function getRatingLabel(rating: RatingEnum): string {
   return ratingLabelMap[rating]
 }
 
+export function hideContent(content: string) {
+  const texts = content.split(" ");
+  const updatedTextArray = texts.map((text) => {
+    if (text.length === 0) return text;
+    return text.split("").map((char, index) => {
+      return index % 2 === 0 ? char : "*";
+    }).join("");
+  })
+  return updatedTextArray.join(" ");
+}
+
 
 
