@@ -27,7 +27,9 @@ export function hideContent(content: string) {
       return index % 2 === 0 ? char : "*";
     }).join("");
   })
-  return updatedTextArray.join(" ");
+  const output = updatedTextArray.join(' ');
+  console.log(output)
+  return output;
 }
 
 

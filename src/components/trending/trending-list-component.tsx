@@ -6,6 +6,51 @@ import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import Loader from '../loader'
 import { motion, type Variants } from 'framer-motion'
+import { http } from '@/lib/http'
+
+// Skeleton component for loading state
+const TrendingSkeleton = () => (
+  <div className="flex flex-col gap-2">
+    {Array.from({ length: 10 }).map((_, index) => (
+      <div key={index + 'skeleton'} className="animate-pulse">
+        <div className="flex bg-dark-gray-2">
+          {/* Poster Skeleton */}
+          <div className="relative max-md:h-60 w-40 aspect-square md:h-52 flex-shrink-0">
+            <div className="absolute inset-0 bg-dark-gray-hover" />
+          </div>
+
+          {/* Content Skeleton */}
+          <div className="flex-1 p-6">
+            <div className="flex items-start justify-between mb-3">
+              <div className="flex max-md:flex-col md:items-center gap-4">
+                <div className="w-8 h-8 bg-dark-gray rounded"></div>
+                <div className="h-6 w-48 bg-dark-gray rounded"></div>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-5 h-5 bg-dark-gray rounded"></div>
+                <div className="h-4 w-8 bg-dark-gray rounded"></div>
+              </div>
+            </div>
+
+            <div className="space-y-2 mb-4">
+              <div className="h-4 bg-dark-gray rounded w-full"></div>
+              <div className="h-4 bg-dark-gray rounded w-4/5"></div>
+              <div className="h-4 bg-dark-gray rounded w-3/5"></div>
+            </div>
+
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-dark-gray rounded"></div>
+                <div className="h-4 w-12 bg-dark-gray rounded"></div>
+              </div>
+              <div className="h-4 w-16 bg-dark-gray rounded"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+)
 
 const TrendingListComponent = () => {
   const [trendingItems, setTrendingItems] = useState<TrendingItem[]>([])
@@ -56,17 +101,19 @@ const TrendingListComponent = () => {
       if (isInitial) {
         setLoading(true)
         setShowSkeleton(true)
+        setError(null)
       } else {
         setLoadingMore(true)
       }
 
       const url = `/api/trending-all?page=${page}&time_window=day`
-      const response = await fetch(url)
-      if (!response.ok) {
-        throw new Error('Failed to fetch trending items')
-      }
+      const response = await http.getWithRetry(url, {}, {
+        maxRetries: 3,
+        baseDelayMs: 300,
+        timeoutMs: 8000,
+      })
 
-      const data = await response.json()
+      const data = response.data as { results: TrendingItem[]; total_pages: number }
 
       if (isInitial) {
         setTrendingItems(data.results || [])
@@ -100,53 +147,6 @@ const TrendingListComponent = () => {
     const date = item.release_date || item.first_air_date
     return date ? new Date(date).getFullYear() : 'N/A'
   }
-
-  // Skeleton component for loading state
-  const TrendingSkeleton = () => (
-    <div className="flex flex-col gap-2">
-      {Array.from({ length: 10 }).map((_, index) => (
-        <div
-          key={index + 'skeleton'}
-          className="animate-pulse"
-        >
-          <div className="flex bg-dark-gray-2">
-            {/* Poster Skeleton */}
-            <div className="relative max-md:h-60 w-40 aspect-square md:h-52 flex-shrink-0">
-              <div className="absolute inset-0 bg-dark-gray-hover" />
-            </div>
-
-            {/* Content Skeleton */}
-            <div className="flex-1 p-6">
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center gap-4">
-                  <div className="w-8 h-8 bg-dark-gray rounded"></div>
-                  <div className="h-6 w-48 bg-dark-gray rounded"></div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 bg-dark-gray rounded"></div>
-                  <div className="h-4 w-8 bg-dark-gray rounded"></div>
-                </div>
-              </div>
-
-              <div className="space-y-2 mb-4">
-                <div className="h-4 bg-dark-gray rounded w-full"></div>
-                <div className="h-4 bg-dark-gray rounded w-4/5"></div>
-                <div className="h-4 bg-dark-gray rounded w-3/5"></div>
-              </div>
-
-              <div className="flex items-center gap-6">
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-dark-gray rounded"></div>
-                  <div className="h-4 w-12 bg-dark-gray rounded"></div>
-                </div>
-                <div className="h-4 w-16 bg-dark-gray rounded"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  )
 
   if (error) {
     return (
@@ -219,7 +219,7 @@ const TrendingListComponent = () => {
                     {/* Content Info */}
                     <div className="flex-1 p-6">
                       <div className="flex items-start justify-between mb-3">
-                        <div className="flex items-center gap-4">
+                        <div className="flex max-md:flex-col md:items-center gap-4">
                           <span className="text-4xl font-extrabold text-dark-gray-hover group-hover:text-light-green transition-colors">
                             #{index + 1}
                           </span>

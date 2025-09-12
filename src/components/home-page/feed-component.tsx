@@ -1,6 +1,7 @@
 import { getAllFeedPosts } from '@/app/(user)/post/actions'
 import PostList from '@/components/post-list'
 import { getPosterUrl } from '@/lib/tmdb'
+import { hideContent } from '@/lib/utils'
 import { Suspense } from 'react'
 
 function FeedSkeleton() {
@@ -73,13 +74,17 @@ async function FeedServer() {
     const genericPosts = await Promise.all(
       posts.map(async (post) => {
         const cachedPosterUrl = getPosterUrl(post.movie?.posterPath ?? null, 'w500')
+        const isSpoiler = post.isSpoiler
+        const safeTitle = isSpoiler ? hideContent(post.title ?? '') : (post.title ?? null)
+        const safeContent = isSpoiler ? hideContent(post.content) : post.content
+
         if (cachedPosterUrl) {
           return {
             id: post.id,
-            title: post.title ?? null,
-            content: post.content,
+            title: safeTitle,
+            content: safeContent,
             rating: post.rating,
-            isSpoiler: post.isSpoiler,
+            isSpoiler,
             createdAt: post.createdAt,
             posterUrl: cachedPosterUrl,
             user: { name: post.user?.name ?? null, image: post.user?.image ?? null },
@@ -97,10 +102,10 @@ async function FeedServer() {
           const posterUrl: string | null = data?.posterUrl || '/logo.png'
           return {
             id: post.id,
-            title: post.title ?? null,
-            content: post.content,
+            title: safeTitle,
+            content: safeContent,
             rating: post.rating,
-            isSpoiler: post.isSpoiler,
+            isSpoiler,
             createdAt: post.createdAt,
             posterUrl,
             user: { name: post.user?.name ?? null, image: post.user?.image ?? null },
@@ -111,13 +116,16 @@ async function FeedServer() {
         } catch {
           return {
             id: post.id,
-            title: post.title ?? null,
-            content: post.content,
+            title: safeTitle,
+            content: safeContent,
             rating: post.rating,
-            isSpoiler: post.isSpoiler,
+            isSpoiler,
             createdAt: post.createdAt,
             posterUrl: '/logo.png',
-            user: { name: post.user?.name ?? null, image: post.user?.image ?? null },
+            user: {
+              name: post.user?.name ?? null,
+              image: post.user?.image ?? null,
+            },
             likes: post.likes,
             dislikes: post.dislikes,
             _count: { comments: post._count.comments },
