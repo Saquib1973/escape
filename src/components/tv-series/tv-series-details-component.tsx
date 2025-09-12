@@ -1,5 +1,4 @@
 'use client'
-import { TVSeriesDetails } from '@/app/(user)/(cinema)/web-series/[id]/actions'
 import Image from 'next/image'
 import React, { useState, useRef, useEffect } from 'react'
 import { CreatePostForm } from '@/components/forms/create-post-form'
@@ -12,6 +11,7 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import ShareButton from '../buttons/share-button'
 import { useCurrentUrl } from '@/hooks/useCurrentUrl'
+import type { TVSeriesDetails } from '@/types/tmdb'
 
 interface TVSeriesDetailsComponentProps {
   series: TVSeriesDetails

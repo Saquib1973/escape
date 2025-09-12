@@ -1,11 +1,13 @@
 import React from 'react'
-import { getTVSeriesDetails } from './actions'
 import TVSeriesDetailsComponent from '@/components/tv-series/tv-series-details-component'
 import Link from 'next/link'
 
 const page = async ({ params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params
-  const series = await getTVSeriesDetails(id)
+  const base = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+  const url = `${base}/api/series?id=${encodeURIComponent(id)}`
+  const res = await fetch(url, { cache: 'no-store' })
+  const series = res.ok ? await res.json() : null
 
   if (!series) {
     return (

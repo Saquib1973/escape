@@ -1,7 +1,6 @@
-import { getAllFeedPosts, getPostsWithPosters } from '@/app/(user)/post/actions'
+import { getAllFeedPosts } from '@/app/(user)/post/actions'
 import PostList from '@/components/post-list'
-import { ChevronDown } from 'lucide-react'
-import Link from 'next/link'
+import { getPosterUrl } from '@/lib/tmdb'
 import { Suspense } from 'react'
 
 function FeedSkeleton() {
@@ -66,7 +65,61 @@ async function FeedServer() {
       )
     }
 
-    const genericPosts = await getPostsWithPosters(posts)
+    const genericPosts = await Promise.all(
+      posts.map(async (post) => {
+        const cachedPosterUrl = getPosterUrl(post.movie?.posterPath ?? null, 'w500')
+        if (cachedPosterUrl) {
+          return {
+            id: post.id,
+            title: post.title ?? null,
+            content: post.content,
+            rating: post.rating,
+            isSpoiler: post.isSpoiler,
+            createdAt: post.createdAt,
+            posterUrl: cachedPosterUrl,
+            user: { name: post.user?.name ?? null, image: post.user?.image ?? null },
+            likes: post.likes,
+            dislikes: post.dislikes,
+            _count: { comments: post._count.comments },
+          }
+        }
+
+        try {
+          const typeParam = post.movie?.type === 'tv_series' ? 'tv' : 'movie'
+          const contentId = post.movie?.id
+          const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL ?? ''}/api/poster?id=${contentId}&type=${typeParam}`, { cache: 'no-store' })
+          const data = await res.json()
+          const posterUrl: string | null = data?.posterUrl || '/logo.png'
+          return {
+            id: post.id,
+            title: post.title ?? null,
+            content: post.content,
+            rating: post.rating,
+            isSpoiler: post.isSpoiler,
+            createdAt: post.createdAt,
+            posterUrl,
+            user: { name: post.user?.name ?? null, image: post.user?.image ?? null },
+            likes: post.likes,
+            dislikes: post.dislikes,
+            _count: { comments: post._count.comments },
+          }
+        } catch {
+          return {
+            id: post.id,
+            title: post.title ?? null,
+            content: post.content,
+            rating: post.rating,
+            isSpoiler: post.isSpoiler,
+            createdAt: post.createdAt,
+            posterUrl: '/logo.png',
+            user: { name: post.user?.name ?? null, image: post.user?.image ?? null },
+            likes: post.likes,
+            dislikes: post.dislikes,
+            _count: { comments: post._count.comments },
+          }
+        }
+      })
+    )
 
     return <PostList posts={genericPosts} emptyText="No reviews yet. Be the first to share your thoughts!" />
   } catch (error) {
@@ -81,22 +134,8 @@ async function FeedServer() {
 
 export default function FeedComponent() {
   return (
-    <div className="flex flex-col items-center justify-center">
-      <div className="w-full max-md:px-4">
-        <h1 className="text-2xl text-gray-300">Reviews</h1>
-        <Suspense fallback={<FeedSkeleton />}>
-          <FeedServer />
-        </Suspense>
-      </div>
-      <div className="flex justify-self-end pt-2 px-3">
-        <Link
-          href="/feed"
-          className="text-gray-300 hover:text-white text-sm transition-all flex gap-1 items-center justify-center"
-        >
-          Show More
-          <ChevronDown />
-        </Link>
-      </div>
-    </div>
+    <Suspense fallback={<FeedSkeleton />}>
+      <FeedServer />
+    </Suspense>
   )
 }

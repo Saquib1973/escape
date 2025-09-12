@@ -2,7 +2,8 @@ import React from 'react'
 import prisma from '@/lib/prisma'
 import { getSession } from '@/lib/auth'
 import UserDetailScreen from '@/components/user/user-detail-screen'
-import { getPostsWithPosters } from '@/app/(user)/post/actions'
+import type { GenericPost } from '@/types/post'
+import { getPosterUrl } from '@/lib/tmdb'
 
 const page = async ({ params }: { params: Promise<{ username: string }> }) => {
   const { username } = await params
@@ -29,7 +30,7 @@ const page = async ({ params }: { params: Promise<{ username: string }> }) => {
           user: { select: { name: true, image: true } },
           likes: { select: { id: true, userId: true } },
           _count: { select: { comments: true } },
-          movie: { select: { id: true, type: true } },
+          movie: { select: { id: true, type: true, posterPath: true } },
         },
         orderBy: { createdAt: 'desc' },
         take: 20,
@@ -56,7 +57,21 @@ const page = async ({ params }: { params: Promise<{ username: string }> }) => {
     initialIsFollowing = Boolean(rel)
   }
 
-  const postsWithPosters = await getPostsWithPosters(user.posts)
+  const postsWithPosters: GenericPost[] = user.posts.map((p) => ({
+    id: p.id,
+    title: p.title,
+    content: p.content,
+    rating: p.rating,
+    isSpoiler: p.isSpoiler,
+    createdAt: p.createdAt,
+    posterUrl: getPosterUrl(p.movie?.posterPath ?? null, 'w500') ?? '/logo.png',
+    user: {
+      name: p.user?.name ?? null,
+      image: p.user?.image ?? null,
+    },
+    likes: p.likes,
+    _count: { comments: p._count.comments },
+  }))
 
   return (
     <UserDetailScreen

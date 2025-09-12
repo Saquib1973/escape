@@ -1,14 +1,3 @@
-export interface SimplerPost {
-  id: string
-  title: string | null
-  content: string
-  rating: RatingEnum | null
-  isSpoiler: boolean
-  createdAt: string | Date
-  contentId: string
-  movieType?: string
-}
-
 export type RatingEnum =
   | 'TRASH'
   | 'TIMEPASS'
@@ -16,14 +5,40 @@ export type RatingEnum =
   | 'MUST_WATCH'
   | 'LEGENDARY'
 
-export interface PaginatedPostsResponse {
-  success: boolean
-  posts: SimplerPost[]
-  pagination: {
-    page: number
-    size: number
-    total: number
-    totalPages: number
-    hasMore: boolean
-  }
+  export type GenericPost = {
+    id: string
+    title?: string | null
+    content: string
+    rating: RatingEnum | null
+    isSpoiler?: boolean
+    createdAt?: Date | string
+    posterUrl?: string | null
+    user: {
+      name: string | null
+      image: string | null
+    }
+    likes?: Array<{ id: string; userId: string }>
+    dislikes?: Array<{ id: string; userId: string }>
+    _count?: {
+      comments: number
+    }
 }
+  interface Post {
+    id: string
+    title: string | null
+    content: string
+    rating: RatingEnum | null
+    isSpoiler: boolean
+    createdAt: Date
+    movie?: { id: string; type: string; posterPath?: string | null }
+    posterUrl?: string | null
+    user: {
+      id: string
+      name: string | null
+      image: string | null
+    }
+    likes: Array<{ id: string; userId: string }>
+    _count: {
+      comments: number
+    }
+  }

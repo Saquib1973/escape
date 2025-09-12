@@ -1,9 +1,9 @@
 'use client'
-import React, { useMemo, useState } from 'react'
-import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion';
 import { Bot } from 'lucide-react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { useMemo, useState } from 'react';
 
 type Props = {
   contextType?: 'movie' | 'tv'

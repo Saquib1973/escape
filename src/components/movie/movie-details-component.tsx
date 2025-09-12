@@ -1,21 +1,23 @@
 'use client'
-import { MovieDetails } from '@/app/(user)/(cinema)/movie/[id]/actions'
-import Image from 'next/image'
-import React, { useState, useRef, useEffect } from 'react'
 import { CreatePostForm } from '@/components/forms/create-post-form'
-import { PostsSection } from '../posts-section'
+import { useCurrentUrl } from '@/hooks/useCurrentUrl'
 import { AnimatePresence, motion } from 'framer-motion'
-import AnimatePageWrapper from '../animate-page-wrapper'
 import { Bookmark, Bug, Menu, Plus } from 'lucide-react'
 import { useSession } from 'next-auth/react'
+import Image from 'next/image'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import MovieRecommendation from './movie-recommendation'
-import AiRecommendationComponent from './../ai-recommendation-component'
+import React, { useEffect, useRef, useState } from 'react'
+import AnimatePageWrapper from '../animate-page-wrapper'
 import ShareButton from '../buttons/share-button'
-import { useCurrentUrl } from '@/hooks/useCurrentUrl'
+import { PostsSection } from '../posts-section'
+import AiRecommendationComponent from './../ai-recommendation-component'
+import MovieRecommendation from './movie-recommendation'
+
+import type { MovieDetails } from '@/types/tmdb'
 
 interface MovieDetailsComponentProps {
-  movie: MovieDetails
+  movie: MovieDetails | null
 }
 
 const MovieDetailsComponent: React.FC<MovieDetailsComponentProps> = ({
@@ -81,20 +83,40 @@ const MovieDetailsComponent: React.FC<MovieDetailsComponentProps> = ({
     setMenu(false)
     if (!session) {
       router.push('/signin')
-      return
+    } else {
+      setShowCreatePost(true)
     }
-    setShowCreatePost(true)
   }
 
   const handleWatchlist = () => {
     setMenu(false)
     if (!session) {
       router.push('/signin')
-      return
     }
-    // TODO: Implement watchlist functionality
-    console.log('Add to watchlist:', movie.title)
+    // Watchlist functionality not implemented yet
   }
+
+    if (!movie) {
+      return (
+        <div className="h-full flex items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-white mb-2">
+              Movie Not Found
+            </h1>
+            <p className="text-gray-300 mb-4">
+              The movie you&apos;re looking for doesn&apos;t exist or has been
+              removed.
+            </p>
+            <Link
+              href="/"
+              className="bg-dark-gray-hover text-white px-4 py-2 cursor-pointer"
+            >
+              Go back to Home
+            </Link>
+          </div>
+        </div>
+      )
+    }
 
   const renderMobile = () => (
     <div className="md:hidden">
@@ -554,6 +576,8 @@ const MovieDetailsComponent: React.FC<MovieDetailsComponentProps> = ({
       </div>
     </div>
   )
+
+
 
   return (
     <AnimatePageWrapper className="">

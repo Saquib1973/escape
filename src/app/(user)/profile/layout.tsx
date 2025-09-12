@@ -1,19 +1,9 @@
+import UserProfileTabSection from '@/components/profile/user-profile-tab-section'
 import { getSession } from '@/lib/auth'
+import prisma from '@/lib/prisma'
 import Image from 'next/image'
 import { redirect } from 'next/navigation'
-import UserProfileTabSection from '@/components/user-profile-tab-section'
-import prisma from '@/lib/prisma'
 
-//temporary data
-const tempUserData = {
-  follower: 10,
-  following: 12,
-  Watched: 3,
-  favourites: [
-    { name: 'Saiyara', release: '2025' },
-    { name: 'Pushpa 2', release: '2025' },
-  ],
-}
 export default async function ProfileLayout({
   children,
 }: {

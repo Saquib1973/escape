@@ -3,26 +3,10 @@
 import { useState, useEffect, useCallback } from 'react'
 import { getAllContentPosts as getAllMoviePosts } from '@/app/(user)/post/actions'
 import PostList from '@/components/post-list'
+import type { Post } from '@/types/post'
 
-type RatingEnum = 'TRASH' | 'TIMEPASS' | 'ONE_TIME_WATCH' | 'MUST_WATCH' | 'LEGENDARY'
 
-interface Post {
-  id: string
-  title: string | null
-  content: string
-  rating: RatingEnum | null
-  isSpoiler: boolean
-  createdAt: Date
-  user: {
-    id: string
-    name: string | null
-    image: string | null
-  }
-  likes: Array<{ id: string; userId: string }>
-  _count: {
-    comments: number
-  }
-}
+
 
 interface PostsSectionProps {
   readonly movieId: string
@@ -39,7 +23,26 @@ export function PostsSection({ movieId, refreshTrigger }: PostsSectionProps) {
       setLoading(true)
       setError(null)
       const fetchedPosts = await getAllMoviePosts(movieId)
-      setPosts(fetchedPosts)
+      // Prefer cached posterPath from DB; fall back to API route if missing
+      const withPosters: Post[] = await Promise.all(
+        fetchedPosts.map(async (post) => {
+          const posterPath = post.movie?.posterPath ?? null
+          if (posterPath) {
+            return { ...post, posterUrl: `https://image.tmdb.org/t/p/w500${posterPath}` }
+          }
+          try {
+            const typeParam = post.movie?.type === 'tv_series' ? 'tv' : 'movie'
+            const contentId = post.movie?.id ?? movieId
+            const res = await fetch(`/api/poster?id=${contentId}&type=${typeParam}`, { cache: 'no-store' })
+            const data = await res.json()
+            const posterUrl: string | null = data?.posterUrl || '/logo.png'
+            return { ...post, posterUrl }
+          } catch {
+            return { ...post, posterUrl: '/logo.png' }
+          }
+        })
+      )
+      setPosts(withPosters)
     } catch (err) {
       setError('Failed to load posts')
       console.error('Error fetching posts:', err)
@@ -60,30 +63,7 @@ export function PostsSection({ movieId, refreshTrigger }: PostsSectionProps) {
   }, [refreshTrigger, fetchPosts])
 
   if (loading) {
-    return (
-      <div className="py-8">
-        <div className="animate-pulse">
-          <div className="flex flex-col gap-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-dark-gray-2 p-6">
-                <div className="flex gap-4">
-                  <div className="w-12 h-12 bg-dark-gray"></div>
-                  <div className="flex-1 space-y-2">
-                    <div className="h-4 bg-dark-gray w-24"></div>
-                    <div className="h-3 bg-dark-gray w-16"></div>
-                    <div className="h-4 bg-dark-gray w-3/4"></div>
-                    <div className="space-y-1">
-                      <div className="h-3 bg-dark-gray w-full"></div>
-                      <div className="h-3 bg-dark-gray w-5/6"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    )
+    return <PostList posts={[]} emptyText="Loading posts..." />
   }
 
   if (error) {
@@ -97,15 +77,5 @@ export function PostsSection({ movieId, refreshTrigger }: PostsSectionProps) {
     )
   }
 
-  return (
-    <div className="py-8">
-      <div className="flex justify-end items-center mb-6">
-        {Boolean(posts?.length) && (
-          <span className="text-gray-400 text-sm">{posts.length} posts</span>
-        )}
-      </div>
-
-      <PostList posts={posts} emptyText="Be the first to share your thoughts about this movie!" />
-    </div>
-  )
+  return <PostList posts={posts} emptyText="Be the first to share your thoughts about this movie!" />
 }

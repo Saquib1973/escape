@@ -4,7 +4,8 @@ import prisma from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { getMoviePosterInfo, getTVSeriesPosterInfo } from '@/lib/tmdb'
+import { getPosterUrl } from '@/lib/tmdb'
+import type { RatingEnum } from '@/types/post'
 
 const PostPage = async ({ params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params
@@ -16,7 +17,7 @@ const PostPage = async ({ params }: { params: Promise<{ id: string }> }) => {
         select: { id: true, name: true,username:true, image: true },
       },
       movie: {
-        select: { id: true, type: true },
+        select: { id: true, type: true, posterPath: true },
       },
       likes: { select: { id: true } },
       dislikes: { select: { id: true } },
@@ -26,11 +27,7 @@ const PostPage = async ({ params }: { params: Promise<{ id: string }> }) => {
 
   if (!post) return notFound()
 
-  // Fetch poster image for convenience
-  const posterInfo =
-    post.movie.type === 'tv_series'
-      ? await getTVSeriesPosterInfo(post.movie.id)
-      : await getMoviePosterInfo(post.movie.id)
+  const posterUrl = getPosterUrl(post.movie?.posterPath ?? null, 'w500')
 
   const formatDate = (date: Date) =>
     new Date(date).toLocaleString('en-US', {
@@ -41,7 +38,6 @@ const PostPage = async ({ params }: { params: Promise<{ id: string }> }) => {
       minute: '2-digit',
     })
 
-  type RatingEnum = 'TRASH' | 'TIMEPASS' | 'ONE_TIME_WATCH' | 'MUST_WATCH' | 'LEGENDARY'
   const ratingBadge = (rating: RatingEnum) => {
     const map: Record<RatingEnum, { label: string; className: string }> = {
       TRASH: { label: 'Trash', className: 'bg-red-900/30 text-red-300 border-red-500/30' },
@@ -62,11 +58,11 @@ const PostPage = async ({ params }: { params: Promise<{ id: string }> }) => {
     <AnimatePageWrapper>
         <div className=" py-6 max-md:px-4">
           <div className="flex flex-col md:flex-row gap-6 items-start">
-            {posterInfo?.posterUrl && (
+            {posterUrl && (
               <div className="md:w-60 max-w-40 w-full md:flex-shrink-0">
                 <Image
-                  src={posterInfo.posterUrl}
-                  alt={posterInfo.title}
+                  src={posterUrl}
+                  alt={post.title ?? 'Poster'}
                   width={240}
                   height={360}
                   className="w-full h-auto object-cover border border-dark-gray"

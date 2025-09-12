@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import PostList from '@/components/post-list'
-import type { GenericPost } from '@/components/post-list'
+import type { GenericPost } from '@/types/post'
 
 type Props = {
   userId: string

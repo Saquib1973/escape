@@ -4,47 +4,21 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { MessageCircle, ThumbsDown, ThumbsUp } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
+import type { GenericPost, RatingEnum } from '@/types/post'
+import { getRatingLabel } from '@/lib/utils'
 
-type RatingEnum = 'TRASH' | 'TIMEPASS' | 'ONE_TIME_WATCH' | 'MUST_WATCH' | 'LEGENDARY'
 
-export type GenericPost = {
-  id: string
-  title?: string | null
-  content: string
-  rating: RatingEnum | null
-  isSpoiler?: boolean
-  createdAt?: Date | string
-  posterUrl?: string | null
-  user: {
-    name: string | null
-    image: string | null
-  }
-  likes?: Array<{ id: string; userId: string }>
-  dislikes?: Array<{ id: string; userId: string }>
-  _count?: {
-    comments: number
-  }
-}
+
 
 type Props = {
   posts: GenericPost[]
   emptyText?: string
 }
 
-const ratingConfig: Record<RatingEnum, { label: string }> = {
-  TRASH: { label: 'Trash' },
-  TIMEPASS: { label: 'Timepass' },
-  ONE_TIME_WATCH: { label: 'One-time watch' },
-  MUST_WATCH: { label: 'Must watch' },
-  LEGENDARY: { label: 'Legendary' },
-}
-
-const RatingBar: React.FC<{ rating: RatingEnum }> = ({ rating }) => {
-  const cfg = ratingConfig[rating]
-  return (
-    <span className="text-gray-300 text-sm">{cfg.label}</span>
-  )
-}
+// creating a record to rename the ratings
+const RatingBar: React.FC<{ rating: RatingEnum }> = ({ rating }) => (
+  <span className="text-gray-300 text-sm">{getRatingLabel(rating)}</span>
+)
 
 const PostList: React.FC<Props> = ({ posts, emptyText = 'No posts yet' }) => {
 
@@ -86,7 +60,7 @@ const PostList: React.FC<Props> = ({ posts, emptyText = 'No posts yet' }) => {
                           target &&
                           target.src !== window.location.origin + '/logo.png'
                         ) {
-                          target.src = ''
+                          target.src = window.location.origin + '/logo.png'
                         }
                       }}
                     />

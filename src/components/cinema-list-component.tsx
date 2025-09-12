@@ -7,7 +7,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { MediaItem } from '../types/media'
 import CinemaListLoadingSkeleton from './skeletons/cinema-list-loading-skeleton'
-
+import { axiosGetWithRetry } from '@/lib/http'
 interface CinemaListComponentProps {
   title: string
   items?: MediaItem[]
@@ -38,23 +38,19 @@ const CinemaListComponent: React.FC<CinemaListComponentProps> = ({
   const [error, setError] = useState<string | null>(null)
 
   const items: MediaItem[] = useMemo(() => {
-    return (itemsProp && itemsProp.length > 0) ? itemsProp : fetchedItems
+    return itemsProp && itemsProp.length > 0 ? itemsProp : fetchedItems
   }, [itemsProp, fetchedItems])
 
   const fetchData = useCallback(async () => {
+    if (!apiUrl) return
+    setLoading(true)
+    setError(null)
+
     try {
-      if (!apiUrl) return
-      setLoading(true)
-      setError(null)
-      const res = await fetch(apiUrl, { method: 'GET' })
-      if (!res.ok) {
-        const body = await res.text()
-        throw new Error(body || 'Failed to fetch list')
-      }
-      const data = await res.json()
-      setFetchedItems(data.results || [])
+      const { data } = await axiosGetWithRetry<{ results?: MediaItem[] }>(apiUrl)
+      setFetchedItems(data.results ?? [])
     } catch (error) {
-      console.error(error)
+      console.error('Cinema list error :', error)
       setError('Failed to load data')
     } finally {
       setLoading(false)

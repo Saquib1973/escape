@@ -3,9 +3,7 @@
 import prisma from '@/lib/prisma'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { getMultipleMoviePosterInfo, getMultipleTVSeriesPosterInfo } from '@/lib/tmdb'
-import type { GenericPost } from '@/components/post-list'
-import type { TMDBMoviePoster, TMDBTVSeriesPoster } from '@/types/tmdb'
+// Generic post mapping is now handled at call sites; no poster augmentation here
 
 export type RatingEnum =
   | 'TRASH'
@@ -31,7 +29,7 @@ export async function getAllFeedPosts() {
           select: { id: true, name: true, image: true }
         },
         movie: {
-          select: { id: true, type: true }
+          select: { id: true, type: true, posterPath: true }
         },
         likes: { select: { id: true, userId: true } },
         dislikes: { select: { id: true, userId: true } },
@@ -56,6 +54,9 @@ export async function getAllContentPosts(contentId: string) {
       include: {
         user: {
           select: { id: true, name: true, image: true }
+        },
+        movie: {
+          select: { id: true, type: true, posterPath: true }
         },
         likes: { select: { id: true, userId: true } },
         dislikes: { select: { id: true, userId: true } },
@@ -123,57 +124,5 @@ export async function createPost(data: CreatePostData) {
 }
 
 // Shared function to fetch posts with poster information
-export async function getPostsWithPosters(posts: Array<{
-  id: string
-  title: string | null
-  content: string
-  rating: RatingEnum | null
-  isSpoiler: boolean
-  createdAt: Date
-  movie: { id: string; type: string }
-  user: { name: string | null; image: string | null }
-  likes: Array<{ id: string; userId: string }>
-  dislikes?: Array<{ id: string; userId: string }>
-  _count: { comments: number }
-}>): Promise<GenericPost[]> {
-  if (posts.length === 0) return []
-
-  const moviePosts = posts.filter((post) => post.movie.type === 'movie')
-  const tvSeriesPosts = posts.filter((post) => post.movie.type === 'tv_series')
-
-  const movieIds = moviePosts.map((post) => post.movie.id)
-  const tvSeriesIds = tvSeriesPosts.map((post) => post.movie.id)
-
-  const [moviePosterMap, tvSeriesPosterMap] = await Promise.all([
-    movieIds.length > 0 ? getMultipleMoviePosterInfo(movieIds) : Promise.resolve(new Map()),
-    tvSeriesIds.length > 0 ? getMultipleTVSeriesPosterInfo(tvSeriesIds) : Promise.resolve(new Map()),
-  ])
-
-  return posts.map((post) => {
-    let contentInfo: TMDBMoviePoster | TMDBTVSeriesPoster | undefined
-    if (post.movie.type === 'movie') {
-      contentInfo = moviePosterMap.get(post.movie.id)
-    } else {
-      contentInfo = tvSeriesPosterMap.get(post.movie.id)
-    }
-
-    return {
-      id: post.id,
-      title: post.title ?? null,
-      content: post.content,
-      rating: post.rating,
-      isSpoiler: post.isSpoiler,
-      createdAt: post.createdAt,
-      posterUrl: contentInfo?.posterUrl ?? '/logo.png',
-      user: {
-        name: post.user.name,
-        image: post.user.image,
-      },
-      likes: post.likes,
-      dislikes: post.dislikes,
-      _count: { comments: post._count.comments },
-    }
-  })
-}
 
 

@@ -1,7 +1,7 @@
 import { getSession } from '@/lib/auth'
 import prisma from '@/lib/prisma'
-import type { GenericPost } from '@/components/post-list'
-import { getMoviePosterInfo, getTVSeriesPosterInfo } from '@/lib/tmdb'
+import { getPosterUrl } from '@/lib/tmdb'
+import type { GenericPost } from '@/types/post'
 
 export async function getUserReviews(): Promise<GenericPost[]> {
   try {
@@ -34,6 +34,7 @@ export async function getUserReviews(): Promise<GenericPost[]> {
           select: {
             id: true,
             type: true,
+            posterPath: true,
           },
         },
       },
@@ -42,34 +43,24 @@ export async function getUserReviews(): Promise<GenericPost[]> {
       },
     })
 
-    // Fetch posters in parallel per post
-    const results: GenericPost[] = await Promise.all(
-      posts.map(async (post) => {
-        let posterUrl: string | null = null
-        try {
-          const posterInfo = post.movie.type === 'tv_series'
-            ? await getTVSeriesPosterInfo(post.movie.id)
-            : await getMoviePosterInfo(post.movie.id)
-          posterUrl = posterInfo?.posterUrl ?? null
-        } catch {}
-
-        return {
-          id: post.id,
-          title: post.title,
-          content: post.content,
-          rating: post.rating,
-          isSpoiler: post.isSpoiler,
-          createdAt: post.createdAt,
-          posterUrl,
-          user: {
-            name: post.user?.name ?? null,
-            image: post.user?.image ?? null,
-          },
-          likes: post.likes,
-          _count: { comments: post._count.comments },
-        }
-      })
-    )
+    const results: GenericPost[] = posts.map((post) => {
+      const posterUrl = getPosterUrl(post.movie?.posterPath ?? null, 'w500')
+      return {
+        id: post.id,
+        title: post.title,
+        content: post.content,
+        rating: post.rating,
+        isSpoiler: post.isSpoiler,
+        createdAt: post.createdAt,
+        posterUrl,
+        user: {
+          name: post.user?.name ?? null,
+          image: post.user?.image ?? null,
+        },
+        likes: post.likes,
+        _count: { comments: post._count.comments },
+      }
+    })
 
     return results
   } catch (error) {

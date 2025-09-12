@@ -1,6 +1,7 @@
 'use client'
 
 import { createPost, type RatingEnum } from '@/app/(user)/post/actions'
+import { getRatingLabel } from '@/lib/utils'
 import { motion } from 'framer-motion'
 import { X } from 'lucide-react'
 import { useState } from 'react'
@@ -58,7 +59,7 @@ export function CreatePostForm({
       <option value="">No rating</option>
       {ratingOptions.map((opt) => (
         <option key={opt} value={opt}>
-          {opt.replaceAll('_',' ')}
+          {getRatingLabel(opt)}
         </option>
       ))}
     </select>
