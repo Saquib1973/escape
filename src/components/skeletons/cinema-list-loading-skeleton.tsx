@@ -7,20 +7,21 @@ interface CinemaListLoadingSkeletonProps {
 }
 
 const CinemaListLoadingSkeleton: React.FC<CinemaListLoadingSkeletonProps> = ({ itemCount = 8 }) => {
+  const bdList = [
+    'bg-gradient-to-bl to-light-gray from-dark-gray-2',
+    'bg-gradient-to-tr delay-100 from-light-gray to-dark-gray-2',
+  ]
   return (
     <div className="w-full h-fit">
       <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
         {Array.from({ length: itemCount }, (_, index) => (
-          <div
-            key={index+"loading-skeleton"}
-            className="flex-shrink-0 w-36"
-          >
-            <div className="bg-dark-gray-2 overflow-hidden">
+          <div key={index + 'loading-skeleton'} className="flex-shrink-0 w-36">
+            <div className={`${bdList[index % bdList.length]} overflow-hidden`}>
               <div className="flex flex-col w-full h-60">
                 {/* Poster skeleton - large area for movie poster */}
                 <div className="flex-1 flex items-center justify-center">
                   <div className="w-full h-full flex items-center justify-center bg-gradient-to-tr from-dark-gray-2 to-dark-gray animate-pulse">
-                    <Loader size='md' text='Loading...' />
+                    {/* <Loader size="md" text="Loading..." /> */}
                   </div>
                 </div>
 

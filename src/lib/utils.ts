@@ -28,7 +28,6 @@ export function hideContent(content: string) {
     }).join("");
   })
   const output = updatedTextArray.join(' ');
-  console.log(output)
   return output;
 }
 

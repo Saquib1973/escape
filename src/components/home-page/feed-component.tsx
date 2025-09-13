@@ -71,68 +71,31 @@ async function FeedServer() {
       )
     }
 
-    const genericPosts = await Promise.all(
-      posts.map(async (post) => {
-        const cachedPosterUrl = getPosterUrl(post.movie?.posterPath ?? null, 'w500')
-        const isSpoiler = post.isSpoiler
-        const safeTitle = isSpoiler ? hideContent(post.title ?? '') : (post.title ?? null)
-        const safeContent = isSpoiler ? hideContent(post.content) : post.content
+    const genericPosts = posts.map((post) => {
+      const posterUrl = getPosterUrl(post.movie?.posterPath ?? null, 'w500')
+      const isSpoiler = post.isSpoiler
+      const safeTitle = isSpoiler ? hideContent(post.title ?? '') : (post.title ?? null)
+      const safeContent = isSpoiler ? hideContent(post.content) : post.content
 
-        if (cachedPosterUrl) {
-          return {
-            id: post.id,
-            title: safeTitle,
-            content: safeContent,
-            rating: post.rating,
-            isSpoiler,
-            createdAt: post.createdAt,
-            posterUrl: cachedPosterUrl,
-            user: { name: post.user?.name ?? null, image: post.user?.image ?? null },
-            likes: post.likes,
-            dislikes: post.dislikes,
-            _count: { comments: post._count.comments },
-          }
-        }
-
-        try {
-          const typeParam = post.movie?.type === 'tv_series' ? 'tv' : 'movie'
-          const contentId = post.movie?.id
-          const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL ?? ''}/api/poster?id=${contentId}&type=${typeParam}`, { cache: 'no-store' })
-          const data = await res.json()
-          const posterUrl: string | null = data?.posterUrl || '/logo.png'
-          return {
-            id: post.id,
-            title: safeTitle,
-            content: safeContent,
-            rating: post.rating,
-            isSpoiler,
-            createdAt: post.createdAt,
-            posterUrl,
-            user: { name: post.user?.name ?? null, image: post.user?.image ?? null },
-            likes: post.likes,
-            dislikes: post.dislikes,
-            _count: { comments: post._count.comments },
-          }
-        } catch {
-          return {
-            id: post.id,
-            title: safeTitle,
-            content: safeContent,
-            rating: post.rating,
-            isSpoiler,
-            createdAt: post.createdAt,
-            posterUrl: '/logo.png',
-            user: {
-              name: post.user?.name ?? null,
-              image: post.user?.image ?? null,
-            },
-            likes: post.likes,
-            dislikes: post.dislikes,
-            _count: { comments: post._count.comments },
-          }
-        }
-      })
-    )
+      return {
+        id: post.id,
+        title: safeTitle,
+        content: safeContent,
+        rating: post.rating,
+        isSpoiler,
+        createdAt: post.createdAt,
+        posterUrl,
+        user: { name: post.user?.name ?? null, image: post.user?.image ?? null },
+        movie: post.movie ? {
+          id: post.movie.id,
+          type: post.movie.type,
+          posterPath: post.movie.posterPath
+        } : undefined,
+        likes: post.likes,
+        dislikes: post.dislikes,
+        _count: { comments: post._count.comments },
+      }
+    })
     return (
       <div className="max-md:px-4 py-10">
         <h1 className='text-2xl text-gray-300'>Reviews</h1>

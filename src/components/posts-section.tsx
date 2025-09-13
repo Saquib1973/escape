@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
 import { getAllContentPosts as getAllMoviePosts } from '@/app/(user)/post/actions'
 import PostList from '@/components/post-list'
-import type { Post } from '@/types/post'
+import type { GenericPost } from '@/types/post'
+import { useCallback, useEffect, useState } from 'react'
 
 
 
@@ -14,7 +14,7 @@ interface PostsSectionProps {
 }
 
 export function PostsSection({ movieId, refreshTrigger }: PostsSectionProps) {
-  const [posts, setPosts] = useState<Post[]>([])
+  const [posts, setPosts] = useState<GenericPost[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -24,21 +24,45 @@ export function PostsSection({ movieId, refreshTrigger }: PostsSectionProps) {
       setError(null)
       const fetchedPosts = await getAllMoviePosts(movieId)
       // Prefer cached posterPath from DB; fall back to API route if missing
-      const withPosters: Post[] = await Promise.all(
+      const withPosters: GenericPost[] = await Promise.all(
         fetchedPosts.map(async (post) => {
           const posterPath = post.movie?.posterPath ?? null
+          let posterUrl: string | null = null
+
           if (posterPath) {
-            return { ...post, posterUrl: `https://image.tmdb.org/t/p/w500${posterPath}` }
+            posterUrl = `https://image.tmdb.org/t/p/w500${posterPath}`
+          } else {
+            try {
+              const typeParam = post.movie?.type === 'tv_series' ? 'tv' : 'movie'
+              const contentId = post.movie?.id ?? movieId
+              const res = await fetch(`/api/poster?id=${contentId}&type=${typeParam}`, { cache: 'no-store' })
+              const data = await res.json()
+              posterUrl = data?.posterUrl || '/logo.png'
+            } catch {
+              posterUrl = '/logo.png'
+            }
           }
-          try {
-            const typeParam = post.movie?.type === 'tv_series' ? 'tv' : 'movie'
-            const contentId = post.movie?.id ?? movieId
-            const res = await fetch(`/api/poster?id=${contentId}&type=${typeParam}`, { cache: 'no-store' })
-            const data = await res.json()
-            const posterUrl: string | null = data?.posterUrl || '/logo.png'
-            return { ...post, posterUrl }
-          } catch {
-            return { ...post, posterUrl: '/logo.png' }
+
+          return {
+            id: post.id,
+            title: post.title,
+            content: post.content,
+            rating: post.rating,
+            isSpoiler: post.isSpoiler,
+            createdAt: post.createdAt,
+            posterUrl,
+            user: {
+              name: post.user?.name ?? null,
+              image: post.user?.image ?? null
+            },
+            movie: post.movie ? {
+              id: post.movie.id,
+              type: post.movie.type,
+              posterPath: post.movie.posterPath
+            } : undefined,
+            likes: post.likes,
+            dislikes: post.dislikes,
+            _count: { comments: post._count.comments },
           }
         })
       )
