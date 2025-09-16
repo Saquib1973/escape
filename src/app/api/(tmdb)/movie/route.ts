@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
-import { http } from '@/lib/http'
-import prisma from '@/lib/prisma'
+import { http, prisma } from '@/lib'
 import { TMDBMovieDetails } from '@/types/tmdb'
 
 const token = process.env.TMDB_TOKEN
@@ -23,7 +22,7 @@ export async function GET(request: Request) {
       )
     }
 
-    const url = `${baseUrl}/movie/${movieId}?language=en-US`
+    const url = `${baseUrl}/movie/${movieId}?language=hi-IN`
     const response = await http.getWithRetry<TMDBMovieDetails>(url, {
       headers: {
         accept: 'application/json',

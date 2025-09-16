@@ -4,9 +4,9 @@ import { Calendar, ChevronDown, Star } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
-import Loader from '../loader'
+import Loader from '../../loader'
 import { motion, type Variants } from 'framer-motion'
-import { http } from '@/lib/http'
+import { http } from '@/lib'
 
 // Skeleton component for loading state
 const TrendingSkeleton = () => (

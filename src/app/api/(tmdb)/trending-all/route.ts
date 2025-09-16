@@ -21,7 +21,7 @@ export async function GET(request: Request) {
       )
     }
 
-    const url = `${process.env.TMDB_BASE_URL}/trending/all/${timeWindow}?language=en-US&page=${page}`
+    const url = `${process.env.TMDB_BASE_URL}/trending/all/${timeWindow}?language=hi-IN&page=${page}`
 
     const response = await fetch(url, {
       method: 'GET',

@@ -1,5 +1,5 @@
 'use client'
-import { getRatingLabel } from '@/lib/utils'
+import { formatDateTime, getRatingLabel } from '@/lib'
 import type { GenericPost } from '@/types/post'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
@@ -55,13 +55,13 @@ const PostList: React.FC<Props> = ({ posts, emptyText = 'No posts yet' }) => {
   }
 
   return (
-    <div className="flex flex-col gap-1 py-6">
+    <div className="flex flex-col">
       <AnimatePresence mode="wait">
         {posts.map((post, index) => (
           <Link
             href={`/post/${post.id}`}
             key={post.id}
-            className="cursor-pointer hover:bg-dark-gray-2 group transition-colors"
+            className="cursor-pointer hover:bg-dark-gray-2 border-b border-dark-gray-2  bg-dark-gray-2/40 group transition-colors"
           >
             <motion.div
               initial={{ opacity: 0, y: -8 }}
@@ -75,7 +75,7 @@ const PostList: React.FC<Props> = ({ posts, emptyText = 'No posts yet' }) => {
               <div className="flex gap-4 ">
                 {/* Poster (preferred) or fallback to user initial */}
                 <div className="flex">
-                  <div className="w-32 overflow-hidden">
+                  <div className="w-36 overflow-hidden">
                     <Image
                       src={post.posterUrl || '/logo.png'}
                       alt={post.title || 'Poster'}
@@ -114,16 +114,7 @@ const PostList: React.FC<Props> = ({ posts, emptyText = 'No posts yet' }) => {
                       {post.createdAt && (
                         <div className="flex items-center gap-1 text-gray-400 text-xs mt-1">
                           <span>
-                            {new Date(post.createdAt).toLocaleDateString(
-                              'en-US',
-                              {
-                                year: 'numeric',
-                                month: 'short',
-                                day: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit',
-                              }
-                            )}
+                            {formatDateTime(post.createdAt as Date)}
                           </span>
                         </div>
                       )}
@@ -183,6 +174,7 @@ const PostList: React.FC<Props> = ({ posts, emptyText = 'No posts yet' }) => {
             </motion.div>
           </Link>
         ))}
+
       </AnimatePresence>
     </div>
   )

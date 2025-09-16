@@ -1,8 +1,8 @@
 'use client'
 
 import React from 'react'
-import CinemaListComponent from '../cinema-list-component'
-import { MediaItem } from '../../types/media'
+import CinemaList from '../../cinema-list'
+import { MediaItem } from '../../../types/media'
 
 const InCinemaComponent = () => {
   const getYear = (item: MediaItem) => {
@@ -14,8 +14,9 @@ const InCinemaComponent = () => {
   }
 
   return (
-    <CinemaListComponent
+    <CinemaList
       title="Now in Cinema"
+      subHeading="Discover what's trending in cinema"
       apiUrl="/api/now-playing"
       linkPath={(id) => `/movie/${id}`}
       scrollContainerClass="cinema-scroll-container"

@@ -12,7 +12,7 @@ export async function GET() {
       )
     }
 
-    const url = `${baseUrl}/movie/popular?language=en-US&page=1&region=IN`
+    const url = `${baseUrl}/movie/popular?language=hi-IN&page=1&region=IN`
     const response = await fetch(url, {
       method: 'GET',
       headers: {

@@ -13,7 +13,7 @@ export async function GET() {
   }
 
   try {
-    const url = `${baseUrl}/movie/now_playing?language=en-US&page=1&region=IN`
+    const url = `${baseUrl}/movie/now_playing?language=hi-IN&page=1&region=IN`
     const response = await axios.get(url, {
       headers: {
         accept: 'application/json',

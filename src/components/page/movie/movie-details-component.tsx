@@ -1,6 +1,5 @@
 'use client'
 import { CreatePostForm } from '@/components/forms/create-post-form'
-import { useCurrentUrl } from '@/hooks/useCurrentUrl'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Bookmark, Bug, Menu, Plus } from 'lucide-react'
 import { useSession } from 'next-auth/react'
@@ -8,11 +7,12 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useRef, useState } from 'react'
-import AnimatePageWrapper from '../animate-page-wrapper'
-import ShareButton from '../buttons/share-button'
-import { PostsSection } from '../posts-section'
-import AiRecommendationComponent from './../ai-recommendation-component'
+import AnimatePageWrapper from '../../animate-page-wrapper'
+import ShareButton from '../../buttons/share-button'
+import { PostsSection } from '../../posts-section'
+import AiRecommendationComponent from '../../ai-recommendation-component'
 import MovieRecommendation from './movie-recommendation'
+import { formatDate } from '@/lib'
 
 import type { MovieDetails } from '@/types/tmdb'
 
@@ -31,7 +31,6 @@ const MovieDetailsComponent: React.FC<MovieDetailsComponentProps> = ({
   const mobileMoreRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
   const { data: session, status } = useSession()
-  const currentUrl = useCurrentUrl()
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -63,13 +62,6 @@ const MovieDetailsComponent: React.FC<MovieDetailsComponentProps> = ({
     return `${hours}h ${mins}m`
   }
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    })
-  }
 
   const getImageUrl = (
     path: string | null,
@@ -223,7 +215,7 @@ const MovieDetailsComponent: React.FC<MovieDetailsComponentProps> = ({
                         <Bookmark className="size-4" />
                         Add to Watchlist
                       </button>
-                      <ShareButton url={currentUrl} />
+                      <ShareButton />
                       <button
                         onClick={() => {
                           setMobileMoreOpen(false)
@@ -417,7 +409,7 @@ const MovieDetailsComponent: React.FC<MovieDetailsComponentProps> = ({
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.175, duration: 0.15 }}
                       >
-                        <ShareButton url={currentUrl} />
+                        <ShareButton />
                       </motion.div>
                       <motion.button
                         initial={{ opacity: 0, x: -5 }}

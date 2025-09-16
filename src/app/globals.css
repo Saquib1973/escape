@@ -43,6 +43,9 @@
 .auth-form-input {
   @apply text-white placeholder:text-gray-300 bg-dark-gray outline-none p-2 px-4 w-full;
 }
+.text-input {
+  @apply w-full px-3 py-2 bg-dark-gray text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-light-green focus:border-transparent resize-none
+}
 
 * {
   box-sizing: border-box;

@@ -4,13 +4,13 @@ import React, { useState, useRef, useEffect } from 'react'
 import { CreatePostForm } from '@/components/forms/create-post-form'
 import { PostsSection } from '@/components/posts-section'
 import { AnimatePresence, motion } from 'framer-motion'
-import AnimatePageWrapper from '../animate-page-wrapper'
+import AnimatePageWrapper from '../../animate-page-wrapper'
 import { Bookmark, Bug, Menu, Plus } from 'lucide-react'
 import SeriesRecommendation from './series-recommendation'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import ShareButton from '../buttons/share-button'
-import { useCurrentUrl } from '@/hooks/useCurrentUrl'
+import ShareButton from '../../buttons/share-button'
+import { formatDate } from '@/lib'
 import type { TVSeriesDetails } from '@/types/tmdb'
 
 interface TVSeriesDetailsComponentProps {
@@ -28,7 +28,6 @@ const TVSeriesDetailsComponent: React.FC<TVSeriesDetailsComponentProps> = ({
   const mobileMoreRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
   const { data: session, status } = useSession()
-  const currentUrl = useCurrentUrl()
 
   // Close menus when clicking outside
   useEffect(() => {
@@ -53,13 +52,6 @@ const TVSeriesDetailsComponent: React.FC<TVSeriesDetailsComponentProps> = ({
     }
   }, [menu, mobileMoreOpen])
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    })
-  }
 
   const getImageUrl = (
     path: string | null,
@@ -195,7 +187,7 @@ const TVSeriesDetailsComponent: React.FC<TVSeriesDetailsComponentProps> = ({
                         <Bookmark className="size-4" />
                         Add to Watchlist
                       </button>
-                      <ShareButton url={currentUrl} />
+                      <ShareButton />
                       <button
                         onClick={() => {
                           setMobileMoreOpen(false)
@@ -405,7 +397,7 @@ const TVSeriesDetailsComponent: React.FC<TVSeriesDetailsComponentProps> = ({
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.175, duration: 0.15 }}
                       >
-                        <ShareButton url={currentUrl} />
+                        <ShareButton />
                       </motion.div>
                       <motion.button
                         initial={{ opacity: 0, x: -5 }}

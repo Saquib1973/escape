@@ -30,7 +30,7 @@ export async function searchMovies(query: string): Promise<Movie[]> {
   if (!query.trim()) return []
 
   try {
-    const url = `${TMDB_BASE_URL}/search/movie?include_adult=false&language=en-US&page=1&query=${encodeURIComponent(query)}`
+    const url = `${TMDB_BASE_URL}/search/movie?include_adult=false&language=hi-IN&page=1&query=${encodeURIComponent(query)}`
     const response = await fetch(url, {
       method: 'GET',
       headers: {
@@ -55,7 +55,7 @@ export async function searchTVShows(query: string): Promise<TVShow[]> {
   if (!query.trim()) return []
 
   try {
-    const url = `${TMDB_BASE_URL}/search/tv?include_adult=false&language=en-US&page=1&query=${encodeURIComponent(query)}`
+    const url = `${TMDB_BASE_URL}/search/tv?include_adult=false&language=hi-IN&page=1&query=${encodeURIComponent(query)}`
     const response = await fetch(url, {
       method: 'GET',
       headers: {

@@ -5,16 +5,16 @@ import { Share2 } from 'lucide-react'
 import { useState } from 'react'
 
 interface ShareButtonProps {
-  url: string
   className?: string
 }
 
-const ShareButton: React.FC<ShareButtonProps> = ({ url, className = '' }) => {
+const ShareButton: React.FC<ShareButtonProps> = ({ className = '' }) => {
   const [copied, setCopied] = useState(false)
   const [shouldAnimate, setShouldAnimate] = useState(false)
 
   const handleShare = async () => {
-    const urlToShare = url || (typeof window !== 'undefined' ? window.location.href : '')
+    const urlToShare = typeof window !== 'undefined' ? window.location.href : ''
+
     try {
       await navigator.clipboard.writeText(urlToShare)
       setShouldAnimate(true)

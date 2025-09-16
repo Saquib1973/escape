@@ -1,6 +1,5 @@
-import UserProfileTabSection from '@/components/profile/user-profile-tab-section'
-import { getSession } from '@/lib/auth'
-import prisma from '@/lib/prisma'
+import UserProfileTabSection from '@/components/page/profile/user-profile-tab-section'
+import { getSession, prisma } from '@/lib'
 import Image from 'next/image'
 import { redirect } from 'next/navigation'
 

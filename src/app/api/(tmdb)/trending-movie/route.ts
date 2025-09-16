@@ -16,7 +16,7 @@ export async function GET(request: Request) {
       )
     }
 
-    const url = `${baseUrl}/trending/movie/${timeWindow}?language=en-US&page=${page}`
+    const url = `${baseUrl}/trending/movie/${timeWindow}?language=hi-IN&page=${page}`
 
     const response = await fetch(url, {
       method: 'GET',

@@ -1,5 +1,5 @@
 import AnimatePageWrapper from '@/components/animate-page-wrapper'
-import { getSession } from '@/lib/auth'
+import { getSession } from '@/lib'
 import { redirect } from 'next/navigation'
 import React from 'react'
 

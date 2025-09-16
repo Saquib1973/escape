@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSession } from '@/lib/auth'
-import prisma from '@/lib/prisma'
+import { getSession, prisma } from '@/lib'
 
 export async function POST(
   request: NextRequest,

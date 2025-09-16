@@ -7,8 +7,10 @@ import {
   type Movie,
   type TVShow,
 } from './tmdb-actions'
-import { UserSearchResults } from '@/components/search'
-import SearchResultsWrapper from '@/components/search/search-results-wrapper'
+import {
+  SearchResultsWrapper,
+  UserSearchResults,
+} from '@/components/page/search'
 
 interface SearchPageProps {
   searchParams: Promise<{ q?: string; tab?: string }>
@@ -17,7 +19,10 @@ interface SearchPageProps {
 const SearchPage = async ({ searchParams }: SearchPageProps) => {
   const params = await searchParams
   const query = params.q || ''
-  const activeTab = (params.tab === 'shows' || params.tab === 'movies') ? params.tab : 'movies'
+  const activeTab =
+    params.tab === 'shows' || params.tab === 'movies' || params.tab === 'users'
+      ? params.tab
+      : 'movies'
 
   let userSearchResults: SearchUserResult[] = []
   let movieSearchResults: Movie[] = []
@@ -39,23 +44,23 @@ const SearchPage = async ({ searchParams }: SearchPageProps) => {
   return (
     <AnimatePageWrapper>
       <div className="py-8 max-md:px-2">
-        <h1 className="text-3xl text-gray-300 font-light">
-          Search Results
-        </h1>
+        <h1 className="text-3xl text-gray-300 font-light">Search Results</h1>
       </div>
 
       {query.trim() ? (
         <div className="flex max-md:flex-col-reverse w-full text-gray-300 gap-6">
-          {/* Main content area for movies and TV shows */}
+          {/* Main content area for movies, TV shows, and users */}
           <SearchResultsWrapper
             movies={movieSearchResults}
             tvShows={tvSearchResults}
+            users={userSearchResults}
             query={query}
             activeTab={activeTab}
           />
 
-          {/* Right sidebar for user results */}
-          <UserSearchResults users={userSearchResults} query={query} />
+          <div className="max-md:hidden md:w-[30%]">
+            <UserSearchResults users={userSearchResults} query={query} />
+          </div>
         </div>
       ) : (
         <div className="text-center py-12">

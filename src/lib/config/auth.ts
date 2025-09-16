@@ -4,7 +4,7 @@ import prisma from './prisma'
 import GoogleProvider from 'next-auth/providers/google'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import bcrypt from 'bcryptjs'
-import { generateUniqueUsernameFromEmail, generateRandomUsername } from './username'
+import { generateUniqueUsernameFromEmail, generateRandomUsername } from '../user/username'
 
 const customAdapter = {
   ...PrismaAdapter(prisma),

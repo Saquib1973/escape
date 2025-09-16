@@ -1,21 +1,26 @@
 'use client'
 
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { motion } from 'framer-motion'
 import MovieSearchResults from './movie-search-results'
 import TVSearchResults from './tv-search-results'
+import UserSearchResults from './user-search-results'
 import { type Movie, type TVShow } from '@/app/(user)/search/tmdb-actions'
+import { type SearchUserResult } from '@/app/(user)/search/action'
 
 interface SearchResultsWrapperProps {
   movies: Movie[]
   tvShows: TVShow[]
+  users: SearchUserResult[]
   query: string
-  activeTab: 'movies' | 'shows'
+  activeTab: 'movies' | 'shows' | 'users'
 }
 
 const SearchResultsWrapper = ({
   movies,
   tvShows,
+  users,
   query,
   activeTab,
 }: SearchResultsWrapperProps) => {
@@ -23,40 +28,45 @@ const SearchResultsWrapper = ({
   const searchParams = useSearchParams()
   const containerRef = useRef<HTMLDivElement | null>(null)
 
-  const handleTabChange = (tab: 'movies' | 'shows') => {
+  const handleTabChange = (tab: 'movies' | 'shows' | 'users') => {
     const params = new URLSearchParams(searchParams.toString())
     params.set('tab', tab)
     router.push(`/search?${params.toString()}`)
   }
   const movieBtnRef = useRef<HTMLButtonElement | null>(null)
   const tvBtnRef = useRef<HTMLButtonElement | null>(null)
+  const userBtnRef = useRef<HTMLButtonElement | null>(null)
   const [indicator, setIndicator] = useState<{ left: number; width: number }>({
     left: 0,
     width: 0,
   })
 
-  const updateIndicator = () => {
-    const target = activeTab === 'movies' ? movieBtnRef.current : tvBtnRef.current
+  const updateIndicator = useCallback(() => {
+    let target: HTMLButtonElement | null = null
+    if (activeTab === 'movies') target = movieBtnRef.current
+    else if (activeTab === 'shows') target = tvBtnRef.current
+    else if (activeTab === 'users') target = userBtnRef.current
+
     const container = containerRef.current
     if (!target || !container) return
+
     const targetRect = target.getBoundingClientRect()
     const containerRect = container.getBoundingClientRect()
     const left = targetRect.left - containerRect.left
     const width = targetRect.width
+
     setIndicator({ left, width })
-  }
+  }, [activeTab])
 
   useLayoutEffect(() => {
     updateIndicator()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab, movies?.length, tvShows?.length, query])
+  }, [updateIndicator])
 
   useEffect(() => {
     const onResize = () => updateIndicator()
     window.addEventListener('resize', onResize)
     return () => window.removeEventListener('resize', onResize)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [updateIndicator])
 
   return (
     <div className="flex-1 px-2 md:px-0">
@@ -79,25 +89,44 @@ const SearchResultsWrapper = ({
               type="button"
               ref={tvBtnRef}
               onClick={() => handleTabChange('shows')}
-              className={'py-2 text-sm md:text-base transition-colors ' + `${activeTab!=="movies" ? "text-white" : "text-gray-300"}`}
+              className={'py-2 text-sm md:text-base transition-colors ' + `${activeTab==="shows" ? "text-white" : "text-gray-300"}`}
               aria-selected={activeTab === 'shows'}
               role="tab"
             >
               TV Shows
             </button>
-            <div
+            <button
+              name='users'
+              type="button"
+              ref={userBtnRef}
+              onClick={() => handleTabChange('users')}
+              className={'py-2 text-sm md:text-base transition-colors md:hidden ' + `${activeTab==="users" ? "text-white" : "text-gray-300"}`}
+              aria-selected={activeTab === 'users'}
+              role="tab"
+            >
+              Users
+            </button>
+            <motion.div
               aria-hidden
-              className="pointer-events-none absolute -bottom-[2px] h-1 bg-gray-300 transition-all duration-300 ease-out"
-              style={{ left: `${indicator.left}px`, width: `${indicator.width}px` }}
+              className="pointer-events-none absolute -bottom-[2px] h-1 bg-gray-300"
+              initial={false}
+              animate={{
+                left: indicator.left,
+                width: indicator.width,
+              }}
+              transition={{
+                type: "spring",
+                stiffness: 300,
+                damping: 30,
+                mass: 0.8,
+              }}
             />
           </div>
         </div>
 
-        {activeTab === 'movies' ? (
-          <MovieSearchResults movies={movies} query={query} />
-        ) : (
-          <TVSearchResults tvShows={tvShows} query={query} />
-        )}
+        {activeTab === 'movies' && <MovieSearchResults movies={movies} query={query} />}
+        {activeTab === 'shows' && <TVSearchResults tvShows={tvShows} query={query} />}
+        {activeTab === 'users' && <UserSearchResults users={users} query={query} />}
       </div>
     </div>
   )

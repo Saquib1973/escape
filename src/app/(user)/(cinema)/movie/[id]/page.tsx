@@ -1,4 +1,4 @@
-import MovieDetailsComponent from '@/components/movie/movie-details-component'
+import MovieDetailsComponent from '@/components/page/movie/movie-details-component'
 
 const page = async ({ params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params

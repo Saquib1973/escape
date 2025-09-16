@@ -1,7 +1,7 @@
 'use client'
 
 import { createPost, type RatingEnum } from '@/app/(user)/post/actions'
-import { getRatingLabel } from '@/lib/utils'
+import { getRatingLabel } from '@/lib'
 import { motion } from 'framer-motion'
 import { X } from 'lucide-react'
 import { useState } from 'react'
@@ -54,7 +54,7 @@ export function CreatePostForm({
     <select
       value={rating ?? ''}
       onChange={(e) => setRating((e.target.value || null) as RatingEnum | null)}
-      className="w-full px-3 py-2 bg-dark-gray-hover text-white focus:outline-none focus:ring-2 focus:ring-light-green focus:border-transparent"
+      className="text-input"
     >
       <option value="">No rating</option>
       {ratingOptions.map((opt) => (
@@ -75,7 +75,7 @@ export function CreatePostForm({
       <div className="bg-dark-gray-2 max-w-xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           {/* Header */}
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex justify-between items-center mb-2">
             <div className="py-2">
               <h2 className="text-2xl font-bold text-white">Create Post</h2>
               <p className="text-gray-400 text-sm">
@@ -91,7 +91,7 @@ export function CreatePostForm({
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="py-4">
+          <form onSubmit={handleSubmit} className="">
             {/* Title */}
             <div className="flex flex-col gap-1 py-2">
               <label
@@ -106,7 +106,7 @@ export function CreatePostForm({
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Give your post a catchy title..."
-                className="w-full px-3 py-2 bg-dark-gray-hover text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-light-green focus:border-transparent"
+                className="text-input"
               />
             </div>
 
@@ -135,7 +135,7 @@ export function CreatePostForm({
                 placeholder="Share your thoughts about this movie..."
                 required
                 rows={6}
-                className="w-full px-3 py-2 bg-dark-gray-hover text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-light-green focus:border-transparent resize-none"
+                className="text-input"
               />
             </div>
 

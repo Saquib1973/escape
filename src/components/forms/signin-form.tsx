@@ -3,9 +3,12 @@
 import { signIn } from 'next-auth/react'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Loader from '../loader'
 
 export function SignInForm() {
   // states
+  const [loading, setLoading] = useState(false)
+  const [loadingAsGuest, setLoadingAsGuest] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -16,6 +19,7 @@ export function SignInForm() {
     e.preventDefault()
 
     setError('')
+    setLoading(true)
     const result = await signIn('credentials', {
       redirect: false,
       email,
@@ -24,13 +28,16 @@ export function SignInForm() {
 
     if (result?.error) {
       setError(result.error)
+      setLoading(false)
     } else {
-      router.push("/")
+      setLoading(false)
+      router.push('/')
     }
   }
 
   const handleGuestLogin = async () => {
     setError('')
+    setLoadingAsGuest(true)
     const result = await signIn('credentials', {
       redirect: false,
       email: 'guest@welcome.com',
@@ -39,14 +46,17 @@ export function SignInForm() {
 
     if (result?.error) {
       setError(result.error)
+      setLoadingAsGuest(false)
     } else {
-      router.push("/")
+      setLoadingAsGuest(false)
+      router.push('/')
     }
   }
 
   return (
     <form onSubmit={handleSubmit} className="w-full flex flex-col gap-2">
       <input
+        disabled={loading}
         type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
@@ -55,6 +65,7 @@ export function SignInForm() {
         className="auth-form-input"
       />
       <input
+        disabled={loading}
         type="password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
@@ -67,14 +78,22 @@ export function SignInForm() {
         type="submit"
         className="bg-light-green mt-2 text-white cursor-pointer p-2 w-full"
       >
-        Sign In
+        {!loading ? (
+          'Sign In'
+        ) : (
+          <Loader color="#ffffff" className="" size="sm" />
+        )}
       </button>
       <button
         type="button"
         onClick={handleGuestLogin}
         className="bg-dark-gray-2 text-white cursor-pointer p-2 w-full"
-      >
-        Login as guest
+        >
+        {!loadingAsGuest ? (
+          "Login as guest"
+        ) : (
+          <Loader color="#ffffff" className="" size="sm" />
+        )}
       </button>
     </form>
   )

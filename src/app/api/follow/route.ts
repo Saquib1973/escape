@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
-import prisma from '@/lib/prisma'
-import { getSession } from '@/lib/auth'
+import { prisma, getSession } from '@/lib'
 
 type FollowRequestBody = {
   targetUserId: string

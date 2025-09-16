@@ -284,7 +284,7 @@ const RenderAuthSection = () => {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, transition: { delay: 0.56 } }}
+              exit={{ opacity: 0, transition: { delay: innerWidth<768 ? 0.56 : 0 } }}
               transition={{
                 ease: 'easeOut',
                 type: 'spring',

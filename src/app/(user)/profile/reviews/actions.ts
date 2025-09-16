@@ -1,6 +1,4 @@
-import { getSession } from '@/lib/auth'
-import prisma from '@/lib/prisma'
-import { getPosterUrl } from '@/lib/tmdb'
+import { getSession, prisma, getPosterUrl } from '@/lib'
 import type { GenericPost } from '@/types/post'
 
 export async function getUserReviews(): Promise<GenericPost[]> {

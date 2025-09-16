@@ -1,6 +1,6 @@
 'use client'
 
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib'
 import { AnimatePresence, motion } from 'framer-motion'
 import React from 'react'
 

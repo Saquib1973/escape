@@ -1,8 +1,7 @@
 'use server'
 
-import prisma from '@/lib/prisma'
+import { prisma, authOptions } from '@/lib'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
 // Generic post mapping is now handled at call sites; no poster augmentation here
 
 export type RatingEnum =

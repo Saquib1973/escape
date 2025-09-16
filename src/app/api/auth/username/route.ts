@@ -1,6 +1,5 @@
 import type { NextRequest } from 'next/server';
-import prisma from '@/lib/prisma';
-import { generateUsernameCombinations } from '@/lib/username';
+import { prisma, generateUsernameCombinations } from '@/lib';
 
 
 

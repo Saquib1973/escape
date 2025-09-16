@@ -1,6 +1,6 @@
 import AnimatePageWrapper from '@/components/animate-page-wrapper'
-import RightSidebar from '@/components/trending/right-sidebar'
-import TrendingListComponent from '@/components/trending/trending-list-component'
+import RightSidebar from '@/components/page/trending/right-sidebar'
+import TrendingListComponent from '@/components/page/trending/trending-list-component'
 
 const TrendingPage = () => {
   return (

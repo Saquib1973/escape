@@ -21,7 +21,7 @@ const UserSearchResults = ({ users, query }: UserSearchResultsProps) => {
 
   console.log(users)
   return (
-    <div className="md:w-[30%] md:px-4 px-2">
+    <div className="w-full md:px-4 px-2">
       <h1 className="text-xl font-medium mb-4">Users related to &apos;{query}&apos;</h1>
       <div className='flex flex-col gap-1 py-4'>
         {users.map((user, index) => {

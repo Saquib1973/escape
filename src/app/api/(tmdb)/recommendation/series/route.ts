@@ -23,7 +23,7 @@ export async function GET(request: Request) {
       )
     }
 
-    const url = `${baseUrl}/tv/${seriesId}/recommendations?language=en-US&page=${page}`
+    const url = `${baseUrl}/tv/${seriesId}/recommendations?language=hi-IN&page=${page}`
 
     const response = await fetch(url, {
       method: 'GET',

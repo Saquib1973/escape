@@ -1,28 +1,24 @@
-import React from 'react'
+import Loader from '@/components/loader'
 import Image from 'next/image'
-import Loader from '../loader'
 import Link from 'next/link'
 
-interface TVShow {
+interface Movie {
   id: number
-  name: string
+  title: string
   overview: string
   poster_path: string | null
-  first_air_date: string
+  release_date: string
   vote_average: number
 }
 
-interface TVSearchResultsProps {
-  tvShows: TVShow[]
+interface MovieSearchResultsProps {
+  movies: Movie[]
   query: string
   isLoading?: boolean
 }
 
-const TVSearchResults = ({
-  tvShows,
-  query,
-  isLoading = false,
-}: TVSearchResultsProps) => {
+const MovieSearchResults = ({ movies, query, isLoading = false }: MovieSearchResultsProps) => {
+
   const renderContent = () => {
     if (isLoading) {
       return (
@@ -32,46 +28,39 @@ const TVSearchResults = ({
       )
     }
 
-    if (tvShows.length === 0) {
+    if (movies.length === 0) {
       return (
         <p className="text-gray-400 text-sm">
-          No TV shows related to &apos;{query}&apos; found
+          No movies related to &apos;{query}&apos; found
         </p>
       )
     }
 
     return (
       <div className="flex flex-col gap-1">
-        {tvShows.map((show) => (
-          <Link
-            href={`/web-series/${show.id}`}
-            key={show.id}
-            className="flex gap-3 hover:bg-dark-gray-hover transition-colors cursor-pointer group"
-          >
+        {movies.map((movie) => (
+          <Link href={`/movie/${movie.id}`} key={movie.id} className="flex gap-3 hover:bg-dark-gray-hover transition-colors cursor-pointer group">
             <div className="relative w-20 h-32 flex-shrink-0">
               <Image
-                src={
-                  show.poster_path
-                    ? `https://image.tmdb.org/t/p/w500${show.poster_path}`
-                    : '/placeholder-tv.jpg'
+                src={movie.poster_path
+                  ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+                  : '/placeholder-movie.jpg'
                 }
-                alt={show.name}
+                alt={movie.title}
                 fill
                 className="object-cover"
               />
             </div>
             <div className="flex-1 min-w-0 p-2">
               <h3 className="font-medium text-white mb-1 group-hover:text-gray-200 transition-colors line-clamp-1">
-                {show.name}
+                {movie.title}
               </h3>
               <p className="text-gray-400 text-sm mb-2 line-clamp-2 leading-relaxed">
-                {show.overview}
+                {movie.overview}
               </p>
               <div className="flex items-center gap-4 text-xs text-gray-500">
-                <span>{show.first_air_date?.split('-')[0] || 'N/A'}</span>
-                <span className="text-yellow-400">
-                  ★ {show.vote_average.toFixed(1)}
-                </span>
+                <span>{movie.release_date?.split('-')[0] || 'N/A'}</span>
+                <span className="text-yellow-400">★ {movie.vote_average.toFixed(1)}</span>
               </div>
             </div>
           </Link>
@@ -82,12 +71,10 @@ const TVSearchResults = ({
 
   return (
     <div className="w-full">
-      <h2 className="text-xl font-medium py-4">
-        TV Shows related to &apos;{query}&apos;
-      </h2>
+      <h2 className="text-xl font-medium py-4">Movies related to &apos;{query}&apos;</h2>
       {renderContent()}
     </div>
   )
 }
 
-export default TVSearchResults
+export default MovieSearchResults

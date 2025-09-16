@@ -1,8 +1,8 @@
 'use client'
 
 import React from 'react'
-import CinemaListComponent from '../cinema-list-component'
-import { MediaItem } from '../../types/media'
+import CinemaList from '../../cinema-list'
+import { MediaItem } from '../../../types/media'
 
 const SeriesRecommendation = ({ id }: { id: number }) => {
   const getYear = (item: MediaItem) => {
@@ -14,7 +14,7 @@ const SeriesRecommendation = ({ id }: { id: number }) => {
   }
 
   return (
-    <CinemaListComponent
+    <CinemaList
       title="Recommended Series"
       apiUrl={`/api/recommendation/series?id=${id}&page=1`}
       linkPath={(seriesId) => `/web-series/${seriesId}`}

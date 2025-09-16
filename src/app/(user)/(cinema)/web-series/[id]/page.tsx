@@ -1,5 +1,5 @@
 import React from 'react'
-import TVSeriesDetailsComponent from '@/components/tv-series/tv-series-details-component'
+import TVSeriesDetailsComponent from '@/components/page/tv-series/tv-series-details-component'
 import Link from 'next/link'
 
 const page = async ({ params }: { params: Promise<{ id: string }> }) => {

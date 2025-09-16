@@ -9,7 +9,10 @@ export function SignUpForm() {
   //states
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [name, setName] = useState('')
   const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [usernameStatus, setUsernameStatus] = useState<'idle' | 'checking' | 'available' | 'unavailable'>('idle')
   const [usernameRecommendations, setUsernameRecommendations] = useState<string[]>([])
   const [hasShownRecommendations, setHasShownRecommendations] = useState(false)
@@ -107,7 +110,11 @@ export function SignUpForm() {
     setIsLoading(true)
 
     try {
-      const formData = new FormData(e.currentTarget)
+      const formData = new FormData()
+      formData.append('name', name)
+      formData.append('username', username)
+      formData.append('email', email)
+      formData.append('password', password)
       await signup(formData)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Signup failed')
@@ -119,14 +126,17 @@ export function SignUpForm() {
   return (
     <form onSubmit={handleSubmit} className="w-full flex flex-col gap-2">
       <input
+        disabled={isLoading}
         type="text"
-        name="name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
         placeholder="Name"
         required
         className="auth-form-input"
       />
       <div className="relative">
         <input
+          disabled={isLoading}
           type="text"
           name="username"
           placeholder="Username"
@@ -188,15 +198,19 @@ export function SignUpForm() {
           </div>
         )}
       <input
+        disabled={isLoading}
         type="email"
-        name="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
         placeholder="Email"
         required
         className="auth-form-input"
       />
       <input
+        disabled={isLoading}
         type="password"
-        name="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
         placeholder="Password"
         required
         className="auth-form-input"
@@ -205,9 +219,13 @@ export function SignUpForm() {
       <button
         type="submit"
         disabled={isLoading}
-        className="bg-light-green my-2 text-white p-2 w-full disabled:cursor-not-allowed disabled:opacity-50"
+        className="bg-light-green my-2 text-white cursor-pointer p-2 w-full disabled:cursor-not-allowed disabled:opacity-50"
       >
-        {isLoading ? 'Creating Account...' : 'Sign Up'}
+        {!isLoading ? (
+          'Sign Up'
+        ) : (
+          <Loader color="#ffffff" className="" size="sm" />
+        )}
       </button>
     </form>
   )
