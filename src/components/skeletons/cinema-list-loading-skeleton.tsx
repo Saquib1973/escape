@@ -1,6 +1,5 @@
 
 import React from 'react'
-import Loader from '../loader'
 
 interface CinemaListLoadingSkeletonProps {
   itemCount?: number

@@ -91,7 +91,7 @@ const AiRecommendationComponent = ({
             className=" text-white cursor-pointer hover:text-light-green rounded-md text-sm font-medium transition-colors flex gap-1 items-center"
           >
             <Bot className="size-5" />
-            <span>Get AI Recommendations</span>
+            <span>Get AI Recommendations for {title}</span>
           </button>
         )}
 

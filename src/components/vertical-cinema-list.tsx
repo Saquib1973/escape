@@ -56,16 +56,6 @@ const VerticalCinemaList: React.FC<VerticalCinemaListProps> = ({
   useEffect(() => {
     void fetchData()
   }, [fetchData])
-
-  const retry = useCallback(() => {
-    if (!loading) void fetchData()
-  }, [loading, fetchData])
-
-  // Helper functions for data processing
-  const getYear = useCallback((item: MediaItem) => {
-    return new Date(item.release_date as string).getFullYear()
-  }, [])
-
   const getTitle = useCallback((item: MediaItem) => {
     return item.title as string
   }, [])
