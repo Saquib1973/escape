@@ -7,10 +7,15 @@ import Loader from '../loader'
 
 export function SignInForm() {
   // states
-  const [loading, setLoading] = useState(false)
-  const [loadingAsGuest, setLoadingAsGuest] = useState(false)
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [status, setStatus] = useState({
+    guestLogin: false,
+    login:false,
+  })
+
+  const [data, setData] = useState({
+    email: "",
+    password:""
+  });
   const [error, setError] = useState('')
   const router = useRouter()
 
@@ -19,36 +24,35 @@ export function SignInForm() {
     e.preventDefault()
 
     setError('')
-    setLoading(true)
+    setStatus({...status, login:true})
     const result = await signIn('credentials', {
       redirect: false,
-      email,
-      password,
+      email:data.email,
+      password:data.password,
     })
 
     if (result?.error) {
       setError(result.error)
-      setLoading(false)
+      setStatus({...status, login:false})
     } else {
-      setLoading(false)
+      setStatus({...status, login:false})
       router.push('/')
     }
   }
-
   const handleGuestLogin = async () => {
     setError('')
-    setLoadingAsGuest(true)
+    setStatus({...status, guestLogin:true})
     const result = await signIn('credentials', {
       redirect: false,
-      email: 'guest@welcome.com',
-      password: 'guest@welcome.com',
+      email: 'guest@escape.com',
+      password: 'guest',
     })
 
     if (result?.error) {
       setError(result.error)
-      setLoadingAsGuest(false)
+      setStatus({...status, guestLogin:false})
     } else {
-      setLoadingAsGuest(false)
+      setStatus({...status, guestLogin:false})
       router.push('/')
     }
   }
@@ -56,19 +60,19 @@ export function SignInForm() {
   return (
     <form onSubmit={handleSubmit} className="w-full flex flex-col gap-2">
       <input
-        disabled={loading}
+        disabled={status.login}
         type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        value={data.email}
+        onChange={(e) => setData({...data, email:e.target.value})}
         placeholder="Email"
         required
         className="auth-form-input"
       />
       <input
-        disabled={loading}
+        disabled={status.login}
         type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
+        value={data.password}
+        onChange={(e) => setData({...data, password:e.target.value})}
         placeholder="Password"
         required
         className="auth-form-input"
@@ -78,7 +82,7 @@ export function SignInForm() {
         type="submit"
         className="bg-light-green mt-2 text-white cursor-pointer p-2 w-full"
       >
-        {!loading ? (
+        {!status.login ? (
           'Sign In'
         ) : (
           <Loader color="#ffffff" className="" size="sm" />
@@ -89,7 +93,7 @@ export function SignInForm() {
         onClick={handleGuestLogin}
         className="bg-dark-gray-2 text-white cursor-pointer p-2 w-full"
         >
-        {!loadingAsGuest ? (
+        {!status.guestLogin ? (
           "Login as guest"
         ) : (
           <Loader color="#ffffff" className="" size="sm" />

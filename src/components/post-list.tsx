@@ -75,7 +75,7 @@ const PostList: React.FC<Props> = ({ posts, emptyText = 'No posts yet' }) => {
               <div className="flex gap-4 ">
                 {/* Poster (preferred) or fallback to user initial */}
                 <div className="flex">
-                  <div className="w-36 overflow-hidden">
+                  <div className="w-40 overflow-hidden">
                     <Image
                       src={post.posterUrl || '/logo.png'}
                       alt={post.title || 'Poster'}
@@ -113,9 +113,7 @@ const PostList: React.FC<Props> = ({ posts, emptyText = 'No posts yet' }) => {
                       </div>
                       {post.createdAt && (
                         <div className="flex items-center gap-1 text-gray-400 text-xs mt-1">
-                          <span>
-                            {formatDateTime(post.createdAt as Date)}
-                          </span>
+                          <span>{formatDateTime(post.createdAt as Date)}</span>
                         </div>
                       )}
                     </div>
@@ -144,7 +142,7 @@ const PostList: React.FC<Props> = ({ posts, emptyText = 'No posts yet' }) => {
                   {/* Content */}
                   <div className="mb-4">
                     <p className="text-gray-300 text-sm leading-relaxed">
-                      {post.content}
+                      {post.content.length > 150 ? post.content.substring(0, 150) + '...' : post.content}
                     </p>
                   </div>
 
@@ -174,7 +172,6 @@ const PostList: React.FC<Props> = ({ posts, emptyText = 'No posts yet' }) => {
             </motion.div>
           </Link>
         ))}
-
       </AnimatePresence>
     </div>
   )

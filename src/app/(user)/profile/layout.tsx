@@ -17,6 +17,7 @@ export default async function ProfileLayout({
   const userData = await prisma.user.findUnique({
     where: {
       id: session.user.id,
+      isDeleted: false, // Exclude soft deleted users
     },
     select: {
       name: true,

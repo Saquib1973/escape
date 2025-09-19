@@ -594,6 +594,8 @@ const TVSeriesDetailsComponent: React.FC<TVSeriesDetailsComponentProps> = ({
           <CreatePostForm
             movieId={series.id.toString()}
             movieTitle={series.name}
+            contentType="tv_series"
+            posterPath={series.poster_path}
             onClose={() => setShowCreatePost(false)}
             onSuccess={() => {
               // Trigger posts refresh instead of page reload

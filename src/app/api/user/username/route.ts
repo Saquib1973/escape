@@ -33,7 +33,10 @@ export async function GET(req: NextRequest) {
   const limit = 10
   const candidates = generateRandomUsername(limit * 2)
   const existing = await prisma.user.findMany({
-    where: { username: { in: candidates } },
+    where: {
+      username: { in: candidates },
+      isDeleted: false, // Exclude soft deleted users
+    },
     select: { username: true },
   })
   const taken = new Set(existing.map((u) => u.username))

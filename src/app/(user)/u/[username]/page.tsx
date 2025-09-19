@@ -10,7 +10,10 @@ const page = async ({ params }: { params: Promise<{ username: string }> }) => {
   const viewerId = session?.user?.id || null
 
   const user = await prisma.user.findUnique({
-    where: { username },
+    where: {
+      username,
+      isDeleted: false, // Exclude soft deleted users
+    },
     select: {
       id: true,
       name: true,

@@ -1,19 +1,28 @@
 'use server'
 
-import { redirect } from 'next/navigation'
-import { prisma } from '@/lib'
+import { generateUniqueUsernameFromEmail, prisma } from '@/lib'
 import bcrypt from 'bcryptjs'
 
-export async function signup(formData: FormData) {
-  const name = formData.get('name') as string
-  const username = formData.get('username') as string
-  const email = formData.get('email') as string
-  const password = formData.get('password') as string
+interface SignupData{
+  name: string
+  password: string
+  email:string
+}
 
-  const existingUser = await prisma.user.findUnique({ where: { email } })
+export async function signup(data: SignupData) {
+  const { name, password, email } = data;
+
+  const existingUser = await prisma.user.findUnique({
+    where: {
+      email,
+      isDeleted: false, // Only check non-deleted users
+    }
+  })
   if (existingUser) {
     throw new Error('User already exists')
   }
+
+  const username = await generateUniqueUsernameFromEmail(email, prisma)
 
   const hashedPassword = await bcrypt.hash(password, 10)
 
@@ -27,10 +36,10 @@ export async function signup(formData: FormData) {
         image: 'https://api.dicebear.com/9.x/lorelei/svg?seed=' + username,
       },
     })
+
+    return { success: true, email }
   } catch (error) {
     console.log('Error : ', error)
-    return
+    throw new Error('Failed to create user')
   }
-
-  redirect('/signin')
 }

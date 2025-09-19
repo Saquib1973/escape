@@ -21,6 +21,11 @@ model User {
   image         String?
   password      String?   // Hashed for local auth
   role          String?   @default("user") // Extendable for RBAC
+
+  // Soft delete fields
+  deletedAt     DateTime? // When the user was soft deleted
+  isDeleted     Boolean   @default(false) // Quick check for deleted status
+
   accounts      Account[]
   sessions      Session[]
 

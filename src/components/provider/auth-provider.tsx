@@ -20,7 +20,6 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   if (status === 'unauthenticated') {
     return <UnauthenticatedSession />
   }
-  console.log("SESSION_DATA", data)
   return <>{children}</>
 }
 

@@ -594,9 +594,10 @@ const MovieDetailsComponent: React.FC<MovieDetailsComponentProps> = ({
           <CreatePostForm
             movieId={movie.id.toString()}
             movieTitle={movie.title}
+            contentType="movie"
+            posterPath={movie.poster_path}
             onClose={() => setShowCreatePost(false)}
             onSuccess={() => {
-              // Trigger posts refresh instead of page reload
               setRefreshPosts((prev) => prev + 1)
             }}
           />

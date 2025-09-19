@@ -41,7 +41,10 @@ export async function generateUniqueUsernameFromEmail(email: string, prisma: Pri
 
   // Try the base first
   const existingBase = await prisma.user.findUnique({
-    where: { username: base },
+    where: {
+      username: base,
+      isDeleted: true,
+    },
     select: { username: true }
   })
   if (!existingBase) return base
@@ -53,7 +56,10 @@ export async function generateUniqueUsernameFromEmail(email: string, prisma: Pri
     const candidate = `${trimmedBase}${suffix}`
 
     const existing = await prisma.user.findUnique({
-      where: { username: candidate },
+      where: {
+        username: candidate,
+        isDeleted: false, // Exclude soft deleted users
+      },
       select: { username: true }
     })
     if (!existing) return candidate

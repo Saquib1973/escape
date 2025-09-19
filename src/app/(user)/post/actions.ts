@@ -17,6 +17,8 @@ export interface CreatePostData {
   rating?: RatingEnum | null
   isSpoiler: boolean
   contentId: string
+  contentType?: 'movie' | 'tv_series'
+  posterPath?: string | null
 }
 
 // Feed: fetch latest posts across all content types
@@ -97,8 +99,15 @@ export async function createPost(data: CreatePostData) {
     // The specific type (movie/tv_series) can be set by detail pages when first visited.
     await prisma.movie.upsert({
       where: { id: data.contentId },
-      update: {},
-      create: { id: data.contentId, type: 'movie' }
+      update: {
+        type: data.contentType || 'movie',
+        posterPath: data.posterPath || undefined
+      },
+      create: {
+        id: data.contentId,
+        type: data.contentType || 'movie',
+        posterPath: data.posterPath || null
+      }
     })
 
     const post = await prisma.post.create({

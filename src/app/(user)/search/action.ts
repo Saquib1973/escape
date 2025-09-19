@@ -16,6 +16,7 @@ export async function searchUsers(query: string): Promise<SearchUserResult[]> {
   try {
     const users = await prisma.user.findMany({
       where: {
+        isDeleted: false, // Exclude soft deleted users
         OR: [
           {
             name: {

@@ -13,9 +13,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const followerId = session.user.id
-    const body = (await request.json()) as FollowRequestBody
-    const { targetUserId, action } = body
+    const followerId = session.user.id;
+    const { targetUserId, action } = await request.json() as FollowRequestBody
 
     if (!targetUserId || (action !== 'follow' && action !== 'unfollow')) {
       return NextResponse.json({ error: 'Invalid payload' }, { status: 400 })
@@ -25,8 +24,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Cannot follow yourself' }, { status: 400 })
     }
 
-    // Ensure target user exists
-    const targetUser = await prisma.user.findUnique({ where: { id: targetUserId }, select: { id: true } })
+    // Ensure target user exists and is not deleted
+    const targetUser = await prisma.user.findUnique({
+      where: {
+        id: targetUserId,
+        isDeleted: false, // Exclude soft deleted users
+      },
+      select: { id: true }
+    })
     if (!targetUser) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
@@ -38,11 +43,9 @@ export async function POST(request: Request) {
         create: { followerId, followingId: targetUserId },
       })
     } else {
-      // unfollow
       await prisma.follow.deleteMany({ where: { followerId, followingId: targetUserId } })
     }
 
-    // Return fresh counts and state
     const [followersCount, followingCount, isFollowing] = await Promise.all([
       prisma.follow.count({ where: { followingId: targetUserId } }),
       prisma.follow.count({ where: { followerId: targetUserId } }),

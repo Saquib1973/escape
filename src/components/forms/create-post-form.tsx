@@ -5,9 +5,12 @@ import { getRatingLabel } from '@/lib'
 import { motion } from 'framer-motion'
 import { X } from 'lucide-react'
 import { useState } from 'react'
+import Loader from '../loader'
 interface CreatePostFormProps {
   movieId: string
   movieTitle: string
+  contentType?: 'movie' | 'tv_series'
+  posterPath?: string | null
   onClose: () => void
   onSuccess?: () => void
 }
@@ -15,6 +18,8 @@ interface CreatePostFormProps {
 export function CreatePostForm({
   movieId,
   movieTitle,
+  contentType = 'movie',
+  posterPath = null,
   onClose,
   onSuccess,
 }: Readonly<CreatePostFormProps>) {
@@ -39,6 +44,8 @@ export function CreatePostForm({
         rating: rating || null,
         isSpoiler,
         contentId: movieId,
+        contentType,
+        posterPath,
       })
 
       onSuccess?.()
@@ -132,7 +139,7 @@ export function CreatePostForm({
                 id="content"
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                placeholder="Share your thoughts about this movie..."
+                placeholder={`Share your thoughts about this ${contentType === 'tv_series' ? 'TV series' : 'movie'}...`}
                 required
                 rows={6}
                 className="text-input"
@@ -174,7 +181,7 @@ export function CreatePostForm({
                 disabled={isLoading || !content.trim()}
                 className="flex-1 px-4 py-2 bg-light-green text-white cursor-pointer hover:bg-light-green disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                {isLoading ? 'Creating Post...' : 'Create Post'}
+                {isLoading ? <Loader color='white' size='sm' /> : 'Create Post'}
               </button>
             </div>
           </form>

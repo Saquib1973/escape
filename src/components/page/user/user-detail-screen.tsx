@@ -3,9 +3,10 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import PostList from '@/components/post-list'
+import { useMutation } from '@tanstack/react-query'
 import type { GenericPost } from '@/types/post'
 
-type Props = {
+type UserDetailScreenProps = {
   userId: string
   viewerId: string | null
   name: string
@@ -17,7 +18,7 @@ type Props = {
   posts: GenericPost[]
 }
 
-const UserDetailScreen: React.FC<Props> = ({
+const UserDetailScreen: React.FC<UserDetailScreenProps> = ({
   userId,
   viewerId,
   name,
@@ -31,38 +32,44 @@ const UserDetailScreen: React.FC<Props> = ({
   const [isFollowing, setIsFollowing] = useState<boolean>(initialIsFollowing)
   const [followers, setFollowers] = useState<number>(followersCount)
   const [following, setFollowing] = useState<number>(followingCount)
-  const [loading, setLoading] = useState<boolean>(false)
 
   const canFollow = !!viewerId && viewerId !== userId
 
+  const followUserMutation = useMutation({
+    mutationFn: async ({ targetUserId, action }: { targetUserId: string; action: 'follow' | 'unfollow' }) => {
+      const res = await fetch('/api/user/follow', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ targetUserId, action }),
+      })
+      const data = await res.json()
+      if (!res.ok || !data?.ok) {
+        throw new Error(data?.error || 'Failed to follow/unfollow user')
+      }
+      return data
+    },
+  })
+
   const onToggleFollow = async () => {
-    if (!canFollow || loading) return
+    if (!canFollow || followUserMutation.isPending) return
     const action = isFollowing ? 'unfollow' : 'follow'
 
-    // optimistic update
-    setLoading(true)
     setIsFollowing((prev) => !prev)
     setFollowers((prev) => prev + (action === 'follow' ? 1 : -1))
 
     try {
-      const res = await fetch('/api/follow', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ targetUserId: userId, action }),
+      const data = await followUserMutation.mutateAsync({
+        targetUserId: userId,
+        action,
       })
-      const data = await res.json()
-      if (!res.ok || !data?.ok) {
-        throw new Error(data?.error || 'Failed')
-      }
+
       setFollowers(data.followersCount)
       setFollowing(data.followingCount)
       setIsFollowing(Boolean(data.isFollowing))
-    } catch {
-      // revert optimistic update
+    } catch (error) {
       setIsFollowing((prev) => !prev)
       setFollowers((prev) => prev + (action === 'follow' ? -1 : 1))
-    } finally {
-      setLoading(false)
+      console.error('Failed to follow/unfollow user:', error)
     }
   }
 
@@ -70,7 +77,7 @@ const UserDetailScreen: React.FC<Props> = ({
     <div className="flex max-md:flex-col-reverse max-md:px-2 items-start gap-4 text-gray-300">
       <div className="w-full md:w-[70%]">
         <div className="text-2xl font-light mb-4">Reviews</div>
-        <PostList posts={posts} />
+        <PostList emptyText={`${username} has not reviewed any movies yet`} posts={posts} />
       </div>
       <div className="w-full md:w-[30%] md:sticky top-20 self-start right-0 flex flex-col items-center gap-4">
         <div className="flex items-center w-full gap-4">
@@ -100,11 +107,14 @@ const UserDetailScreen: React.FC<Props> = ({
         )}
         {viewerId && canFollow && (
           <button
-            className="w-full p-1 cursor-pointer bg-light-green"
+            className="w-full p-1 cursor-pointer bg-light-green disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={onToggleFollow}
-            disabled={loading}
+            disabled={followUserMutation.isPending}
           >
-            {isFollowing ? 'Unfollow' : 'Follow'}
+            {(() => {
+              if (followUserMutation.isPending) return 'Loading...'
+              return isFollowing ? 'Unfollow' : 'Follow'
+            })()}
           </button>
         )}
       </div>

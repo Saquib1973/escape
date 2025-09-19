@@ -7,6 +7,7 @@ export async function searchUsers(query: string, currentUserId: string) {
   return prisma.user.findMany({
     where: {
       id: { not: currentUserId },
+      isDeleted: false, // Exclude soft deleted users
       OR: [
         { username: { contains: q, mode: 'insensitive' } },
         { name: { contains: q, mode: 'insensitive' } },
@@ -20,7 +21,10 @@ export async function searchUsers(query: string, currentUserId: string) {
 
 export async function isUsernameAvailable(username: string) {
   const existing = await prisma.user.findUnique({
-    where: { username },
+    where: {
+      username,
+      isDeleted: false, // Only check non-deleted users
+    },
     select: { id: true },
   })
   return !existing

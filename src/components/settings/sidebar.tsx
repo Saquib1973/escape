@@ -17,6 +17,7 @@ const SECTIONS: { title: string; items: { href: string; label: string }[] }[] =
       items: [
         { href: '/settings/security', label: 'Security' },
         { href: '/settings/notifications', label: 'Notifications' },
+        { href: '/settings/delete-account', label: 'Delete Account' },
       ],
     },
     {
