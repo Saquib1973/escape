@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Atkinson_Hyperlegible } from 'next/font/google'
 import { AuthProvider } from '@/components/provider/auth-provider'
+import { QueryProvider } from '@/components/provider/query-provider'
 import './globals.css'
 
 const atkinsonHyperlegible = Atkinson_Hyperlegible({
@@ -25,7 +26,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${atkinsonHyperlegible.variable} bg-black`}>
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <QueryProvider>{children}</QueryProvider>
+        </AuthProvider>
       </body>
     </html>
   )

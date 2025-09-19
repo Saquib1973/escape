@@ -50,4 +50,13 @@ export function formatDateTime(date: Date): string {
 }
 
 
+// Media helpers (DRY across components)
+export function getMediaTitle(item: { title?: string | null; name?: string | null }): string {
+  return (item.title || item.name || 'Unknown') as string
+}
+
+export function getMediaReleaseYear(item: { release_date?: string | null; first_air_date?: string | null }): string {
+  const date = item.release_date || item.first_air_date
+  return date ? String(new Date(date).getFullYear()) : 'N/A'
+}
 

@@ -1,267 +1,68 @@
 import { PrismaClient } from '@prisma/client'
+import { z } from 'zod'
 
-export const adjectives = [
-  'mystic',
-  'shadow',
-  'phantom',
-  'nebula',
-  'titan',
-  'iron',
-  'fox',
-  'lion',
-  'falcon',
-  'blade',
-  'nomad',
-  'maverick',
-  'rogue',
-  'viking',
-  'storm',
-  'blaze',
-  'ranger',
-  'striker',
-  'glimmer',
-  'softelm',
-  'faint',
-  'peachy',
-  'ember',
-  'drift',
-  'horizon',
-  'voyage',
-  'rain',
-  'cascade',
-  'radiant',
-  'arctic',
-  'sentinel',
-  'savage',
-  'urban',
-  'lynx',
-  'samurai',
-  'mars',
-  'cosmic',
-  'stellar',
-  'lunar',
-  'solar',
-  'galactic',
-  'celestial',
-  'ethereal',
-  'crimson',
-  'azure',
-  'golden',
-  'silver',
-  'bronze',
-  'platinum',
-  'diamond',
-]
+export const UsernameSchema = z
+  .string()
+  .trim()
+  .toLowerCase()
+  .min(3, 'Username must be at least 3 characters')
+  .max(20, 'Username must be at most 20 characters')
+  .regex(/^[a-zA-Z0-9_-]+$/, 'Only letters, numbers, underscores, and hyphens allowed')
 
-export const nouns = [
-  'assassin',
-  'user',
-  'moon',
-  'dust',
-  'lavender',
-  'twilight',
-  'petal',
-  'sync',
-  'void',
-  'wanderer',
-  'ghost',
-  'cloud',
-  'berry',
-  'midnight',
-  'veil',
-  'static',
-  'serenity',
-  'neutral',
-  'aura',
-  'tiny',
-  'sugar',
-  'lilac',
-  'whisper',
-  'minty',
-  'cozy',
-  'peach',
-  'soft',
-  'velvet',
-  'sleepy',
-  'sketch',
-  'pink',
-  'bloom',
-  'sugarcove',
-  'aurora',
-  'queen',
-  'rose',
-  'crystal',
-  'vibe',
-  'noble',
-  'phantom',
-  'shadow',
-  'nebula',
-  'titan',
-  'fox',
-  'lion',
-  'falcon',
-  'blade',
-  'nomad',
-  'maverick',
-  'rogue',
-  'viking',
-  'storm',
-  'blaze',
-  'ranger',
-  'striker',
-  'glimmer',
-  'ember',
-  'drift',
-  'horizon',
-  'voyage',
-  'rain',
-  'cascade',
-  'radiant',
-  'arctic',
-  'sentinel',
-  'savage',
-  'urban',
-  'lynx',
-  'samurai',
-  'mars',
-  'cosmos',
-  'star',
-  'planet',
-  'comet',
-  'meteor',
-  'asteroid',
-]
 
-export const connectingWords = [
-  'and',
-  'or',
-  'of',
-  'the',
-  'in',
-  'on',
-  'at',
-  'by',
-  'for',
-  'with',
-  'from',
-  'to',
-  'under',
-  'over',
-  'through',
-  'between',
-  'among',
-  'within',
-  'without',
-  'above',
-  'below',
-  'beside',
-  'beyond',
-  'across',
-  'around',
-  'near',
-  'far',
-  'inside',
-  'outside',
-]
-
-export function generateUsernameCombinations(count: number = 10): string[] {
+export function generateRandomUsername(count: number = 10): string[] {
   const usernames: string[] = []
-  const usedCombinations = new Set<string>()
+  const used = new Set<string>()
 
-  while (usernames.length < count && usedCombinations.size < 1000) {
-    const adjective = adjectives[Math.floor(Math.random() * adjectives.length)]
-    const noun = nouns[Math.floor(Math.random() * nouns.length)]
-    const connectingWord =
-      Math.random() < 0.3
-        ? connectingWords[Math.floor(Math.random() * connectingWords.length)]
-        : ''
-    const number = generateRandomNumber()
-
-    let username: string
-
-    if (connectingWord) {
-      username = `${adjective}${connectingWord}${noun}${number}`
-    } else {
-      username = `${adjective}${noun}${number}`
-    }
-
-    if (!usedCombinations.has(username)) {
-      usedCombinations.add(username)
+  while (usernames.length < count) {
+    const timePart = Date.now().toString(36)
+    const randPart = Math.random().toString(36).slice(2, 8)
+    const suffix = (timePart + randPart).slice(-8)
+    const username = `user${suffix}`
+    if (!used.has(username)) {
+      used.add(username)
       usernames.push(username)
     }
   }
 
   return usernames
 }
-export function generateRandomNumber(): string {
-  return Math.floor(1000 + Math.random() * 9000).toString()
-}
 
+// Single public API: generate a deterministic username from email and ensure uniqueness
 
-export function generateUsernameFromEmail(email: string): string {
+export async function generateUniqueUsernameFromEmail(email: string, prisma: PrismaClient): Promise<string> {
   const emailPrefix = email.split('@')[0]
 
   const cleanPrefix = emailPrefix
     .toLowerCase()
-    .replace(/[^a-z0-9]/g, '') // Remove all non-alphanumeric characters
+    .replace(/[^a-z0-9_-]/g, '')
 
-  const prefix = cleanPrefix.length >= 3 ? cleanPrefix : cleanPrefix + 'user'
+  const base = (cleanPrefix.length >= 3 ? cleanPrefix : 'user').slice(0, 20)
 
-  const randomNumber = generateRandomNumber()
+  // Try the base first
+  const existingBase = await prisma.user.findUnique({
+    where: { username: base },
+    select: { username: true }
+  })
+  if (!existingBase) return base
 
-  return `${prefix}${randomNumber}`
-}
+  // Then append small numeric suffixes while respecting 20-char max
+  for (let suffixNumber = 1; suffixNumber <= 100; suffixNumber++) {
+    const suffix = String(suffixNumber)
+    const trimmedBase = base.slice(0, 20 - suffix.length)
+    const candidate = `${trimmedBase}${suffix}`
 
-export async function generateUniqueUsernameFromEmail(email: string, prisma: PrismaClient): Promise<string> {
-  const baseUsername = generateUsernameFromEmail(email)
-  let username = baseUsername
-  let attempts = 0
-  const maxAttempts = 10
-
-  while (attempts < maxAttempts) {
-    const existingUser = await prisma.user.findUnique({
-      where: { username },
+    const existing = await prisma.user.findUnique({
+      where: { username: candidate },
       select: { username: true }
     })
-
-    if (!existingUser) {
-      return username
-    }
-
-    attempts++
-    const newNumber = Math.floor(1000 + Math.random() * 9000).toString()
-    username = `${baseUsername.slice(0, -4)}${newNumber}`
+    if (!existing) return candidate
   }
 
-  const randomSuffix = Math.floor(10000 + Math.random() * 90000).toString()
-  return `${baseUsername.slice(0, -4)}${randomSuffix}`
+  // Fallback: short deterministic-ish suffix based on time
+  const timeSuffix = Date.now().toString(36).slice(-4)
+  const fallbackBase = base.slice(0, 20 - timeSuffix.length)
+  return `${fallbackBase}${timeSuffix}`
 }
 
-export async function generateRandomUsername(prisma: PrismaClient): Promise<string> {
-  const adjectives = ['mystic', 'shadow', 'phantom', 'nebula', 'titan', 'fox', 'lion', 'falcon', 'blade', 'nomad']
-  const nouns = ['user', 'moon', 'dust', 'ghost', 'cloud', 'star', 'planet', 'comet', 'meteor', 'asteroid']
-
-  let attempts = 0
-  const maxAttempts = 20
-
-  while (attempts < maxAttempts) {
-    const adjective = adjectives[Math.floor(Math.random() * adjectives.length)]
-    const noun = nouns[Math.floor(Math.random() * nouns.length)]
-    const number = Math.floor(1000 + Math.random() * 9000).toString()
-    const username = `${adjective}${noun}${number}`
-
-    const existingUser = await prisma.user.findUnique({
-      where: { username },
-      select: { username: true }
-    })
-
-    if (!existingUser) {
-      return username
-    }
-
-    attempts++
-  }
-
-  const timestamp = Date.now().toString().slice(-6)
-  return `user${timestamp}`
-}
+// Removed async random generator in favor of using generateUsernameCombinations + availability checks

@@ -4,7 +4,10 @@ import prisma from './prisma'
 import GoogleProvider from 'next-auth/providers/google'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import bcrypt from 'bcryptjs'
-import { generateUniqueUsernameFromEmail, generateRandomUsername } from '../user/username'
+import {
+  generateUniqueUsernameFromEmail,
+  generateRandomUsername,
+} from '../user/username'
 
 const customAdapter = {
   ...PrismaAdapter(prisma),
@@ -15,7 +18,14 @@ const customAdapter = {
     }
 
     if (!username) {
-      username = await generateRandomUsername(prisma)
+      // Generate few candidates and pick the first available using Prisma directly
+      const candidates = generateRandomUsername()
+      const existing = await prisma.user.findMany({
+        where: { username: { in: candidates } },
+        select: { username: true },
+      })
+      const taken = new Set(existing.map(u => u.username))
+      username = candidates.find(u => !taken.has(u)) || `user${Date.now().toString(36).slice(-6)}`
     }
 
     return prisma.user.create({

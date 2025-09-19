@@ -1,6 +1,4 @@
 import { NextResponse } from 'next/server'
-import { http, prisma } from '@/lib'
-import { TMDBMovieDetails } from '@/types/tmdb'
 
 const token = process.env.TMDB_TOKEN
 const baseUrl = process.env.TMDB_BASE_URL || 'https://api.themoviedb.org/3'
@@ -24,25 +22,24 @@ export async function GET(request: Request) {
     }
 
     const url = `${baseUrl}/tv/${seriesId}?language=hi-IN`
-    const response = await http.getWithRetry<TMDBMovieDetails>(url, {
+    const response = await fetch(url, {
       headers: {
         accept: 'application/json',
         Authorization: `Bearer ${token}`,
       },
+      cache: 'no-store',
     })
-    const posterPath = response.data?.poster_path ?? null
-    // Upsert series row and cache posterPath
-    try {
-      await prisma.movie.upsert({
-        where: { id: seriesId },
-        update: { posterPath },
-        create: { id: seriesId, type: 'tv_series', posterPath },
-      })
-    } catch (dbError) {
-      console.error('Failed to upsert series row:', dbError)
+
+    if (!response.ok) {
+      const errorBody = await response.text()
+      return NextResponse.json(
+        { error: 'Failed to fetch series details', details: errorBody },
+        { status: response.status }
+      )
     }
 
-    return NextResponse.json(response.data, { status: 200 })
+    const data = await response.json()
+    return NextResponse.json(data, { status: 200 })
   } catch (error: unknown) {
     return NextResponse.json(
       {

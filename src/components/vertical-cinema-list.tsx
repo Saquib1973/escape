@@ -3,12 +3,13 @@
 import { Star } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { motion } from 'framer-motion'
-import { axiosGetWithRetry, cn } from '@/lib'
+import { cn } from '@/lib'
 import { MediaItem } from '../types/media'
 import Loader from './loader'
 import Header from './header'
+import { useQuery } from '@tanstack/react-query'
 
 interface VerticalCinemaListProps {
   title: string
@@ -27,35 +28,27 @@ const VerticalCinemaList: React.FC<VerticalCinemaListProps> = ({
   showEmptyState = false,
   className,
 }) => {
-  const [fetchedItems, setFetchedItems] = useState<MediaItem[]>([])
-  const [loading, setLoading] = useState<boolean>(false)
-  const [error, setError] = useState<string | null>(null)
+  const shouldFetch = (!itemsProp || itemsProp.length === 0) && Boolean(apiUrl)
 
+  const { data, isLoading, isError, error, refetch, isFetching } = useQuery<{ results?: MediaItem[] }>({
+    queryKey: ['vertical-cinema-list', apiUrl],
+    queryFn: async () => {
+      if (!apiUrl) return { results: [] }
+      const response = await fetch(apiUrl)
+      if (!response.ok) {
+        throw new Error('Failed to load data')
+      }
+      return response.json()
+    },
+    enabled: shouldFetch,
+    retry: 3,
+    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 5000),
+  })
+
+  const fetchedItems = useMemo(() => data?.results ?? [], [data])
   const items: MediaItem[] = useMemo(() => {
     return itemsProp && itemsProp.length > 0 ? itemsProp : fetchedItems
   }, [itemsProp, fetchedItems])
-
-  const fetchData = useCallback(async () => {
-    if (!apiUrl) return
-    setLoading(true)
-    setError(null)
-
-    try {
-      const { data } = await axiosGetWithRetry<{ results?: MediaItem[] }>(
-        apiUrl
-      )
-      setFetchedItems(data.results ?? [])
-    } catch (error) {
-      console.error('Vertical cinema list error:', error)
-      setError('Failed to load data')
-    } finally {
-      setLoading(false)
-    }
-  }, [apiUrl])
-
-  useEffect(() => {
-    void fetchData()
-  }, [fetchData])
   const getTitle = useCallback((item: MediaItem) => {
     return item.title as string
   }, [])
@@ -93,7 +86,7 @@ const VerticalCinemaList: React.FC<VerticalCinemaListProps> = ({
   }
 
   const renderContent = () => {
-    if (loading) {
+    if (isLoading) {
       return (
         <div className="w-full h-[86vh] flex py-6 justify-center">
           <div className="flex flex-col items-center gap-3">
@@ -102,21 +95,19 @@ const VerticalCinemaList: React.FC<VerticalCinemaListProps> = ({
         </div>
       )
     }
-    if (error) {
+    if (isError) {
       return (
         <div className="w-full h-[86vh] flex flex-col items-center justify-center gap-4">
           <div className="text-red-400 text-center">
             <div className="text-lg mb-2">⚠️</div>
-            <div className="text-sm">{error}</div>
+            <div className="text-sm">{(error instanceof Error ? error.message : 'Failed to load data')}</div>
           </div>
           <button
-            onClick={() => {
-              if (!loading) void fetchData()
-            }}
-            disabled={loading}
+            onClick={() => { if (!isFetching) { void refetch() } }}
+            disabled={isFetching}
             className="px-6 py-2 bg-light-green hover:bg-light-green/80 text-black font-medium rounded-lg disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200"
           >
-            {loading ? 'Retrying...' : 'Try Again'}
+            {isFetching ? 'Retrying...' : 'Try Again'}
           </button>
         </div>
       )

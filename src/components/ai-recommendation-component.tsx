@@ -4,6 +4,7 @@ import { Bot } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
 
 type Props = {
   contextType?: 'movie' | 'tv'
@@ -55,19 +56,26 @@ const AiRecommendationComponent = ({
 
   const skeletonKeys = ['a','b','c','d','e','f','g','h']
 
+  const { mutateAsync: generateRecs } = useMutation({
+    mutationKey: ['ai', 'recommendations'],
+    mutationFn: async (payload: unknown) => {
+      const resp = await fetch('/api/ai/recommendations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      if (!resp.ok) throw new Error('Failed to fetch recommendations')
+      return resp.json() as Promise<{ items?: Rec[] }>
+    },
+  })
+
   const fetchRecommendations = async () => {
     if (status !== 'authenticated') return
 
     try {
       setLoading(true)
       setError(null)
-      const resp = await fetch('/api/ai/recommendations', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      })
-      if (!resp.ok) throw new Error('Failed to fetch recommendations')
-      const data = await resp.json()
+      const data = await generateRecs(body)
       setItems(Array.isArray(data?.items) ? data.items : [])
       setHasFetched(true)
     } catch (e) {

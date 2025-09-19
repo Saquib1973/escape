@@ -1,28 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/config/auth'
-import { prisma } from '@/lib'
+import { searchUsers } from '@/lib/services/user'
+import { UnauthorizedError, getUserId } from '@/lib/services/auth'
 
 export async function GET(req: NextRequest) {
-  const session = await getServerSession(authOptions)
-  if (!session?.user?.id)
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
-  const q = req.nextUrl.searchParams.get('query')?.trim() || ''
-  if (!q) return NextResponse.json([])
-
-  const users = await prisma.user.findMany({
-    where: {
-      id: { not: session.user.id },
-      OR: [
-        { username: { contains: q, mode: 'insensitive' } },
-        { name: { contains: q, mode: 'insensitive' } },
-      ],
-    },
-    select: { id: true, username: true, name: true, image: true },
-    take: 10,
-    orderBy: { username: 'asc' },
-  })
-
-  return NextResponse.json(users)
+  try {
+    const userId = await getUserId()
+    const query = req.nextUrl.searchParams.get('query') || ''
+    const users = await searchUsers(query, userId)
+    return NextResponse.json(users)
+  } catch (err) {
+    if (err instanceof UnauthorizedError)
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    return NextResponse.json(
+      { error: 'Internal Server Error' },
+      { status: 500 }
+    )
+  }
 }

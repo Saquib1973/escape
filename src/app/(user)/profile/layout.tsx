@@ -1,3 +1,4 @@
+import AnimatePageWrapper from '@/components/animate-page-wrapper'
 import UserProfileTabSection from '@/components/page/profile/user-profile-tab-section'
 import { getSession, prisma } from '@/lib'
 import Image from 'next/image'
@@ -39,13 +40,13 @@ export default async function ProfileLayout({
   } : null
 
   return (
-    <div className="flex justify-center">
+    <AnimatePageWrapper className="flex justify-center">
       <div className="max-w-5xl w-full mx-auto py-8">
         <HeaderComponent userData={userDataWithCounts} />
         <UserProfileTabSection />
         {children}
       </div>
-    </div>
+    </AnimatePageWrapper>
   )
 }
 interface UserData {

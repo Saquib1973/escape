@@ -3,13 +3,14 @@ import { TrendingItem } from '@/types/trending'
 import { Calendar, ChevronDown, Star } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback } from 'react'
 import Loader from '../../loader'
 import { motion, type Variants } from 'framer-motion'
-import { http } from '@/lib'
+import { getMediaTitle, getMediaReleaseYear } from '@/lib'
+import { useInfiniteQuery } from '@tanstack/react-query'
 
 // Skeleton component for loading state
-const TrendingSkeleton = () => (
+const Skeleton = () => (
   <div className="flex flex-col gap-2">
     {Array.from({ length: 10 }).map((_, index) => (
       <div key={index + 'skeleton'} className="animate-pulse">
@@ -53,14 +54,35 @@ const TrendingSkeleton = () => (
 )
 
 const TrendingListComponent = () => {
-  const [trendingItems, setTrendingItems] = useState<TrendingItem[]>([])
-  const [loading, setLoading] = useState(true)
-  const [loadingMore, setLoadingMore] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [hasMore, setHasMore] = useState(true)
-  const [showSkeleton, setShowSkeleton] = useState(true)
+  const {
+    data,
+    isLoading,
+    isError,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: ['trending-all', 'day'],
+    initialPageParam: 1,
+    queryFn: async ({ pageParam }) => {
+      const page = Number(pageParam) || 1
+      const url = `/api/trending-all?page=${page}&time_window=day`
+      const res = await fetch(url, { method: 'GET' })
+      if (!res.ok) throw new Error('Failed to load trending items')
+      return res.json() as Promise<{ results: TrendingItem[]; total_pages: number }>
+    },
+    getNextPageParam: (lastPage, allPages) => {
+      const next = allPages.length + 1
+      return next <= (lastPage?.total_pages ?? 0) ? next : undefined
+    },
+  })
 
+  const trendingItems: TrendingItem[] = (data?.pages ?? []).flatMap(
+    (p) => p?.results ?? [],
+  )
+
+  //Animations
   const containerVariants: Variants = {
     hidden: { opacity: 1 },
     show: {
@@ -71,7 +93,6 @@ const TrendingListComponent = () => {
       },
     },
   }
-
   const itemVariants: Variants = {
     hidden: { opacity: 0, y: 20 },
     show: {
@@ -81,79 +102,21 @@ const TrendingListComponent = () => {
     },
   }
 
-  //effects
-  useEffect(() => {
-    fetchTrendingItems(1, true)
-  }, [])
-
   const handleLoadMore = useCallback(() => {
-    if (!loadingMore && hasMore) {
-      fetchTrendingItems(currentPage + 1, false)
+    if (hasNextPage && !isFetchingNextPage) {
+      void fetchNextPage()
     }
-  }, [loadingMore, hasMore, currentPage])
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage])
 
-  // function to fetch trending data
-  const fetchTrendingItems = async (
-    page: number,
-    isInitial: boolean = false
-  ) => {
-    try {
-      if (isInitial) {
-        setLoading(true)
-        setShowSkeleton(true)
-        setError(null)
-      } else {
-        setLoadingMore(true)
-      }
+  const getTitle = (item: TrendingItem) => getMediaTitle(item)
+  const getReleaseYear = (item: TrendingItem) => getMediaReleaseYear(item)
 
-      const url = `/api/trending-all?page=${page}&time_window=day`
-      const response = await http.getWithRetry(url, {}, {
-        maxRetries: 3,
-        baseDelayMs: 300,
-        timeoutMs: 8000,
-      })
-
-      const data = response.data as { results: TrendingItem[]; total_pages: number }
-
-      if (isInitial) {
-        setTrendingItems(data.results || [])
-        // Hide skeleton after a short delay to show the transition
-        setTimeout(() => {
-          setShowSkeleton(false)
-        }, 500)
-      } else {
-        setTrendingItems((prev) => [...prev, ...(data.results || [])])
-      }
-
-      setHasMore(page < data.total_pages)
-      setCurrentPage(page)
-    } catch (err) {
-      console.error('Error fetching trending items:', err)
-      if (isInitial) {
-        setError('Failed to load trending items')
-        setShowSkeleton(false)
-      }
-    } finally {
-      if (isInitial) {
-        setLoading(false)
-      } else {
-        setLoadingMore(false)
-      }
-    }
-  }
-
-  const getTitle = (item: TrendingItem) => item.title || item.name || 'Unknown'
-  const getReleaseYear = (item: TrendingItem) => {
-    const date = item.release_date || item.first_air_date
-    return date ? new Date(date).getFullYear() : 'N/A'
-  }
-
-  if (error) {
+  if (isError) {
     return (
       <div className="w-full flex items-center justify-center py-20">
         <div className="text-red-400 text-center">
           <h2 className="text-xl mb-2">Error Loading Trending Content</h2>
-          <p>{error}</p>
+          <p>{error instanceof Error ? error.message : String(error ?? 'Something went wrong')}</p>
         </div>
       </div>
     )
@@ -162,8 +125,8 @@ const TrendingListComponent = () => {
   return (
     <div className="w-full">
       {/* Show skeleton for initial loading */}
-      {showSkeleton && loading ? (
-        <TrendingSkeleton />
+      {isLoading ? (
+        <Skeleton />
       ) : (
         <>
           {/* Trending List */}
@@ -171,7 +134,7 @@ const TrendingListComponent = () => {
             variants={containerVariants}
             initial="hidden"
             animate="show"
-            className="flex flex-col gap-4 md:gap-2"
+            className="flex flex-col"
           >
             {trendingItems.map((item, index) => (
               <motion.div key={item.id + index} variants={itemVariants}>
@@ -183,7 +146,7 @@ const TrendingListComponent = () => {
                   }
                   className="group w-full transition-all duration-300 cursor-pointer"
                 >
-                  <div className="flex hover:bg-dark-gray-hover bg-dark-gray-2">
+                  <div className="flex border-b border-dark-gray-2 hover:bg-dark-gray-2">
                     {/* Poster Image */}
                     <div className="relative max-md:h-60 w-40 aspect-square md:h-52 flex-shrink-0">
                       {item.poster_path ? (
@@ -220,7 +183,7 @@ const TrendingListComponent = () => {
                     <div className="flex-1 p-6">
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex max-md:flex-col md:items-center gap-4">
-                          <span className="text-4xl font-extrabold text-dark-gray-hover group-hover:text-light-green transition-colors">
+                          <span className="text-4xl font-extrabold text-gray-300 group-hover:text-light-green transition-colors">
                             #{index + 1}
                           </span>
                           <h3 className="text-xl text-gray-300 font-medium group-hover:text-white transition-colors">
@@ -256,14 +219,14 @@ const TrendingListComponent = () => {
           </motion.div>
 
           {/* Load More Button */}
-          {hasMore && (
+          {hasNextPage && (
             <div className="mt-8 flex items-center justify-center">
               <button
                 onClick={handleLoadMore}
-                disabled={loadingMore}
+                disabled={isFetchingNextPage}
                 className={`px-4 py-2 text-gray-200 transition disabled:opacity-60 disabled:cursor-not-allowed`}
               >
-                {loadingMore ? (
+                {isFetchingNextPage ? (
                   <Loader />
                 ) : (
                   <div className="flex gap-1 items-center cursor-pointer">

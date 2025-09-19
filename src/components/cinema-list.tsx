@@ -3,11 +3,12 @@
 import { MoveRight, Star } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { MediaItem } from '../types/media'
 import CinemaListLoadingSkeleton from './skeletons/cinema-list-loading-skeleton'
-import { axiosGetWithRetry, cn } from '@/lib'
+import { cn } from '@/lib'
+import { useQuery } from '@tanstack/react-query'
 import Header from './header'
 interface CinemaListProps {
   title: string
@@ -38,10 +39,24 @@ const CinemaList: React.FC<CinemaListProps> = ({
   showEmptyState = false,
   className,
 }) => {
-  const [fetchedItems, setFetchedItems] = useState<MediaItem[]>([])
-  const [loading, setLoading] = useState<boolean>(false)
-  const [error, setError] = useState<string | null>(null)
+  const shouldFetch = (!itemsProp || itemsProp.length === 0) && Boolean(apiUrl)
 
+  const { data, isLoading, isError, error, refetch, isFetching } = useQuery<{ results?: MediaItem[] }>({
+    queryKey: ['cinema-list', apiUrl],
+    queryFn: async () => {
+      if (!apiUrl) return { results: [] }
+      const response = await fetch(apiUrl)
+      if (!response.ok) {
+        throw new Error('Failed to load data')
+      }
+      return response.json()
+    },
+    enabled: shouldFetch,
+    retry: 3,
+    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 5000),
+  })
+
+  const fetchedItems = useMemo(() => data?.results ?? [], [data])
   const items: MediaItem[] = useMemo(() => {
     return itemsProp && itemsProp.length > 0 ? itemsProp : fetchedItems
   }, [itemsProp, fetchedItems])
@@ -64,27 +79,7 @@ const CinemaList: React.FC<CinemaListProps> = ({
   const finalGetTitle = getTitle || defaultGetTitle
   const finalLinkPath = linkPath || defaultLinkPath
 
-  const fetchData = useCallback(async () => {
-    if (!apiUrl) return
-    setLoading(true)
-    setError(null)
-
-    try {
-      const { data } = await axiosGetWithRetry<{ results?: MediaItem[] }>(
-        apiUrl
-      )
-      setFetchedItems(data.results ?? [])
-    } catch (error) {
-      console.error('Cinema list error :', error)
-      setError('Failed to load data')
-    } finally {
-      setLoading(false)
-    }
-  }, [apiUrl])
-
-  useEffect(() => {
-    void fetchData()
-  }, [fetchData])
+  // fetching is handled by useQuery
 
   // Animation variants
   const containerVariants = {
@@ -123,7 +118,7 @@ const CinemaList: React.FC<CinemaListProps> = ({
   }
 
   const renderHeader = () => (
-    <div className={`flex justify-between items-center}`}>
+    <div className={`flex justify-between items-center`}>
       <Header className='mb-0' title={title} subHeading={subHeading} />
       <div className="flex gap-2 h-fit">
         <button
@@ -169,21 +164,19 @@ const CinemaList: React.FC<CinemaListProps> = ({
   )
 
   const renderContent = () => {
-    if (loading) {
+    if (isLoading) {
       return <CinemaListLoadingSkeleton itemCount={8} />
     }
-    if (error) {
+    if (isError) {
       return (
         <div className="w-full h-72 flex flex-col items-center justify-center gap-3">
-          <div className="text-red-400">{error}</div>
+          <div className="text-red-400">{(error instanceof Error ? error.message : 'Failed to load data')}</div>
           <button
-            onClick={() => {
-              if (!loading) void fetchData()
-            }}
-            disabled={loading}
+            onClick={() => { if (!isFetching) { void refetch() } }}
+            disabled={isFetching}
             className={`px-4 py-2 bg-dark-gray hover:bg-dark-gray-hover text-gray-200 disabled:opacity-60 disabled:cursor-not-allowed transition-colors`}
           >
-            {loading ? 'Retrying...' : 'Retry'}
+            {isFetching ? 'Retrying...' : 'Retry'}
           </button>
         </div>
       )

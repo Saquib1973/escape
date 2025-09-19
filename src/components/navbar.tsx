@@ -169,6 +169,11 @@ const RenderAuthSection = () => {
       name: 'notifications',
       link: '/profile/notifications',
     },
+    {
+      name: 'settings',
+      link: '/settings',
+    },
+
   ]
   const { data: session, status } = useSession()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
