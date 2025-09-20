@@ -5,6 +5,7 @@ import { signIn } from 'next-auth/react'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Loader from '../loader'
+import Input from '../input'
 
 export function SignUpForm() {
   //states
@@ -28,7 +29,6 @@ export function SignUpForm() {
       const result = await signup(data)
 
       if (result?.success) {
-        // Automatically log in the user after successful signup
         const loginResult = await signIn('credentials', {
           redirect: false,
           email: data.email,
@@ -38,7 +38,6 @@ export function SignUpForm() {
         if (loginResult?.error) {
           setError('Signup successful but login failed. Please try logging in manually.')
         } else {
-          // Redirect to home page after successful login
           router.push('/')
         }
       }
@@ -51,32 +50,32 @@ export function SignUpForm() {
 
   return (
     <form onSubmit={handleSubmit} className="w-full flex flex-col gap-2">
-      <input
+      <Input
         disabled={isLoading}
         type="text"
         value={data.name}
         onChange={(e) => setData({...data, name:e.target.value})}
         placeholder="Name"
         required
-        className="auth-form-input"
+        variant='primary'
       />
-      <input
+      <Input
         disabled={isLoading}
         type="email"
         value={data.email}
         onChange={(e) => setData({...data, email:e.target.value})}
         placeholder="Email"
         required
-        className="auth-form-input"
+        variant='primary'
       />
-      <input
+      <Input
         disabled={isLoading}
         type="password"
         value={data.password}
         onChange={(e) => setData({...data, password:e.target.value})}
         placeholder="Password"
         required
-        className="auth-form-input"
+        variant='primary'
       />
       {error && <p className="text-red-500">{error}</p>}
       <button

@@ -4,18 +4,19 @@ import { signIn } from 'next-auth/react'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Loader from '../loader'
+import Input from '../input'
 
 export function SignInForm() {
   // states
   const [status, setStatus] = useState({
     guestLogin: false,
-    login:false,
+    login: false,
   })
 
   const [data, setData] = useState({
-    email: "",
-    password:""
-  });
+    email: '',
+    password: '',
+  })
   const [error, setError] = useState('')
   const router = useRouter()
 
@@ -24,24 +25,24 @@ export function SignInForm() {
     e.preventDefault()
 
     setError('')
-    setStatus({...status, login:true})
+    setStatus({ ...status, login: true })
     const result = await signIn('credentials', {
       redirect: false,
-      email:data.email,
-      password:data.password,
+      email: data.email,
+      password: data.password,
     })
 
     if (result?.error) {
       setError(result.error)
-      setStatus({...status, login:false})
+      setStatus({ ...status, login: false })
     } else {
-      setStatus({...status, login:false})
+      setStatus({ ...status, login: false })
       router.push('/')
     }
   }
   const handleGuestLogin = async () => {
     setError('')
-    setStatus({...status, guestLogin:true})
+    setStatus({ ...status, guestLogin: true })
     const result = await signIn('credentials', {
       redirect: false,
       email: 'guest@escape.com',
@@ -50,32 +51,32 @@ export function SignInForm() {
 
     if (result?.error) {
       setError(result.error)
-      setStatus({...status, guestLogin:false})
+      setStatus({ ...status, guestLogin: false })
     } else {
-      setStatus({...status, guestLogin:false})
+      setStatus({ ...status, guestLogin: false })
       router.push('/')
     }
   }
 
   return (
     <form onSubmit={handleSubmit} className="w-full flex flex-col gap-2">
-      <input
+      <Input
         disabled={status.login}
         type="email"
         value={data.email}
-        onChange={(e) => setData({...data, email:e.target.value})}
+        onChange={(e) => setData({ ...data, email: e.target.value })}
         placeholder="Email"
         required
-        className="auth-form-input"
+        variant="primary"
       />
-      <input
+      <Input
         disabled={status.login}
         type="password"
         value={data.password}
-        onChange={(e) => setData({...data, password:e.target.value})}
+        onChange={(e) => setData({ ...data, password: e.target.value })}
         placeholder="Password"
         required
-        className="auth-form-input"
+        variant="primary"
       />
       {error && <p className="text-red-500">{error}</p>}
       <button
@@ -92,9 +93,9 @@ export function SignInForm() {
         type="button"
         onClick={handleGuestLogin}
         className="bg-dark-gray-2 text-white cursor-pointer p-2 w-full"
-        >
+      >
         {!status.guestLogin ? (
-          "Login as guest"
+          'Login as guest'
         ) : (
           <Loader color="#ffffff" className="" size="sm" />
         )}

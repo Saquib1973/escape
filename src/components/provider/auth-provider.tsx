@@ -13,7 +13,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
-  const { data, status } = useSession()
+  const { status } = useSession()
   if (status === 'loading') {
     return <LoadingSession />
   }

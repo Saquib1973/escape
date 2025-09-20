@@ -6,6 +6,8 @@ import { motion } from 'framer-motion'
 import { X } from 'lucide-react'
 import { useState } from 'react'
 import Loader from '../loader'
+import Input from '../input'
+import TextArea from '../text-area'
 interface CreatePostFormProps {
   movieId: string
   movieTitle: string
@@ -30,7 +32,13 @@ export function CreatePostForm({
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const ratingOptions: RatingEnum[] = ['TRASH','TIMEPASS','ONE_TIME_WATCH','MUST_WATCH','LEGENDARY']
+  const ratingOptions: RatingEnum[] = [
+    'TRASH',
+    'TIMEPASS',
+    'ONE_TIME_WATCH',
+    'MUST_WATCH',
+    'LEGENDARY',
+  ]
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -61,7 +69,7 @@ export function CreatePostForm({
     <select
       value={rating ?? ''}
       onChange={(e) => setRating((e.target.value || null) as RatingEnum | null)}
-      className="text-input"
+      className="text-white placeholder:text-gray-300 bg-dark-gray outline-none w-full p-2 px-4 text-base focus:ring-1 focus:ring-light-green"
     >
       <option value="">No rating</option>
       {ratingOptions.map((opt) => (
@@ -107,24 +115,25 @@ export function CreatePostForm({
               >
                 Title
               </label>
-              <input
+              <Input
                 type="text"
                 id="title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Give your post a catchy title..."
-                className="text-input"
+                className="focus:ring-1 focus:ring-light-green"
               />
             </div>
 
             {/* Rating */}
             <div className="flex flex-col gap-1 py-2">
-              <label htmlFor="rating" className="block text-sm font-medium text-gray-300 mb-2">
+              <label
+                htmlFor="rating"
+                className="block text-sm font-medium text-gray-300 mb-2"
+              >
                 Your Rating
               </label>
-              <div id="rating">
-                {renderRatingSelect()}
-              </div>
+              <div id="rating">{renderRatingSelect()}</div>
             </div>
 
             {/* Content */}
@@ -135,28 +144,30 @@ export function CreatePostForm({
               >
                 Review Content
               </label>
-              <textarea
+              <TextArea
                 id="content"
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                placeholder={`Share your thoughts about this ${contentType === 'tv_series' ? 'TV series' : 'movie'}...`}
+                placeholder={`Share your thoughts about this ${
+                  contentType === 'tv_series' ? 'TV series' : 'movie'
+                }...`}
                 required
                 rows={6}
-                className="text-input"
+                className="focus:ring-1 focus:ring-light-green"
               />
             </div>
 
             {/* Spoiler Checkbox */}
             <div className="flex items-center gap-1 py-2">
-              <input
+              <Input
                 type="checkbox"
                 id="spoiler"
                 checked={isSpoiler}
                 onChange={(e) => setIsSpoiler(e.target.checked)}
-                className="w-5 h-5 text-light-green bg-dark-gray-hover border-gray-600 rounded focus:ring-light-green focus:ring-2"
+                className="size-4 accent-light-green"
               />
-              <label htmlFor="spoiler" className="ml-2 text-sm text-gray-300">
-                This post contains spoilers
+              <label htmlFor="spoiler" className="ml-1 text-gray-300">
+                has spoilers ?
               </label>
             </div>
 
@@ -181,7 +192,7 @@ export function CreatePostForm({
                 disabled={isLoading || !content.trim()}
                 className="flex-1 px-4 py-2 bg-light-green text-white cursor-pointer hover:bg-light-green disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                {isLoading ? <Loader color='white' size='sm' /> : 'Create Post'}
+                {isLoading ? <Loader color="white" size="sm" /> : 'Create Post'}
               </button>
             </div>
           </form>

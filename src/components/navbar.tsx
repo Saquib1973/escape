@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Loader from './loader'
+import Input from './input'
 
 const navbarItems = [
   {
@@ -116,14 +117,15 @@ const Navbar = () => {
                 }`}
               >
                 <form onSubmit={handleSearchSubmit} className="relative">
-                  <input
+                  <Input
                     type="text"
                     ref={searchInputRef}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search..."
-                    className="w-full px-3 py-2 bg-dark-gray-hover text-white placeholder-dark-gray-hover outline-none transition-all"
+                    variant="secondary"
                     autoFocus={isSearchOpen}
+
                   />
                 </form>
               </div>
@@ -201,9 +203,9 @@ const RenderAuthSection = () => {
     }
   }, [isDropdownOpen])
 
-  if (status === 'loading') {
+  if ( status === 'loading') {
     return (
-      <div className="cursor-not-allowed w-20 md:w-36 h-10 bg-dark-gray-hover flex items-center justify-center text-gray-600 gap-1 animate-pulse">
+      <div className="cursor-not-allowed w-10 max-md:rounded-full md:w-36 h-10 bg-dark-gray-hover flex items-center justify-center text-gray-600 gap-1 animate-pulse">
         <span className='max-md:hidden'>Loading</span>
         <Loader size="sm" />
       </div>
@@ -233,7 +235,7 @@ const RenderAuthSection = () => {
     }
     return (
       <div
-        className="relative w-20 md:w-36 group dropdown-container"
+        className="relative w-10 md:w-36 group dropdown-container"
         onMouseEnter={() => {
           // Keep dropdown open when hovering over the entire container
           if (window.innerWidth >= 768) {
@@ -251,7 +253,7 @@ const RenderAuthSection = () => {
         tabIndex={-1}
       >
         <button
-          className={`flex w-full h-10 justify-around items-center md:space-x-2 px-2 md:px-4 py-4 transition-colors ${
+          className={`flex w-full max-md:rounded-full h-10 justify-center md:justify-around items-center md:space-x-2  md:p-4 transition-colors ${
             isDropdownOpen || isHovered
               ? 'bg-dark-gray-2'
               : 'bg-dark-gray-hover group-hover:bg-dark-gray-2'
@@ -263,13 +265,13 @@ const RenderAuthSection = () => {
             }
           }}
         >
-          <div className="w-7 h-7 bg-light-green rounded-full flex items-center justify-center">
+          <div className="md:size-8 size-10 bg-light-green rounded-full flex items-center justify-center">
             <Image
               src={userImage}
               className="rounded-full"
               alt="Profile"
-              width={28}
-              height={28}
+              width={34}
+              height={34}
               unoptimized={userImage.includes('dicebear')}
             />
           </div>
@@ -280,7 +282,7 @@ const RenderAuthSection = () => {
             animate={{ rotate: isDropdownOpen || isHovered ? 180 : 0 }}
             transition={{ duration: 0.2, ease: 'easeInOut' }}
           >
-            <ChevronDown className="w-4 h-4 text-gray-300" />
+            <ChevronDown className="size-4 max-md:hidden text-gray-300" />
           </motion.div>
         </button>
         {/* Dropdown Menu */}

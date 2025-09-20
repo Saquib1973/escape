@@ -1,5 +1,5 @@
 import AnimatePageWrapper from '@/components/animate-page-wrapper'
-import UserProfileTabSection from '@/components/page/profile/user-profile-tab-section'
+import ProfileSidebar from '@/components/profile/sidebar'
 import { getSession, prisma } from '@/lib'
 import Image from 'next/image'
 import { redirect } from 'next/navigation'
@@ -33,19 +33,25 @@ export default async function ProfileLayout({
   })
 
   // Merge with actual follower/following counts from database
-  const userDataWithCounts = userData ? {
-    ...userData,
-    follower: userData._count.followers,
-    following: userData._count.following,
-    Watched: 0, // You can add actual watched count logic here
-  } : null
+  const userDataWithCounts = userData
+    ? {
+        ...userData,
+        follower: userData._count.followers,
+        following: userData._count.following,
+        Watched: 0, // You can add actual watched count logic here
+      }
+    : null
 
   return (
-    <AnimatePageWrapper className="flex justify-center">
+    <AnimatePageWrapper className="mx-auto text-gray-300 w-full">
       <div className="max-w-5xl w-full mx-auto py-8">
         <HeaderComponent userData={userDataWithCounts} />
-        <UserProfileTabSection />
-        {children}
+      </div>
+      <div className="flex flex-col gap-3 md:flex-row md:gap-4">
+        <div className="w-full md:w-fit max-h-fit sticky top-15 md:top-18 left-0">
+          <ProfileSidebar />
+        </div>
+        <main className="flex-1 p-2 ">{children}</main>
       </div>
     </AnimatePageWrapper>
   )
@@ -70,7 +76,7 @@ const HeaderComponent = ({ userData }: { userData: UserData | null }) => {
               alt={`user profile picture`}
               width={64}
               height={64}
-              unoptimized={userData.image.includes("dicebear")}
+              unoptimized={userData.image.includes('dicebear')}
               className="w-full bg-light-green h-full object-cover"
             />
           </div>
