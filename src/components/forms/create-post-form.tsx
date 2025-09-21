@@ -8,6 +8,7 @@ import { useState } from 'react'
 import Loader from '../loader'
 import Input from '../input'
 import TextArea from '../text-area'
+import ActivityDatePicker from '../activity/activity-date-picker'
 interface CreatePostFormProps {
   movieId: string
   movieTitle: string
@@ -31,6 +32,8 @@ export function CreatePostForm({
   const [isSpoiler, setIsSpoiler] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+  const [activityDate, setActivityDate] = useState(new Date())
+  const [useCustomDate, setUseCustomDate] = useState(false)
 
   const ratingOptions: RatingEnum[] = [
     'TRASH',
@@ -54,6 +57,7 @@ export function CreatePostForm({
         contentId: movieId,
         contentType,
         posterPath,
+        activityDate: useCustomDate ? activityDate : undefined,
       })
 
       onSuccess?.()
@@ -169,6 +173,38 @@ export function CreatePostForm({
               <label htmlFor="spoiler" className="ml-1 text-gray-300">
                 has spoilers ?
               </label>
+            </div>
+
+            {/* Activity Date Section */}
+            <div className="py-2">
+              <div className="flex items-center gap-2 mb-3">
+                <Input
+                  type="checkbox"
+                  id="useCustomDate"
+                  checked={useCustomDate}
+                  onChange={(e) => setUseCustomDate(e.target.checked)}
+                  className="size-4 accent-light-green"
+                />
+                <label htmlFor="useCustomDate" className="text-gray-300">
+                  Log this activity for a different date
+                </label>
+              </div>
+
+              {useCustomDate && (
+                <div className="ml-6">
+                  <label htmlFor="activity-date" className="block text-sm font-medium text-gray-300 mb-2">
+                    Activity Date
+                  </label>
+                  <ActivityDatePicker
+                    selectedDate={activityDate}
+                    onDateChange={setActivityDate}
+                    disabled={isLoading}
+                  />
+                  <p className="text-xs text-gray-400 mt-1">
+                    When did you actually watch this {contentType === 'tv_series' ? 'series' : 'movie'}?
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Error Message */}

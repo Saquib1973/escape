@@ -42,6 +42,7 @@ export async function POST(request: Request) {
         update: {},
         create: { followerId, followingId: targetUserId },
       })
+
     } else {
       await prisma.follow.deleteMany({ where: { followerId, followingId: targetUserId } })
     }

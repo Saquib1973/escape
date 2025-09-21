@@ -193,7 +193,7 @@ const TrendingListComponent = () => {
                         <div className="flex items-center gap-2">
                           <Star className="w-5 h-5 fill-light-green text-light-green" />
                           <span className="text-gray-300 font-medium">
-                            {item.vote_average.toFixed(1)}
+                            {item?.vote_average?.toFixed(1)}
                           </span>
                         </div>
                       </div>

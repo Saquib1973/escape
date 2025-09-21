@@ -63,6 +63,7 @@ export async function POST(
       }
     })
 
+
     return NextResponse.json({ action: 'added', message: 'Post liked' })
   } catch (error) {
     console.error('Error in like route:', error)

@@ -1,16 +1,17 @@
 'use client'
 import Image from 'next/image'
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState } from 'react'
 import { CreatePostForm } from '@/components/forms/create-post-form'
+import LogWatchingForm from '@/components/forms/log-watching-form'
 import { PostsSection } from '@/components/posts-section'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence } from 'framer-motion'
 import AnimatePageWrapper from '../../animate-page-wrapper'
-import { Bookmark, Bug, Menu, Plus } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import SeriesRecommendation from './series-recommendation'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import ShareButton from '../../buttons/share-button'
 import { formatDate } from '@/lib'
+import MediaItemDropdown from '../../media-item-dropdown'
 import type { TVSeriesDetails } from '@/types/tmdb'
 
 interface TVSeriesDetailsComponentProps {
@@ -21,36 +22,11 @@ const TVSeriesDetailsComponent: React.FC<TVSeriesDetailsComponentProps> = ({
   series,
 }) => {
   const [showCreatePost, setShowCreatePost] = useState(false)
+  const [showLogForm, setShowLogForm] = useState(false)
   const [refreshPosts, setRefreshPosts] = useState(0)
-  const [menu, setMenu] = useState(false)
-  const menuRef = useRef<HTMLDivElement>(null)
-  const [mobileMoreOpen, setMobileMoreOpen] = useState(false)
-  const mobileMoreRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
-  const { data: session, status } = useSession()
+  const { data: session } = useSession()
 
-  // Close menus when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setMenu(false)
-      }
-      if (
-        mobileMoreRef.current &&
-        !mobileMoreRef.current.contains(event.target as Node)
-      ) {
-        setMobileMoreOpen(false)
-      }
-    }
-
-    if (menu || mobileMoreOpen) {
-      document.addEventListener('mousedown', handleClickOutside)
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [menu, mobileMoreOpen])
 
 
   const getImageUrl = (
@@ -68,17 +44,7 @@ const TVSeriesDetailsComponent: React.FC<TVSeriesDetailsComponentProps> = ({
     return `${Math.round(avgRuntime)} min`
   }
 
-  const handleCreatePost = () => {
-    setMenu(false)
-    if (!session) {
-      router.push('/signin')
-      return
-    }
-    setShowCreatePost(true)
-  }
-
   const handleWatchlist = () => {
-    setMenu(false)
     if (!session) {
       router.push('/signin')
       return
@@ -149,59 +115,27 @@ const TVSeriesDetailsComponent: React.FC<TVSeriesDetailsComponentProps> = ({
             ))}
           </div>
           <div className="flex flex-wrap gap-2">
-            <button
-              onClick={handleCreatePost}
-              className="h-9 px-3 inline-flex items-center gap-2 text-sm bg-dark-gray-hover/80 text-gray-200 hover:text-white hover:bg-dark-gray-2 transition-colors"
-              aria-label="Create Post"
-            >
-              <Plus className="size-4" />
-              Create Post
-            </button>
-            <div className="relative" ref={mobileMoreRef}>
-              <button
-                onClick={() => setMobileMoreOpen((v) => !v)}
-                className={`h-9 px-3 inline-flex items-center gap-2 text-sm text-gray-300 hover:text-white hover:bg-dark-gray-2 transition-colors ${
-                  mobileMoreOpen ? 'bg-dark-gray-2' : 'bg-dark-gray-hover/80'
-                }`}
-                aria-label="More actions"
-              >
-                <Menu className="size-4" />
-              </button>
-              <AnimatePresence mode="wait">
-                {mobileMoreOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -4 }}
-                    transition={{ duration: 0.15 }}
-                    className="absolute z-10 mt-0 right-0 bg-dark-gray-2 min-w-[180px]"
+            <div className="relative group">
+              <MediaItemDropdown
+                item={{
+                  id: series.id,
+                  title: series.name,
+                  poster_path: series.poster_path,
+                  release_date: series.first_air_date
+                }}
+                contentType="tv_series"
+                onWatchlistToggle={handleWatchlist}
+                isInWatchlist={false}
+                customButton={
+                  <button
+                    className="h-9 px-3 inline-flex items-center gap-2 text-sm bg-dark-gray-hover/80 text-gray-200 hover:text-white hover:bg-dark-gray-2 transition-colors"
+                    aria-label="Create Post"
                   >
-                    <div className="flex flex-col py-0.5">
-                      <button
-                        onClick={() => {
-                          setMobileMoreOpen(false)
-                          handleWatchlist()
-                        }}
-                        className="flex items-center gap-3 px-3 py-2 text-sm text-gray-300 hover:bg-dark-gray-hover hover:text-white transition-colors text-left"
-                      >
-                        <Bookmark className="size-4" />
-                        Add to Watchlist
-                      </button>
-                      <ShareButton />
-                      <button
-                        onClick={() => {
-                          setMobileMoreOpen(false)
-                          alert('reported')
-                        }}
-                        className="flex items-center gap-3 px-3 py-2 text-sm text-gray-300 hover:bg-dark-gray-hover hover:text-white transition-colors text-left"
-                      >
-                        <Bug className="size-4" />
-                        Report
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                    <Plus className="size-4" />
+                    Create Post
+                  </button>
+                }
+              />
             </div>
           </div>
         </div>
@@ -343,78 +277,26 @@ const TVSeriesDetailsComponent: React.FC<TVSeriesDetailsComponentProps> = ({
                 </p>
               )}
             </div>
-            <div className="relative dropdown-container" ref={menuRef}>
-              {status === 'loading' ? (
-                <div className="flex gap-1 justify-center items-center p-2 bg-dark-gray-hover text-gray-600 animate-pulse">
-                  <div className="w-5 h-5 bg-gray-600 rounded animate-pulse"></div>
-                </div>
-              ) : (
-                <button
-                  onClick={() => setMenu(!menu)}
-                  className={`flex gap-1 justify-center items-center p-2 transition-all duration-300 ${
-                    menu
-                      ? 'bg-light-green text-white'
-                      : 'bg-dark-gray-hover text-gray-300 hover:text-white'
-                  }`}
-                  aria-label="Open menu"
-                >
-                  <Menu className="size-5" />
-                </button>
-              )}
-
-              <AnimatePresence mode="wait">
-                {menu && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.2, ease: 'easeOut' }}
-                    className="absolute top-8 -right-0 bg-dark-gray-2 z-10"
+            <div className="relative group">
+              <MediaItemDropdown
+                item={{
+                  id: series.id,
+                  title: series.name,
+                  poster_path: series.poster_path,
+                  release_date: series.first_air_date
+                }}
+                contentType="tv_series"
+                onWatchlistToggle={handleWatchlist}
+                isInWatchlist={false}
+                customButton={
+                  <button
+                    className="flex gap-1 justify-center items-center p-2 bg-dark-gray-hover text-gray-300 hover:text-white transition-all duration-300"
+                    aria-label="More options"
                   >
-                    <div className="flex flex-col gap-1 min-w-[160px]">
-                      <motion.button
-                        initial={{ opacity: 0, x: -5 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.1, duration: 0.15 }}
-                        onClick={handleCreatePost}
-                        className="flex items-center gap-3 px-3 py-2 text-sm text-gray-300 hover:bg-dark-gray-hover hover:text-white transition-colors"
-                      >
-                        <Plus className="size-4" />
-                        Create Post
-                      </motion.button>
-                      <motion.button
-                        initial={{ opacity: 0, x: -5 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.15, duration: 0.15 }}
-                        onClick={handleWatchlist}
-                        className="flex items-center gap-3 px-3 py-2 text-sm text-gray-300 hover:bg-dark-gray-hover hover:text-white transition-colors"
-                      >
-                        <Bookmark className="size-4" />
-                        Add to Watchlist
-                      </motion.button>
-                      <motion.div
-                        initial={{ opacity: 0, x: -5 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.175, duration: 0.15 }}
-                      >
-                        <ShareButton />
-                      </motion.div>
-                      <motion.button
-                        initial={{ opacity: 0, x: -5 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.2, duration: 0.15 }}
-                        onClick={() => {
-                          alert('reported')
-                        }}
-                        className="flex items-center gap-3 px-3 py-2 text-sm text-gray-300 hover:bg-dark-gray-hover hover:text-white transition-colors"
-                      >
-                        <Bug className="size-4" />
-                        Report
-                      </motion.button>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                    <Plus className="size-5" />
+                  </button>
+                }
+              />
             </div>
           </div>
 
@@ -600,6 +482,22 @@ const TVSeriesDetailsComponent: React.FC<TVSeriesDetailsComponentProps> = ({
             onSuccess={() => {
               // Trigger posts refresh instead of page reload
               setRefreshPosts((prev) => prev + 1)
+            }}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Log Watching Form */}
+      <AnimatePresence mode="wait">
+        {showLogForm && (
+          <LogWatchingForm
+            contentId={series.id.toString()}
+            contentType="tv_series"
+            contentTitle={series.name}
+            posterPath={series.poster_path || undefined}
+            onClose={() => setShowLogForm(false)}
+            onSuccess={() => {
+              // Optionally refresh activity data or show success message
             }}
           />
         )}

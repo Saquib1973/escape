@@ -2,6 +2,7 @@
 
 import { prisma, authOptions } from '@/lib'
 import { getServerSession } from 'next-auth'
+import { ActivityService } from '@/lib/services/activity'
 // Generic post mapping is now handled at call sites; no poster augmentation here
 
 export type RatingEnum =
@@ -19,6 +20,7 @@ export interface CreatePostData {
   contentId: string
   contentType?: 'movie' | 'tv_series'
   posterPath?: string | null
+  activityDate?: Date // Optional custom date for activity logging
 }
 
 // Feed: fetch latest posts across all content types
@@ -123,6 +125,30 @@ export async function createPost(data: CreatePostData) {
         user: { select: { id: true, name: true, image: true } }
       }
     })
+
+    // Log movie/series watching activity only if it's a review (has rating)
+    if (data.rating) {
+      try {
+        const activityDate = data.activityDate || new Date()
+
+        await ActivityService.logActivity({
+          userId: session.user.id,
+          activityType: data.contentType === 'tv_series' ? 'series_watched' : 'movie_watched',
+          activityDate,
+          contentId: data.contentId,
+          metadata: {
+            contentType: data.contentType || 'movie',
+            rating: data.rating,
+            isSpoiler: data.isSpoiler,
+            reviewTitle: data.title,
+            loggedAt: new Date().toISOString(),
+          },
+        })
+      } catch (activityError) {
+        // Don't fail the post creation if activity logging fails
+        console.error('Error logging watching activity:', activityError)
+      }
+    }
 
     return post
   } catch (error) {

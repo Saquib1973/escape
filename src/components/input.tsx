@@ -8,7 +8,7 @@ interface InputProps {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   placeholder?: string
   required?: boolean
-  type?: 'text' | 'checkbox' | 'email' | "password"
+  type?: 'text' | 'checkbox' | 'email' | 'password' | 'date'
   className?: string
   variant?: 'primary' | 'secondary'
   size?: 'sm' | 'md' | 'lg'

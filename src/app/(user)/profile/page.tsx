@@ -1,9 +1,15 @@
+import Activity from '@/components/activity/activity'
 import AnimatePageWrapper from '@/components/animate-page-wrapper'
-import React from 'react'
 
-const ProfilePage = () => {
+export const revalidate = 0
+
+const ProfilePage = async () => {
+
+
   return (
-    <AnimatePageWrapper>ProfilePage</AnimatePageWrapper>
+    <AnimatePageWrapper className="text-gray-300 p-2">
+      <Activity />
+    </AnimatePageWrapper>
   )
 }
 

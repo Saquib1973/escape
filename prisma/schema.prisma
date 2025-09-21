@@ -40,6 +40,9 @@ model User {
   // Follows
   followers     Follow[]  @relation("UserFollowedBy")
   following     Follow[]  @relation("UserFollows")
+
+  // Activity tracking
+  activities    UserActivity[]
 }
 
 model Account {
@@ -199,6 +202,25 @@ model Follow {
   // Helpful indexes
   @@index([followerId])
   @@index([followingId])
+}
+
+model UserActivity {
+  id          String   @id @default(uuid())
+  userId      String
+  activityDate DateTime // The date this activity occurred (can be today or past date)
+  activityType String  // Type of activity: 'post_created', 'review_posted', 'movie_watched', etc.
+  contentId   String?  // Optional: ID of the content (movie, post, etc.)
+  metadata    Json?    // Optional: Additional data about the activity
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Indexes for better performance
+  @@index([userId])
+  @@index([activityDate])
+  @@index([userId, activityDate])
 }
 
 enum Rating {

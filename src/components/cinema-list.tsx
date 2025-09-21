@@ -1,6 +1,6 @@
 'use client'
 
-import { MoveRight, Star } from 'lucide-react'
+import { MoveRight, Option, Star } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import React, { useCallback, useMemo } from 'react'
@@ -10,9 +10,10 @@ import CinemaListLoadingSkeleton from './skeletons/cinema-list-loading-skeleton'
 import { cn } from '@/lib'
 import { useQuery } from '@tanstack/react-query'
 import Header from './header'
+import MediaItemDropdown from './media-item-dropdown'
 interface CinemaListProps {
   title: string
-  subHeading?:string
+  subHeading?: string
   items?: MediaItem[]
   apiUrl?: string
   linkPath?: (id: number) => string
@@ -23,6 +24,10 @@ interface CinemaListProps {
   showRating?: boolean
   showEmptyState?: boolean
   className?: string
+  contentType?: 'movie' | 'tv_series'
+  showDropdown?: boolean
+  onWatchlistToggle?: (item: MediaItem) => void
+  getWatchlistStatus?: (item: MediaItem) => boolean
 }
 
 const CinemaList: React.FC<CinemaListProps> = ({
@@ -38,10 +43,16 @@ const CinemaList: React.FC<CinemaListProps> = ({
   showRating = true,
   showEmptyState = false,
   className,
+  contentType = 'movie',
+  showDropdown = false,
+  onWatchlistToggle,
+  getWatchlistStatus,
 }) => {
   const shouldFetch = (!itemsProp || itemsProp.length === 0) && Boolean(apiUrl)
 
-  const { data, isLoading, isError, error, refetch, isFetching } = useQuery<{ results?: MediaItem[] }>({
+  const { data, isLoading, isError, error, refetch, isFetching } = useQuery<{
+    results?: MediaItem[]
+  }>({
     queryKey: ['cinema-list', apiUrl],
     queryFn: async () => {
       if (!apiUrl) return { results: [] }
@@ -119,7 +130,7 @@ const CinemaList: React.FC<CinemaListProps> = ({
 
   const renderHeader = () => (
     <div className={`flex justify-between items-center`}>
-      <Header className='mb-0' title={title} subHeading={subHeading} />
+      <Header className="mb-0" title={title} subHeading={subHeading} />
       <div className="flex gap-2 h-fit">
         <button
           onClick={() => handleScroll('left')}
@@ -170,9 +181,15 @@ const CinemaList: React.FC<CinemaListProps> = ({
     if (isError) {
       return (
         <div className="w-full h-72 flex flex-col items-center justify-center gap-3">
-          <div className="text-red-400">{(error instanceof Error ? error.message : 'Failed to load data')}</div>
+          <div className="text-red-400">
+            {error instanceof Error ? error.message : 'Failed to load data'}
+          </div>
           <button
-            onClick={() => { if (!isFetching) { void refetch() } }}
+            onClick={() => {
+              if (!isFetching) {
+                void refetch()
+              }
+            }}
             disabled={isFetching}
             className={`px-4 py-2 bg-dark-gray hover:bg-dark-gray-hover text-gray-200 disabled:opacity-60 disabled:cursor-not-allowed transition-colors`}
           >
@@ -200,25 +217,48 @@ const CinemaList: React.FC<CinemaListProps> = ({
           >
             {items.map((item) => (
               <motion.div key={item.id} variants={itemVariants}>
-                <Link
-                  href={finalLinkPath(item.id)}
-                  className="flex-shrink-0 group w-36 block h-full"
-                >
+                <div className="flex-shrink-0 group w-36 block h-full relative">
                   <div className="bg-dark-gray-2 overflow-hidden h-full">
                     <div className="flex flex-col w-full h-full">
-                      <div className="h-full flex items-center justify-center overflow-hidden">
-                        {item.poster_path ? (
-                          <Image
-                            src={`https://image.tmdb.org/t/p/w500${item.poster_path}`}
-                            alt={finalGetTitle(item)}
-                            width={160}
-                            height={240}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                          />
-                        ) : (
-                          <div className="text-center text-gray-400">
-                            <div className="w-16 h-40 mb-2 mx-auto bg-gray-700"></div>
-                            <p className="text-sm font-medium">No Image</p>
+                      <div className="h-full flex items-center justify-center overflow-hidden relative">
+                        <Link
+                          href={finalLinkPath(item.id)}
+                          className="block w-full h-full"
+                        >
+                          {item.poster_path ? (
+                            <Image
+                              src={`https://image.tmdb.org/t/p/w500${item.poster_path}`}
+                              alt={finalGetTitle(item)}
+                              width={160}
+                              height={240}
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            />
+                          ) : (
+                            <div className="text-center text-gray-400">
+                              <div className="w-16 h-40 mb-2 mx-auto bg-gray-700"></div>
+                              <p className="text-sm font-medium">No Image</p>
+                            </div>
+                          )}
+                        </Link>
+
+                        {/* Dropdown Menu */}
+                        {showDropdown && (
+                          <div className='absolute top-0 right-0'>
+                            <MediaItemDropdown
+                              item={{
+                                id: item.id,
+                                title: finalGetTitle(item),
+                                poster_path: item.poster_path,
+                                release_date: item.release_date,
+                              }}
+                              contentType={contentType}
+                              onWatchlistToggle={() =>
+                                onWatchlistToggle?.(item)
+                              }
+                              isInWatchlist={
+                                getWatchlistStatus?.(item) || false
+                              }
+                            />
                           </div>
                         )}
                       </div>
@@ -234,7 +274,7 @@ const CinemaList: React.FC<CinemaListProps> = ({
                       )}
                     </div>
                   </div>
-                </Link>
+                </div>
               </motion.div>
             ))}
           </motion.div>
@@ -256,7 +296,7 @@ const CinemaList: React.FC<CinemaListProps> = ({
   }
 
   return (
-    <div className={cn("w-full max-w-6xl flex flex-col gap-4 mb-6", className)}>
+    <div className={cn('w-full max-w-6xl flex flex-col gap-4 mb-6', className)}>
       {renderHeader()}
       {renderContent()}
     </div>
