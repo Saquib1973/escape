@@ -4,6 +4,8 @@ import { useSession } from 'next-auth/react'
 import React from 'react'
 import MovieDetailPanel from './movie-detail-panel'
 import { MovieDetail } from './types'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { useDebounce } from '@/hooks/useDebounce'
 
 interface HeatmapData {
   activities: Record<string, MovieDetail[]>
@@ -25,6 +27,8 @@ export default function ActivityHeatmap({
   const [selectedDate, setSelectedDate] = React.useState<string | null>(null)
   const [selectedMovies, setSelectedMovies] = React.useState<MovieDetail[]>([])
   const [currentMonth, setCurrentMonth] = React.useState(new Date())
+  const today = new Date()
+  const debouncedMonth = useDebounce(currentMonth, 400)
 
   React.useEffect(() => {
     if (!userId) {
@@ -35,7 +39,7 @@ export default function ActivityHeatmap({
     const fetchHeatmapData = async () => {
       try {
         const response = await fetch(
-          `/api/activity/heatmap?month=${currentMonth.toISOString()}`
+          `/api/activity/heatmap?month=${debouncedMonth.toISOString()}`
         )
         if (!response.ok) {
           throw new Error('Failed to fetch heatmap data')
@@ -49,8 +53,10 @@ export default function ActivityHeatmap({
       }
     }
 
+    // Show loading state when refetching (e.g., when month changes)
+    setLoading(true)
     fetchHeatmapData()
-  }, [userId, currentMonth])
+  }, [userId, debouncedMonth])
 
   const handleDateClick = (dateStr: string, movies: MovieDetail[]) => {
     setSelectedDate(dateStr)
@@ -74,19 +80,16 @@ export default function ActivityHeatmap({
     )
   }
 
+  const goToCurrentMonth = () => {
+    setCurrentMonth(new Date(today.getFullYear(), today.getMonth(), 1))
+  }
+
   if (loading) {
     return (
       <div className={`activity-heatmap ${className}`}>
-        <div className="bg-gray-100 rounded p-4 animate-pulse">
-          <div className="h-6 bg-gray-200 rounded mb-4 w-32"></div>
-          <div className="grid grid-cols-7 gap-1">
-            {Array.from({ length: 35 }, (_, i) => (
-              <div
-                key={`loading-skeleton-${i}`}
-                className="w-8 h-8 bg-gray-200 rounded"
-              ></div>
-            ))}
-          </div>
+        <div className="bg-dark-gray-2 p-4 animate-pulse">
+          <div className="h-6 ml-auto bg-dark-gray mb-4 w-32"></div>
+          <div className="h-[250px] md:h-[300px] w-full bg-dark-gray"></div>
         </div>
       </div>
     )
@@ -147,35 +150,39 @@ export default function ActivityHeatmap({
   const calendarGrid = generateCalendarGrid()
 
   const getIntensityClass = (count: number) => {
-    if (count === 0) return 'bg-gray-100'
-    if (count === 1) return 'bg-blue-100'
-    if (count === 2) return 'bg-blue-200'
-    if (count >= 3) return 'bg-blue-300'
-    return 'bg-gray-100'
+    if (count === 0) return 'bg-dark-gray'
+    if (count === 1) return 'bg-light-green/50'
+    if (count === 2) return 'bg-light-green/70'
+    if (count >= 3) return 'bg-light-green'
+    return 'bg-light-green'
   }
 
   return (
     <div className={`activity-heatmap ${className}`}>
-      <div className="bg-gray-100 rounded p-4">
+      <div className="bg-dark-gray-2">
         {/* Header */}
-        <div className="flex items-center justify-between mb-4">
-          <button
-            onClick={goToPreviousMonth}
-            className="px-3 py-1 bg-gray-200 rounded text-gray-800 hover:bg-gray-300"
-          >
-            ← Previous
-          </button>
-          <h3 className="text-lg font-semibold text-gray-800">
+        <div className="flex items-center justify-end pt-4 px-4 mb-6 gap-2">
+          <h3 className="text-lg font-semibold mr-2">
             {currentMonth.toLocaleDateString('en-US', {
               month: 'long',
               year: 'numeric',
             })}
           </h3>
           <button
-            onClick={goToNextMonth}
-            className="px-3 py-1 bg-gray-200 rounded text-gray-800 hover:bg-gray-300"
+            onClick={goToCurrentMonth}
+            className="px-2 py-1 bg-dark-gray text-sm hover:bg-dark-gray-hover"
+            disabled={
+              currentMonth.getFullYear() === today.getFullYear() &&
+              currentMonth.getMonth() === today.getMonth()
+            }
           >
-            Next →
+            Today
+          </button>
+          <button onClick={goToPreviousMonth} className="p-1 bg-dark-gray ">
+            <ChevronLeft className="size-5" />
+          </button>
+          <button onClick={goToNextMonth} className="p-1 bg-dark-gray ">
+            <ChevronRight className="size-5" />
           </button>
         </div>
 
@@ -184,7 +191,7 @@ export default function ActivityHeatmap({
           {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
             <div
               key={day}
-              className="text-center text-xs font-medium text-gray-500"
+              className="text-center text-xs font-medium text-gray-300"
             >
               {day}
             </div>
@@ -192,7 +199,7 @@ export default function ActivityHeatmap({
         </div>
 
         {/* Calendar grid */}
-        <div className="grid grid-cols-7 gap-1">
+        <div className="grid grid-cols-7">
           {calendarGrid.map((day, index) => (
             <button
               key={`day-${day.date?.toISOString() || index}`}
@@ -201,14 +208,10 @@ export default function ActivityHeatmap({
               }
               disabled={!day.date}
               className={`
-                h-8 text-sm font-medium rounded
-                ${day.date ? getIntensityClass(day.count) : 'bg-gray-50'}
-                ${day.isToday ? 'ring-2 ring-blue-500' : ''}
-                ${
-                  day.date
-                    ? 'cursor-pointer hover:brightness-90'
-                    : 'cursor-default'
-                }
+                p-3 md:p-5 text-sm
+                ${day.date ? getIntensityClass(day.count) : 'bg-dark-gray-2'}
+                ${day.isToday ? 'bg-dark-gray-hover' : ''}
+                ${day.date ? 'cursor-pointer' : 'cursor-default'}
               `}
               title={
                 day.date
@@ -225,22 +228,10 @@ export default function ActivityHeatmap({
           ))}
         </div>
 
-        {/* Legend */}
-        <div className="flex items-center justify-center gap-4 mt-4 text-xs text-gray-600">
-          <span>Less</span>
-          <div className="flex gap-1">
-            <div className="w-3 h-3 bg-gray-100 rounded"></div>
-            <div className="w-3 h-3 bg-blue-100 rounded"></div>
-            <div className="w-3 h-3 bg-blue-200 rounded"></div>
-            <div className="w-3 h-3 bg-blue-300 rounded"></div>
-          </div>
-          <span>More</span>
-        </div>
-
         {/* Modal */}
         {selectedDate && (
           <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-10">
-            <div className="bg-white rounded p-4 max-w-sm w-full max-h-[70vh] overflow-auto">
+            <div className="bg-dark-gray-2 p-4 max-w-sm w-full max-h-[70vh] overflow-auto">
               <MovieDetailPanel
                 date={selectedDate}
                 movies={selectedMovies}

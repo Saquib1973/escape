@@ -54,6 +54,7 @@ export class ActivityService {
       const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
       const startOfWeek = new Date(now)
       startOfWeek.setDate(now.getDate() - now.getDay())
+      startOfWeek.setHours(0, 0, 0, 0)
 
       // Only count movie/series watching activities
       const watchingActivitiesFilter = {
@@ -62,40 +63,60 @@ export class ActivityService {
         },
       }
 
-      const [
-        totalActivities,
-        yearActivities,
-        monthActivities,
-        weekActivities,
-      ] = await Promise.all([
-        prisma.userActivity.count({
-          where: {
-            userId,
-            ...watchingActivitiesFilter,
-          },
-        }),
-        prisma.userActivity.count({
-          where: {
-            userId,
-            activityDate: { gte: startOfYear },
-            ...watchingActivitiesFilter,
-          },
-        }),
-        prisma.userActivity.count({
-          where: {
-            userId,
-            activityDate: { gte: startOfMonth },
-            ...watchingActivitiesFilter,
-          },
-        }),
-        prisma.userActivity.count({
-          where: {
-            userId,
-            activityDate: { gte: startOfWeek },
-            ...watchingActivitiesFilter,
-          },
-        }),
-      ])
+      const runCounts = async () => {
+        return await Promise.all([
+          prisma.userActivity.count({
+            where: {
+              userId,
+              ...watchingActivitiesFilter,
+            },
+          }),
+          prisma.userActivity.count({
+            where: {
+              userId,
+              activityDate: { gte: startOfYear },
+              ...watchingActivitiesFilter,
+            },
+          }),
+          prisma.userActivity.count({
+            where: {
+              userId,
+              activityDate: { gte: startOfMonth },
+              ...watchingActivitiesFilter,
+            },
+          }),
+          prisma.userActivity.count({
+            where: {
+              userId,
+              activityDate: { gte: startOfWeek },
+              ...watchingActivitiesFilter,
+            },
+          }),
+        ])
+      }
+
+      let totalActivities: number,
+        yearActivities: number,
+        monthActivities: number,
+        weekActivities: number
+
+      try {
+        ;[totalActivities, yearActivities, monthActivities, weekActivities] =
+          await runCounts()
+      } catch (error: unknown) {
+        // Handle transient connection closure (P1017) by reconnecting once
+        const maybePrismaError = error as { code?: string }
+        if (maybePrismaError?.code === 'P1017') {
+          try {
+            await prisma.$disconnect()
+          } catch {}
+          await prisma.$connect()
+          ;[totalActivities, yearActivities, monthActivities, weekActivities] =
+            await runCounts()
+        } else {
+          throw error
+        }
+      }
 
       return {
         totalActivities,

@@ -7,9 +7,9 @@ import React, { useCallback, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { cn } from '@/lib'
 import { MediaItem } from '../types/media'
-import Loader from './loader'
 import Header from './header'
 import { useQuery } from '@tanstack/react-query'
+import MediaItemDropdown from './media-item-dropdown'
 
 interface VerticalCinemaListProps {
   title: string
@@ -18,6 +18,10 @@ interface VerticalCinemaListProps {
   apiUrl?: string
   showEmptyState?: boolean
   className?: string
+  contentType?: 'movie' | 'tv_series'
+  showDropdown?: boolean
+  onWatchlistToggle?: (item: MediaItem) => void
+  getWatchlistStatus?: (item: MediaItem) => boolean
 }
 
 const VerticalCinemaList: React.FC<VerticalCinemaListProps> = ({
@@ -27,6 +31,10 @@ const VerticalCinemaList: React.FC<VerticalCinemaListProps> = ({
   apiUrl,
   showEmptyState = false,
   className,
+  contentType = 'movie',
+  showDropdown = false,
+  onWatchlistToggle,
+  getWatchlistStatus,
 }) => {
   const shouldFetch = (!itemsProp || itemsProp.length === 0) && Boolean(apiUrl)
 
@@ -85,19 +93,30 @@ const VerticalCinemaList: React.FC<VerticalCinemaListProps> = ({
     },
   }
 
+  const skeletonKeys = useMemo(() => Array.from({ length: 12 }, () => Math.random().toString(36).slice(2)), [])
+
   const renderContent = () => {
     if (isLoading) {
       return (
-        <div className="w-full h-[86vh] flex py-6 justify-center">
-          <div className="flex flex-col items-center gap-3">
-            <Loader text="Loading upcoming movies..." />
-          </div>
+        <div className="flex w-full flex-wrap gap-1 items-center justify-start py-2">
+          {skeletonKeys.map((key) => (
+            <div key={key} className="flex-shrink-0">
+              <div className="relative aspect-[2/3] w-[108px] bg-dark-gray-2 overflow-hidden rounded-sm">
+                <div className="absolute inset-0 bg-gradient-to-br from-dark-gray via-dark-gray-2 to-dark-gray animate-pulse" />
+
+                <div className="absolute top-1 right-1 bg-black/40 px-1 py-0.5 flex items-center gap-1 text-xs text-white rounded">
+                  <div className="size-2 bg-dark-gray-hover rounded-full animate-pulse" />
+                  <div className="w-3 h-2 bg-dark-gray-hover animate-pulse" />
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       )
     }
     if (isError) {
       return (
-        <div className="w-full h-[86vh] flex flex-col items-center justify-center gap-4">
+        <div className="w-full flex flex-col items-center justify-center gap-4">
           <div className="text-red-400 text-center">
             <div className="text-lg mb-2">⚠️</div>
             <div className="text-sm">{(error instanceof Error ? error.message : 'Failed to load data')}</div>
@@ -114,7 +133,7 @@ const VerticalCinemaList: React.FC<VerticalCinemaListProps> = ({
     }
     if (showEmptyState && items.length === 0) {
       return (
-        <div className="w-full h-[86vh] flex flex-col items-center justify-center gap-3">
+        <div className="w-full flex flex-col items-center justify-center gap-3">
           <div className="text-4xl">🎬</div>
           <div className="text-gray-400 text-center">
             <div className="text-sm font-medium">No upcoming movies</div>
@@ -139,11 +158,12 @@ const VerticalCinemaList: React.FC<VerticalCinemaListProps> = ({
             variants={itemVariants}
             className="flex-shrink-0"
           >
-            <Link
-              href={linkPath(item.id)}
-              className="flex flex-col items-center group cursor-pointer"
-            >
-              <div className="relative aspect-[2/3] w-[108px] bg-dark-gray-2 overflow-hidden">
+            <div className="flex flex-col items-center group cursor-pointer relative">
+              <Link
+                href={linkPath(item.id)}
+                className="block"
+              >
+                <div className="relative aspect-[2/3] w-[108px] bg-dark-gray-2 overflow-hidden">
                 {item.poster_path ? (
                   <Image
                     src={`https://image.tmdb.org/t/p/w500${item.poster_path}`}
@@ -168,8 +188,25 @@ const VerticalCinemaList: React.FC<VerticalCinemaListProps> = ({
                     {item.vote_average.toFixed(1)}
                   </span>
                 </div>
-              </div>
-            </Link>
+                </div>
+              </Link>
+
+              {showDropdown && (
+                <div className="absolute top-1 right-1">
+                  <MediaItemDropdown
+                    item={{
+                      id: item.id,
+                      title: getTitle(item),
+                      poster_path: item.poster_path,
+                      release_date: item.release_date,
+                    }}
+                    contentType={contentType}
+                    onWatchlistToggle={() => onWatchlistToggle?.(item)}
+                    isInWatchlist={getWatchlistStatus?.(item) || false}
+                  />
+                </div>
+              )}
+            </div>
           </motion.div>
         ))}
       </motion.div>
@@ -179,7 +216,7 @@ const VerticalCinemaList: React.FC<VerticalCinemaListProps> = ({
   return (
     <div className={cn('w-full', className)}>
       <Header title={title} subHeading={subHeading} />
-      <div className="overflow-y-auto w-full h-[86vh] scrollbar-hide">
+      <div className="overflow-y-auto w-full scrollbar-hide">
         {renderContent()}
       </div>
     </div>

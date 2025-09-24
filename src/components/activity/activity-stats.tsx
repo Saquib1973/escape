@@ -47,9 +47,9 @@ export default function ActivityStats({
           {['total', 'year', 'month', 'week'].map((type) => (
             <div
               key={`loading-skeleton-${type}`}
-              className="bg-gray-200 p-3 animate-pulse"
+              className="bg-dark-gray-2 p-3 animate-pulse"
             >
-              <div className="h-6 bg-gray-300"></div>
+              <div className="h-10 bg-dark-gray"></div>
             </div>
           ))}
         </div>

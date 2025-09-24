@@ -23,6 +23,8 @@ const MovieRecommendation = ({ id }: { id: number }) => {
       getTitle={getTitle}
       showRating={true}
       showEmptyState={true}
+      contentType="movie"
+      showDropdown={true}
     />
   )
 }

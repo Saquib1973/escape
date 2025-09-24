@@ -50,11 +50,14 @@ export default function ProfileSidebar() {
   return (
     <div className="w-full md:w-40">
       {/* Mobile: Instagram-style horizontal navigation */}
-      <div className="md:hidden max-md:px-1">
-        <div className="relative flex justify-around rounded-full items-center bg-dark-gray-2">
+      <div
+        className="md:hidden fixed inset-x-0 bottom-2 backdrop-blur-3xl z-50 px-2"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      >
+        <div className="relative flex  rounded-full justify-around items-center bg-dark-gray-2 border-t border-dark-gray-hover h-14 w-full">
           {/* Animated background slider with Framer Motion */}
           <motion.div
-            className={`absolute bg-light-green h-14 rounded-full`}
+            className={`absolute bg-light-green rounded-full h-full`}
             animate={{
               left: `${(activeIndex * 100) / mobileSidebarItems.length}%`,
             }}
@@ -73,7 +76,7 @@ export default function ProfileSidebar() {
                 key={item.name + index}
                 href={item.href}
                 className={cn(
-                  'relative z-10 flex flex-col items-center rounded-full justify-center py-2.5 transition-colors duration-200 min-w-0 flex-1',
+                  'relative z-10 flex flex-col items-center rounded-full justify-center py-3 transition-colors duration-200 min-w-0 flex-1',
                   isActive
                     ? 'text-white'
                     : 'text-gray-300 hover:text-light-green'

@@ -151,14 +151,14 @@ export default function MediaItemDropdown({
     <>
       <div className="relative" ref={dropdownRef}>
         {customButton ? (
-          <div onClick={(e) => handleButtonClick(e)}>
-            {customButton}
-          </div>
+          <div onClick={(e) => handleButtonClick(e)}>{customButton}</div>
         ) : (
           <button
             ref={buttonRef}
             onClick={handleButtonClick}
-            className={`absolute top-1 right-1 p-1 bg-dark-gray cursor-pointer md:opacity-0 ${isOpen ? "opacity-100":"group-hover:opacity-100"} transition-opacity z-50`}
+            className={`absolute top-1 right-1 p-1 bg-dark-gray cursor-pointer md:opacity-0 ${
+              isOpen ? 'opacity-100' : 'group-hover:opacity-100'
+            } transition-opacity z-40`}
             aria-label="More options"
           >
             <MoreVertical className="size-4 text-white" />
@@ -174,7 +174,7 @@ export default function MediaItemDropdown({
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.2 }}
-                  className="fixed inset-0 bg-black/50 z-[9999] flex items-end"
+                  className="fixed inset-0 bg-black/50 z-[100] flex items-end"
                   onClick={() => setIsOpen(false)}
                 >
                   <motion.div
@@ -227,10 +227,14 @@ export default function MediaItemDropdown({
                       >
                         <Bookmark
                           className={`size-5 ${
-                            isInWatchlist ? 'fill-light-green text-light-green' : ''
+                            isInWatchlist
+                              ? 'fill-light-green text-light-green'
+                              : ''
                           }`}
                         />
-                        {isInWatchlist ? 'Remove from Watchlist' : 'Add to Watchlist'}
+                        {isInWatchlist
+                          ? 'Remove from Watchlist'
+                          : 'Add to Watchlist'}
                       </motion.button>
                       <motion.div
                         initial={{ opacity: 0, x: -10 }}
@@ -255,17 +259,13 @@ export default function MediaItemDropdown({
                 </motion.div>
               ) : (
                 // Regular dropdown for larger screens
+                // Regular dropdown for larger screens
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.15, ease: 'easeOut' }}
-                  className="fixed bg-dark-gray-2 border border-white/5 z-[100] min-w-[160px]"
-                  style={{
-                    top: `${dropdownPosition.top}px`,
-                    right: `${dropdownPosition.right}px`,
-                    zIndex: 9999,
-                  }}
+                  className="absolute right-0 top-full mt-2 bg-dark-gray-2 border border-white/5 z-40 min-w-[160px]"
                 >
                   <div className="flex flex-col gap-1">
                     <motion.button
@@ -297,10 +297,14 @@ export default function MediaItemDropdown({
                     >
                       <Bookmark
                         className={`size-4 ${
-                          isInWatchlist ? 'fill-light-green text-light-green' : ''
+                          isInWatchlist
+                            ? 'fill-light-green text-light-green'
+                            : ''
                         }`}
                       />
-                      {isInWatchlist ? 'Remove from Watchlist' : 'Add to Watchlist'}
+                      {isInWatchlist
+                        ? 'Remove from Watchlist'
+                        : 'Add to Watchlist'}
                     </motion.button>
                     <motion.div
                       initial={{ opacity: 0, x: -5 }}

@@ -24,6 +24,8 @@ const InCinemaComponent = () => {
       getYear={getYear}
       getTitle={getTitle}
       showEmptyState={true}
+      contentType="movie"
+      showDropdown={true}
     />
   )
 }

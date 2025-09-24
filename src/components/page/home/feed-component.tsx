@@ -6,7 +6,7 @@ import { Suspense } from 'react'
 
 function FeedSkeleton() {
   return (
-    <div className=" py-10">
+    <div className="w-full py-10">
       <h1 className="text-2xl text-gray-300 mb-4">Reviews</h1>
       <div className="flex flex-col gap-3">
         {Array.from({ length: 3 }, (_, i) => (

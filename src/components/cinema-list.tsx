@@ -240,27 +240,6 @@ const CinemaList: React.FC<CinemaListProps> = ({
                             </div>
                           )}
                         </Link>
-
-                        {/* Dropdown Menu */}
-                        {showDropdown && (
-                          <div className='absolute top-0 right-0'>
-                            <MediaItemDropdown
-                              item={{
-                                id: item.id,
-                                title: finalGetTitle(item),
-                                poster_path: item.poster_path,
-                                release_date: item.release_date,
-                              }}
-                              contentType={contentType}
-                              onWatchlistToggle={() =>
-                                onWatchlistToggle?.(item)
-                              }
-                              isInWatchlist={
-                                getWatchlistStatus?.(item) || false
-                              }
-                            />
-                          </div>
-                        )}
                       </div>
 
                       {showRating && (
@@ -274,6 +253,23 @@ const CinemaList: React.FC<CinemaListProps> = ({
                       )}
                     </div>
                   </div>
+
+                  {/* Dropdown Menu - positioned relative to the card container */}
+                  {showDropdown && (
+                    <div className="absolute top-1 right-1">
+                      <MediaItemDropdown
+                        item={{
+                          id: item.id,
+                          title: finalGetTitle(item),
+                          poster_path: item.poster_path,
+                          release_date: item.release_date,
+                        }}
+                        contentType={contentType}
+                        onWatchlistToggle={() => onWatchlistToggle?.(item)}
+                        isInWatchlist={getWatchlistStatus?.(item) || false}
+                      />
+                    </div>
+                  )}
                 </div>
               </motion.div>
             ))}
@@ -296,7 +292,12 @@ const CinemaList: React.FC<CinemaListProps> = ({
   }
 
   return (
-    <div className={cn('w-full max-w-6xl flex flex-col gap-4 mb-6', className)}>
+    <div
+      className={cn(
+        'relative w-full max-w-6xl flex flex-col gap-4 mb-6',
+        className
+      )}
+    >
       {renderHeader()}
       {renderContent()}
     </div>

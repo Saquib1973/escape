@@ -47,11 +47,11 @@ export default async function ProfileLayout({
       <div className="max-w-5xl w-full mx-auto py-8">
         <HeaderComponent userData={userDataWithCounts} />
       </div>
-      <div className="flex flex-col gap-3 md:flex-row md:gap-4">
-        <div className="w-full md:w-fit max-h-fit sticky top-15 md:top-18 left-0">
+      <div className="flex flex-col gap-3 md:flex-row md:gap-4 pb-20 md:pb-0">
+        <div className="w-full md:w-fit max-h-fit sticky top-13 md:top-18 left-0">
           <ProfileSidebar />
         </div>
-        <main className="flex-1 p-2 ">{children}</main>
+        <main className="flex-1 p-2">{children}</main>
       </div>
     </AnimatePageWrapper>
   )

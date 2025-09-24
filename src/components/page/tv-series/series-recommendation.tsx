@@ -23,6 +23,8 @@ const SeriesRecommendation = ({ id }: { id: number }) => {
       getTitle={getTitle}
       showRating={true}
       showEmptyState={true}
+      contentType="tv_series"
+      showDropdown={true}
     />
   )
 }

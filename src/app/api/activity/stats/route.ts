@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
 import { getSession } from '@/lib'
 import { ActivityService } from '@/lib/services/activity'
+import { NextResponse } from 'next/server'
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const session = await getSession()
     if (!session?.user?.id) {

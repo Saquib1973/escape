@@ -74,23 +74,13 @@ const PostList: React.FC<Props> = ({ posts, emptyText = 'No posts yet' }) => {
             >
               <div className="flex gap-4 ">
                 {/* Poster (preferred) or fallback to user initial */}
-                <div className="flex">
-                  <div className="w-40 overflow-hidden">
+                <div className="flex self-stretch">
+                  <div className="relative w-40 h-full overflow-hidden">
                     <Image
                       src={post.posterUrl || '/logo.png'}
                       alt={post.title || 'Poster'}
-                      width={96}
-                      height={144}
-                      className="w-full h-full object-contain"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement
-                        if (
-                          target &&
-                          target.src !== window.location.origin + '/logo.png'
-                        ) {
-                          target.src = window.location.origin + '/logo.png'
-                        }
-                      }}
+                      fill
+                      className="object-cover"
                     />
                   </div>
                 </div>
@@ -142,7 +132,7 @@ const PostList: React.FC<Props> = ({ posts, emptyText = 'No posts yet' }) => {
                   {/* Content */}
                   <div className="mb-4">
                     <p className="text-gray-300 text-sm leading-relaxed">
-                      {post.content.length > 150 ? post.content.substring(0, 150) + '...' : post.content}
+                      {post.content.length > 150 ? post.content.substring(0, 100) + '...' : post.content}
                     </p>
                   </div>
 

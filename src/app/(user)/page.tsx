@@ -26,19 +26,23 @@ const HomePage = async () => {
       <div className="flex max-md:flex-col gap-4 relative">
         <FeedComponent />
         <VerticalCinemaList
-          className="sticky top-[70px] max-lg:hidden lg:max-w-84 right-0"
+          className="max-lg:hidden lg:max-w-84"
           title="Upcoming Movies"
           subHeading="Discover upcoming movies"
           apiUrl="/api/upcoming"
           showEmptyState={true}
-          />
+          contentType="movie"
+          showDropdown={true}
+        />
         <CinemaList
-          className="sticky top-[70px] lg:hidden lg:max-w-84 right-0"
+          className="lg:hidden"
           subHeading="Discover upcoming movies"
           title="Upcoming Movies"
           apiUrl="/api/upcoming"
           showEmptyState={true}
           scrollContainerClass="upcoming-movie-scroll-container"
+          contentType="movie"
+          showDropdown={true}
         />
       </div>
     </AnimatePageWrapper>
