@@ -2,7 +2,6 @@ import React from 'react'
 import ActivityStats from './activity-stats'
 import { getSession } from '@/lib'
 import ActivityHeatmap from './activity-heatmap'
-import Link from 'next/link'
 
 const Activity = async () => {
   const session = await getSession()

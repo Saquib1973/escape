@@ -19,30 +19,30 @@ model User {
   email         String?   @unique
   emailVerified DateTime?
   image         String?
-  password      String?   // Hashed for local auth
+  password      String? // Hashed for local auth
   role          String?   @default("user") // Extendable for RBAC
 
   // Soft delete fields
-  deletedAt     DateTime? // When the user was soft deleted
-  isDeleted     Boolean   @default(false) // Quick check for deleted status
+  deletedAt DateTime? // When the user was soft deleted
+  isDeleted Boolean   @default(false) // Quick check for deleted status
 
-  accounts      Account[]
-  sessions      Session[]
+  accounts Account[]
+  sessions Session[]
+
+  activities     UserActivity[]
+  watchlistItems WatchlistItem[]
 
   // User's posts and comments
-  posts         Post[]
-  comments      Comment[]
+  posts    Post[]
+  comments Comment[]
 
   // User's interactions
-  likes         Like[]
-  dislikes      Dislike[]
+  likes    Like[]
+  dislikes Dislike[]
 
   // Follows
-  followers     Follow[]  @relation("UserFollowedBy")
-  following     Follow[]  @relation("UserFollows")
-
-  // Activity tracking
-  activities    UserActivity[]
+  followers Follow[] @relation("UserFollowedBy")
+  following Follow[] @relation("UserFollows")
 }
 
 model Account {
@@ -72,6 +72,23 @@ model Session {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+model WatchlistItem {
+  id        String   @id @default(uuid())
+  userId    String
+  contentId String // references Movie.id
+  createdAt DateTime @default(now())
+
+  // Relations
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movie Movie @relation(fields: [contentId], references: [id], onDelete: Cascade)
+
+  // Ensure a user can save a movie only once
+  @@unique([userId, contentId])
+  // Helpful indexes
+  @@index([userId])
+  @@index([contentId])
+}
+
 model VerificationToken {
   identifier String
   token      String   @unique
@@ -81,37 +98,38 @@ model VerificationToken {
 }
 
 model Movie {
-  id          String   @id
-  type        String   @default("movie") // "movie" or "tv_series"
-  posterPath  String?  // TMDB poster_path cached to reduce API calls
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         String   @id
+  type       String   @default("movie") // "movie" or "tv_series"
+  posterPath String? // TMDB poster_path cached to reduce API calls
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   // Relations
-  posts       Post[]
+  posts         Post[]
+  watchlistedBy WatchlistItem[]
 }
 
 model Post {
-  id          String   @id @default(uuid())
-  title       String?
-  content     String
-  rating      Rating?
-  isSpoiler   Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(uuid())
+  title     String?
+  content   String
+  rating    Rating?
+  isSpoiler Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Foreign keys
-  contentId   String   // Can be movieId or tvSeriesId
-  userId      String
+  contentId String // Can be movieId or tvSeriesId
+  userId    String
 
   // Relations
-  movie       Movie     @relation(fields: [contentId], references: [id], onDelete: Cascade)
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movie Movie @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Comments and interactions
-  comments    Comment[]
-  likes       Like[]
-  dislikes    Dislike[]
+  comments Comment[]
+  likes    Like[]
+  dislikes Dislike[]
 
   // Indexes for better performance
   @@index([contentId])
@@ -120,26 +138,26 @@ model Post {
 }
 
 model Comment {
-  id          String   @id @default(uuid())
-  content     String
-  isSpoiler   Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(uuid())
+  content   String
+  isSpoiler Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Foreign keys
-  postId      String?
-  parentId    String?  // For nested comments
-  userId      String
+  postId   String?
+  parentId String? // For nested comments
+  userId   String
 
   // Relations
-  post        Post?     @relation(fields: [postId], references: [id], onDelete: Cascade)
-  parent      Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
-  replies     Comment[] @relation("CommentReplies")
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post    Post?     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  parent  Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies Comment[] @relation("CommentReplies")
+  user    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Interactions
-  likes       Like[]
-  dislikes    Dislike[]
+  likes    Like[]
+  dislikes Dislike[]
 
   // Indexes for better performance
   @@index([postId])
@@ -158,9 +176,9 @@ model Like {
   commentId String?
 
   // Relations
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  post      Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
-  comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post    Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  comment Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
 
   // Ensure one like per user per post/comment
   @@unique([userId, postId])
@@ -177,9 +195,9 @@ model Dislike {
   commentId String?
 
   // Relations
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  post      Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
-  comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post    Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  comment Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
 
   // Ensure one dislike per user per post/comment
   @@unique([userId, postId])
@@ -187,35 +205,34 @@ model Dislike {
 }
 
 model Follow {
-  id           String   @id @default(uuid())
-  followerId   String
-  followingId  String
-  createdAt    DateTime @default(now())
+  id          String   @id @default(uuid())
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
 
   // Relations
-  follower     User     @relation("UserFollows", fields: [followerId], references: [id], onDelete: Cascade)
-  following    User     @relation("UserFollowedBy", fields: [followingId], references: [id], onDelete: Cascade)
+  follower  User @relation("UserFollows", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("UserFollowedBy", fields: [followingId], references: [id], onDelete: Cascade)
 
   // Ensure a user can follow another user only once
   @@unique([followerId, followingId])
-
   // Helpful indexes
   @@index([followerId])
   @@index([followingId])
 }
 
 model UserActivity {
-  id          String   @id @default(uuid())
-  userId      String
+  id           String   @id @default(uuid())
+  userId       String
   activityDate DateTime // The date this activity occurred (can be today or past date)
-  activityType String  // Type of activity: 'post_created', 'review_posted', 'movie_watched', etc.
-  contentId   String?  // Optional: ID of the content (movie, post, etc.)
-  metadata    Json?    // Optional: Additional data about the activity
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  activityType String // Type of activity: 'post_created', 'review_posted', 'movie_watched', etc.
+  contentId    String? // Optional: ID of the content (movie, post, etc.)
+  metadata     Json? // Optional: Additional data about the activity
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   // Relations
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Indexes for better performance
   @@index([userId])

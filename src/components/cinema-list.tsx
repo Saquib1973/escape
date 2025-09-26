@@ -1,9 +1,9 @@
 'use client'
 
-import { MoveRight, Option, Star } from 'lucide-react'
+import { MoveRight, Star } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { MediaItem } from '../types/media'
 import CinemaListLoadingSkeleton from './skeletons/cinema-list-loading-skeleton'
@@ -48,6 +48,7 @@ const CinemaList: React.FC<CinemaListProps> = ({
   onWatchlistToggle,
   getWatchlistStatus,
 }) => {
+  const [localWatchlistIds, setLocalWatchlistIds] = useState<Set<number>>(new Set())
   const shouldFetch = (!itemsProp || itemsProp.length === 0) && Boolean(apiUrl)
 
   const { data, isLoading, isError, error, refetch, isFetching } = useQuery<{
@@ -71,6 +72,84 @@ const CinemaList: React.FC<CinemaListProps> = ({
   const items: MediaItem[] = useMemo(() => {
     return itemsProp && itemsProp.length > 0 ? itemsProp : fetchedItems
   }, [itemsProp, fetchedItems])
+
+  // Prefetch saved status for current user so UI reflects saved/not-saved on open
+  useEffect(() => {
+    if (getWatchlistStatus) return
+    let cancelled = false
+    const load = async () => {
+      try {
+        const res = await fetch('/api/user/watchlist', { cache: 'no-store' })
+        if (!res.ok) return
+        const data = await res.json() as { items?: { contentId: string }[] }
+        const ids = new Set<number>()
+        for (const it of data.items ?? []) {
+          const n = Number(it.contentId)
+          if (!Number.isNaN(n)) ids.add(n)
+        }
+        if (!cancelled) setLocalWatchlistIds(ids)
+      } catch {
+        // ignore
+      }
+    }
+    void load()
+    return () => {
+      cancelled = true
+    }
+  }, [getWatchlistStatus])
+
+  const isSaved = useCallback(
+    (item: MediaItem) => {
+      if (getWatchlistStatus) return getWatchlistStatus(item)
+      return localWatchlistIds.has(item.id)
+    },
+    [getWatchlistStatus, localWatchlistIds]
+  )
+
+  const toggleWatchlist = useCallback(
+    async (item: MediaItem) => {
+      const currentlySaved = isSaved(item)
+      const idNum = item.id
+      const idStr = String(idNum)
+
+      // Optimistic update
+      setLocalWatchlistIds(prev => {
+        const next = new Set(prev)
+        if (currentlySaved) next.delete(idNum)
+        else next.add(idNum)
+        return next
+      })
+
+      try {
+        if (currentlySaved) {
+          const res = await fetch(`/api/user/watchlist/${idStr}`, { method: 'DELETE' })
+          if (!res.ok) throw new Error('Failed to remove from watchlist')
+        } else {
+          const res = await fetch(`/api/user/watchlist`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contentId: idStr,
+              contentType,
+              posterPath: item.poster_path ?? null,
+            }),
+          })
+          if (!res.ok) throw new Error('Failed to save to watchlist')
+        }
+        onWatchlistToggle?.(item)
+      } catch (err) {
+        console.error('Watchlist toggle failed', err)
+        // Revert optimistic update on failure
+        setLocalWatchlistIds(prev => {
+          const next = new Set(prev)
+          if (currentlySaved) next.add(idNum)
+          else next.delete(idNum)
+          return next
+        })
+      }
+    },
+    [contentType, isSaved, onWatchlistToggle]
+  )
 
   // Default helper functions
   const defaultGetYear = useCallback((item: MediaItem) => {
@@ -215,8 +294,8 @@ const CinemaList: React.FC<CinemaListProps> = ({
             initial="hidden"
             animate="visible"
           >
-            {items.map((item) => (
-              <motion.div key={item.id} variants={itemVariants}>
+            {items.map((item,index) => (
+              <motion.div key={item.id} className={`${index===0 ? "md:ml-3":""}`} variants={itemVariants}>
                 <div className="flex-shrink-0 group w-36 block h-full relative">
                   <div className="bg-dark-gray-2 overflow-hidden h-full">
                     <div className="flex flex-col w-full h-full">
@@ -265,8 +344,8 @@ const CinemaList: React.FC<CinemaListProps> = ({
                           release_date: item.release_date,
                         }}
                         contentType={contentType}
-                        onWatchlistToggle={() => onWatchlistToggle?.(item)}
-                        isInWatchlist={getWatchlistStatus?.(item) || false}
+                        onWatchlistToggle={() => toggleWatchlist(item)}
+                        isInWatchlist={isSaved(item)}
                       />
                     </div>
                   )}

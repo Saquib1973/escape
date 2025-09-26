@@ -14,7 +14,7 @@ import ShareButton from './buttons/share-button'
  *
  * Features:
  * - Three-dot menu that appears on hover
- * - Create Post functionality
+ * - Review functionality
  * - Log Watching functionality with date selection
  * - Add/Remove from Watchlist functionality
  * - Share functionality (copies URL to clipboard)
@@ -60,7 +60,6 @@ export default function MediaItemDropdown({
   const [isOpen, setIsOpen] = useState(false)
   const [showLogForm, setShowLogForm] = useState(false)
   const [showCreatePost, setShowCreatePost] = useState(false)
-  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, right: 0 })
   const [isSmallScreen, setIsSmallScreen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -82,7 +81,10 @@ export default function MediaItemDropdown({
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false)
       }
     }
@@ -129,35 +131,25 @@ export default function MediaItemDropdown({
     alert('Content reported. Thank you for your feedback!')
   }
 
-  const handleButtonClick = (event?: React.MouseEvent) => {
-    if (customButton && event?.currentTarget) {
-      const rect = event.currentTarget.getBoundingClientRect()
-      setDropdownPosition({
-        top: rect.bottom + window.scrollY + 8,
-        right: window.innerWidth - rect.right - window.scrollX
-      })
-    } else if (buttonRef.current) {
-      const rect = buttonRef.current.getBoundingClientRect()
-      setDropdownPosition({
-        top: rect.bottom + window.scrollY + 8,
-        right: window.innerWidth - rect.right - window.scrollX
-      })
-    }
+  const handleButtonClick = () => {
     setIsOpen(!isOpen)
   }
-
 
   return (
     <>
       <div className="relative" ref={dropdownRef}>
         {customButton ? (
-          <div onClick={(e) => handleButtonClick(e)}>{customButton}</div>
+          <button type="button" onClick={handleButtonClick} className="inline-flex">
+            {customButton}
+          </button>
         ) : (
           <button
             ref={buttonRef}
             onClick={handleButtonClick}
-            className={`absolute top-1 right-1 p-1 bg-dark-gray cursor-pointer md:opacity-0 ${
-              isOpen ? 'opacity-100' : 'group-hover:opacity-100'
+            className={`absolute top-1 right-1 p-1 bg-dark-gray cursor-pointer ${
+              isOpen
+                ? 'opacity-100 md:opacity-100'
+                : 'md:opacity-0 group-hover:opacity-100'
             } transition-opacity z-40`}
             aria-label="More options"
           >
@@ -206,7 +198,7 @@ export default function MediaItemDropdown({
                         className="flex items-center gap-4 px-4 py-4 text-base text-gray-300 hover:bg-dark-gray-hover hover:text-white transition-colors"
                       >
                         <Plus className="size-5" />
-                        Create Post
+                        Review
                       </motion.button>
                       <motion.button
                         initial={{ opacity: 0, x: -10 }}
@@ -216,7 +208,7 @@ export default function MediaItemDropdown({
                         className="flex items-center gap-4 px-4 py-4 text-base text-gray-300 hover:bg-dark-gray-hover hover:text-white transition-colors"
                       >
                         <Calendar className="size-5" />
-                        Log Watching
+                        Log
                       </motion.button>
                       <motion.button
                         initial={{ opacity: 0, x: -10 }}
@@ -232,9 +224,7 @@ export default function MediaItemDropdown({
                               : ''
                           }`}
                         />
-                        {isInWatchlist
-                          ? 'Remove from Watchlist'
-                          : 'Add to Watchlist'}
+                        Save
                       </motion.button>
                       <motion.div
                         initial={{ opacity: 0, x: -10 }}
@@ -265,7 +255,7 @@ export default function MediaItemDropdown({
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.15, ease: 'easeOut' }}
-                  className="absolute right-0 top-full mt-2 bg-dark-gray-2 border border-white/5 z-40 min-w-[160px]"
+                  className="absolute right-1 translate-y-7 top-full bg-dark-gray-2 border border-white/15 z-40 w-[140px] shadow-sm"
                 >
                   <div className="flex flex-col gap-1">
                     <motion.button
@@ -276,7 +266,7 @@ export default function MediaItemDropdown({
                       className="flex items-center gap-3 px-3 py-2 text-sm text-gray-300 hover:bg-dark-gray-hover hover:text-white transition-colors"
                     >
                       <Plus className="size-4" />
-                      Create Post
+                      Review
                     </motion.button>
                     <motion.button
                       initial={{ opacity: 0, x: -5 }}
@@ -286,7 +276,7 @@ export default function MediaItemDropdown({
                       className="flex items-center gap-3 px-3 py-2 text-sm text-gray-300 hover:bg-dark-gray-hover hover:text-white transition-colors"
                     >
                       <Calendar className="size-4" />
-                      Log Watching
+                      Log
                     </motion.button>
                     <motion.button
                       initial={{ opacity: 0, x: -5 }}
@@ -302,9 +292,7 @@ export default function MediaItemDropdown({
                             : ''
                         }`}
                       />
-                      {isInWatchlist
-                        ? 'Remove from Watchlist'
-                        : 'Add to Watchlist'}
+                      Save
                     </motion.button>
                     <motion.div
                       initial={{ opacity: 0, x: -5 }}
@@ -347,7 +335,7 @@ export default function MediaItemDropdown({
         )}
       </AnimatePresence>
 
-      {/* Create Post Form */}
+      {/* Review Form */}
       <AnimatePresence mode="wait">
         {showCreatePost && (
           <CreatePostForm
