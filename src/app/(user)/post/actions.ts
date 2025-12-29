@@ -2,7 +2,7 @@
 
 import { prisma, authOptions } from '@/lib'
 import { getServerSession } from 'next-auth'
-import { ActivityService } from '@/lib/services/activity'
+import { ActivityService } from '@/services/activity'
 // Generic post mapping is now handled at call sites; no poster augmentation here
 
 export type RatingEnum =

@@ -1,6 +1,6 @@
 'use client'
 
-import { TrendingItem } from '@/types/trending'
+import { TrendingItem } from '../../../../types/trending'
 import Link from 'next/link'
 import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'

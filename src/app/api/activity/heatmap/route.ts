@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSession } from '@/lib'
-import { ActivityService } from '@/lib/services/activity'
+import { ActivityService } from '@/services/activity'
 
 export async function GET(request: NextRequest) {
   try {

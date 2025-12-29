@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import CinemaList from '../../cinema-list'
-import { MediaItem } from '../../../types/media'
+import { MediaItem } from '../../../../types/media'
 
 const TrendingWebSeriesComponent = () => {
   const [watchlistItems, setWatchlistItems] = useState<Set<number>>(new Set())

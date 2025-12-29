@@ -1,5 +1,5 @@
 import { getSession, prisma, getPosterUrl } from '@/lib'
-import type { GenericPost } from '@/types/post'
+import type { GenericPost } from '../../../../../types/post'
 
 export async function getUserReviews(): Promise<GenericPost[]> {
   try {

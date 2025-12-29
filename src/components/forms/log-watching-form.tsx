@@ -4,8 +4,8 @@ import { Calendar, Film, Tv, X } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
-import Input from '../input'
-import Loader from '../loader'
+import Input from '../ui/input'
+import Loader from '../ui/loader'
 
 interface LogWatchingFormProps {
   contentId: string

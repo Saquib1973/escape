@@ -4,6 +4,8 @@ import FeedComponent from '@/components/page/home/feed-component'
 import InCinemaComponent from '@/components/page/home/in-cinema-component'
 import TrendingMovieComponent from '@/components/page/home/trending-movie-component'
 import TrendingWebSeriesComponent from '@/components/page/home/trending-web-series-component'
+import Button from '@/components/ui/button'
+import Modal from '@/components/ui/modal'
 import VerticalCinemaList from '@/components/vertical-cinema-list'
 import { getSession } from '@/lib'
 
@@ -20,6 +22,7 @@ const HomePage = async () => {
           </h1>
         </div>
       )}
+
       <TrendingMovieComponent />
       <TrendingWebSeriesComponent />
       <InCinemaComponent />

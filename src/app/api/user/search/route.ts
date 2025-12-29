@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { searchUsers } from '@/lib/services/user'
-import { UnauthorizedError, getUserId } from '@/lib/services/auth'
+import { searchUsers } from '@/services/user'
+import { UnauthorizedError, getUserId } from '@/services/auth'
 
 export async function GET(req: NextRequest) {
   try {

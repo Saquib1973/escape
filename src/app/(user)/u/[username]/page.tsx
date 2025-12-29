@@ -1,7 +1,7 @@
 import React from 'react'
 import { prisma, getSession, getPosterUrl } from '@/lib'
 import UserDetailScreen from '@/components/page/user/user-detail-screen'
-import type { GenericPost } from '@/types/post'
+import type { GenericPost } from '../../../../../types/post'
 
 const page = async ({ params }: { params: Promise<{ username: string }> }) => {
   const { username } = await params

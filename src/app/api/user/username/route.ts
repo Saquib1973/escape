@@ -1,4 +1,4 @@
-import { isUsernameAvailable } from '@/lib/services/user'
+import { isUsernameAvailable } from '@/services/user'
 import { prisma, generateRandomUsername, UsernameSchema } from '@/lib'
 import { NextRequest, NextResponse } from 'next/server'
 

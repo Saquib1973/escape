@@ -27,7 +27,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${atkinsonHyperlegible.variable} bg-black`}>
         <AuthProvider>
-          <QueryProvider>{children}</QueryProvider>
+          <QueryProvider>
+            {children}
+          </QueryProvider>
         </AuthProvider>
       </body>
     </html>

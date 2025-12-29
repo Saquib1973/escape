@@ -1,4 +1,4 @@
-import Activity from '@/components/activity/activity'
+import Activity from '@/components/ui/activity/activity'
 import AnimatePageWrapper from '@/components/animate-page-wrapper'
 
 export const revalidate = 0

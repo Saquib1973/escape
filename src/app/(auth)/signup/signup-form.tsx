@@ -4,8 +4,8 @@ import { signup } from '@/app/(auth)/signup/actions'
 import { signIn } from 'next-auth/react'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Loader from '../loader'
-import Input from '../input'
+import Loader from '../../../components/ui/loader'
+import Input from '../../../components/ui/input'
 
 export function SignUpForm() {
   //states

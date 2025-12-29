@@ -7,5 +7,4 @@ export { getPosterUrl } from './config/tmdb'
 // User utilities exports
 export * from './user/username'
 
-// General utilities exports
-export * from './utils/utils'
+export * from './utils'

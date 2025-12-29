@@ -4,7 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import PostList from '@/components/post-list'
 import { useMutation } from '@tanstack/react-query'
-import type { GenericPost } from '@/types/post'
+import type { GenericPost } from '../../../../types/post'
 
 type UserDetailScreenProps = {
   userId: string

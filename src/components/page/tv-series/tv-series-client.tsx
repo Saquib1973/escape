@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query'
 import TVSeriesDetailsComponent from './tv-series-details-component'
 import Link from 'next/link'
-import Loader from '@/components/loader'
+import Loader from '@/components/ui/loader'
 
 interface TVSeriesClientProps {
   seriesId: string

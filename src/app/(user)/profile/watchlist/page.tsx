@@ -1,8 +1,8 @@
 import AnimatePageWrapper from '@/components/animate-page-wrapper'
 import { Metadata } from 'next'
 import { getSession } from '@/lib'
-import { WatchlistService } from '@/lib/services/watchlist'
-import WatchlistList from '@/components/watchlist/watchlist-list'
+import { WatchlistService } from '@/services/watchlist'
+import WatchlistList from '@/components/ui/watchlist/watchlist-list'
 
 export const metadata: Metadata = {
   title: 'Your Watchlist',

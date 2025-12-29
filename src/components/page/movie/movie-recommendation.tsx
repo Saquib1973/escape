@@ -2,7 +2,7 @@
 
 import React from 'react'
 import CinemaList from '../../cinema-list'
-import { MediaItem } from '../../../types/media'
+import { MediaItem } from '../../../../types/media'
 
 const MovieRecommendation = ({ id }: { id: number }) => {
   const getYear = (item: MediaItem) => {

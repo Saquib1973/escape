@@ -1,7 +1,7 @@
 import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import Loader from '@/components/loader'
+import Loader from '@/components/ui/loader'
 
 interface TVShow {
   id: number

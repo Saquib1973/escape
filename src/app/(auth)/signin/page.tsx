@@ -1,4 +1,4 @@
-import { SignInForm } from '@/components/forms/signin-form'
+import { SignInForm } from './signin-form'
 import { GoogleButton } from '@/components/buttons/google-button'
 import Link from 'next/link'
 import AnimatePageWrapper from '@/components/animate-page-wrapper'

@@ -1,6 +1,6 @@
 'use client'
 import { formatDateTime, getRatingLabel } from '@/lib'
-import type { GenericPost } from '@/types/post'
+import type { GenericPost } from '../../types/post'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
   MessageCircle,

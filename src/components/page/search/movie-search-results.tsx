@@ -1,4 +1,4 @@
-import Loader from '@/components/loader'
+import Loader from '@/components/ui/loader'
 import Image from 'next/image'
 import Link from 'next/link'
 

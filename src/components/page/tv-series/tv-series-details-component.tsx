@@ -12,7 +12,7 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { formatDate } from '@/lib'
 import MediaItemDropdown from '../../media-item-dropdown'
-import type { TVSeriesDetails } from '@/types/tmdb'
+import type { TVSeriesDetails } from '../../../../types/tmdb'
 
 interface TVSeriesDetailsComponentProps {
   series: TVSeriesDetails

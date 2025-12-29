@@ -2,7 +2,7 @@ import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import PostActions from '@/components/post-actions'
-import type { RatingEnum } from '@/types/post'
+import type { RatingEnum } from '../../../../types/post'
 import { getRatingLabel, formatDateTime } from '@/lib'
 
 interface PostInfoProps {

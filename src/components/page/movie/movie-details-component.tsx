@@ -15,7 +15,7 @@ import MovieRecommendation from './movie-recommendation'
 import MediaItemDropdown from '../../media-item-dropdown'
 import { formatDate } from '@/lib'
 
-import type { MovieDetails } from '@/types/tmdb'
+import type { MovieDetails } from '../../../../types/tmdb'
 
 interface MovieDetailsComponentProps {
   movie: MovieDetails | null

@@ -2,7 +2,7 @@
 
 import React from 'react'
 import CinemaList from '../../cinema-list'
-import { MediaItem } from '../../../types/media'
+import { MediaItem } from '../../../../types/media'
 
 const InCinemaComponent = () => {
   const getYear = (item: MediaItem) => {

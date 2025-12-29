@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { signOut } from 'next-auth/react'
 import Link from 'next/link'
 import AnimatePageWrapper from '@/components/animate-page-wrapper'
-import Input from '@/components/input'
+import Input from '@/components/ui/input'
 
 export default function DeleteAccountPage() {
   const [isDeleting, setIsDeleting] = useState(false)

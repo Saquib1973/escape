@@ -1,5 +1,5 @@
-import { getUserId, UnauthorizedError } from '@/lib/services/auth'
-import { updateUsername } from '@/lib/services/user'
+import { getUserId, UnauthorizedError } from '@/services/auth'
+import { updateUsername } from '@/services/user'
 import { UsernameSchema } from '@/lib'
 import { NextRequest, NextResponse } from 'next/server'
 

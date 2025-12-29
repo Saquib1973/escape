@@ -5,7 +5,7 @@ import React from 'react'
 import MovieDetailPanel from './movie-detail-panel'
 import { MovieDetail } from './types'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { useDebounce } from '@/hooks/useDebounce'
+import { useDebounce } from '../../../../hooks/useDebounce'
 
 interface HeatmapData {
   activities: Record<string, MovieDetail[]>

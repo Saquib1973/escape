@@ -1,6 +1,6 @@
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
-import type { RatingEnum } from '@/types/post'
+import type { RatingEnum } from '../../types/post'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))

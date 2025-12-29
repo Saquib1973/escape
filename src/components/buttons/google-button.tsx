@@ -2,7 +2,7 @@
 import { signIn } from 'next-auth/react'
 import Image from 'next/image'
 import { useState } from 'react'
-import Loader from '../loader'
+import Loader from '../ui/loader'
 
 export function GoogleButton() {
   const [isLoading, setIsLoading] = useState(false)

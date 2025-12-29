@@ -5,10 +5,10 @@ import { getRatingLabel } from '@/lib'
 import { motion } from 'framer-motion'
 import { X } from 'lucide-react'
 import { useState } from 'react'
-import Loader from '../loader'
-import Input from '../input'
-import TextArea from '../text-area'
-import ActivityDatePicker from '../activity/activity-date-picker'
+import Loader from '../ui/loader'
+import Input from '../ui/input'
+import TextArea from '@/components/ui/text-area'
+import ActivityDatePicker from '../ui/activity/activity-date-picker'
 interface CreatePostFormProps {
   movieId: string
   movieTitle: string

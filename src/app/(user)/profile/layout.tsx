@@ -1,5 +1,5 @@
 import AnimatePageWrapper from '@/components/animate-page-wrapper'
-import ProfileSidebar from '@/components/profile/sidebar'
+import ProfileSidebar from '@/components/profile-sidebar'
 import { getSession, prisma } from '@/lib'
 import Image from 'next/image'
 import { redirect } from 'next/navigation'

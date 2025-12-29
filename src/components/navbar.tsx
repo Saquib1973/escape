@@ -7,8 +7,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import Loader from './loader'
-import Input from './input'
+import Loader from './ui/loader'
+import Input from './ui/input'
 
 const navbarItems = [
   {

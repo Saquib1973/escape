@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import SettingsSidebar from '@/components/settings/sidebar'
+import SettingsSidebar from '@/components/settings-sidebar'
 import AnimatePageWrapper from '@/components/animate-page-wrapper'
 
 export default function SettingsLayout({

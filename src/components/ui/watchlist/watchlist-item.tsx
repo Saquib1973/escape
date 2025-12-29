@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { WatchlistItem } from '@/lib/services/watchlist'
+import { WatchlistItem } from '@/services/watchlist'
 import RemoveWatchlistButton from './remove-button'
 
 interface WatchlistItemProps {

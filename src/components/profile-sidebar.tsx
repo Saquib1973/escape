@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { cn } from '@/lib/utils/utils'
+import { cn } from '@/lib/utils'
 import { BookText, TvMinimal, User } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'

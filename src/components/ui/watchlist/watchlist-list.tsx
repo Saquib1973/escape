@@ -1,4 +1,4 @@
-import { WatchlistItem } from '@/lib/services/watchlist'
+import { WatchlistItem } from '@/services/watchlist'
 import WatchlistItemComponent from './watchlist-item'
 
 interface WatchlistListProps {

@@ -1,4 +1,4 @@
-import { ActivityService } from '@/lib/services/activity'
+import { ActivityService } from '@/services/activity'
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/config/auth'

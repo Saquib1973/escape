@@ -2,7 +2,7 @@
 
 import { getAllContentPosts as getAllMoviePosts } from '@/app/(user)/post/actions'
 import PostList from '@/components/post-list'
-import type { GenericPost } from '@/types/post'
+import type { GenericPost } from '../../types/post'
 import { useCallback, useEffect, useState } from 'react'
 
 
