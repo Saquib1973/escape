@@ -4,28 +4,23 @@ import FeedComponent from '@/components/page/home/feed-component'
 import InCinemaComponent from '@/components/page/home/in-cinema-component'
 import TrendingMovieComponent from '@/components/page/home/trending-movie-component'
 import TrendingWebSeriesComponent from '@/components/page/home/trending-web-series-component'
-import Button from '@/components/ui/button'
-import Modal from '@/components/ui/modal'
 import VerticalCinemaList from '@/components/vertical-cinema-list'
+import WelcomeMessage from '@/components/welcome-message'
 import { getSession } from '@/lib'
 
 const HomePage = async () => {
   const session = await getSession()
   return (
     <AnimatePageWrapper className="py-4 max-md:px-4">
+
       {session && (
-        <div className="text-center pb-4">
-          <h1 className="text-lg font-light text-gray-400">
-            Welcome back,{' '}
-            <span className="text-light-green">{session?.user?.name}</span>.
-            Enjoy reviewing , rating and watching...
-          </h1>
-        </div>
+        <WelcomeMessage username={session?.user?.name ?? ''} />
       )}
 
       <TrendingMovieComponent />
       <TrendingWebSeriesComponent />
       <InCinemaComponent />
+      
       <div className="flex max-md:flex-col gap-4 relative">
         <FeedComponent />
         <VerticalCinemaList

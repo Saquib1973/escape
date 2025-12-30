@@ -1,8 +1,8 @@
 'use client'
 
-import React, { useState } from 'react'
-import CinemaList from '../../cinema-list'
+import { useState } from 'react'
 import { MediaItem } from '../../../../types/media'
+import CinemaList from '../../cinema-list'
 
 const TrendingMovieComponent = () => {
   const [watchlistItems, setWatchlistItems] = useState<Set<number>>(new Set())

@@ -9,6 +9,7 @@ import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Loader from './ui/loader'
 import Input from './ui/input'
+import TypeSelector from './type-selector'
 
 const navbarItems = [
   {
@@ -73,18 +74,21 @@ const Navbar = () => {
       <div className="w-full flex justify-center items-center">
         <div className="w-full max-w-5xl">
           <div className="flex items-center justify-between gap-2 md:gap-4 h-13 md:h-14 min-w-0">
-            <Link href={'/'} className="flex items-center gap-2">
-              <div className="flex space-x-1">
-                <Image
-                  alt="logo"
-                  className=""
-                  src={'/logo-light.png'}
-                  width={20}
-                  height={20}
-                />
-              </div>
-              <span className="text-xl text-white max-md:hidden">Escape</span>
-            </Link>
+            <div className="flex items-center gap-3">
+              <Link href={'/'} className="flex items-center gap-2">
+                <div className="flex space-x-1">
+                  <Image
+                    alt="logo"
+                    className=""
+                    src={'/logo-light.png'}
+                    width={20}
+                    height={20}
+                  />
+                </div>
+                <span className="text-xl text-white max-md:hidden">Escape</span>
+              </Link>
+              <TypeSelector />
+            </div>
 
             <div className="flex items-center gap-1 md:gap-2 min-w-0">
               <div
