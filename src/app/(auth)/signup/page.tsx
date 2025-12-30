@@ -14,8 +14,10 @@ export default function SignUp() {
         </div>
 
         <SignUpForm />
+        
         <div className="">or</div>
         <GoogleButton />
+        
         <div className="flex gap-1">
           <p>Already have an account?</p>
           <Link href={'/signin'} className="underline">

@@ -1,7 +1,9 @@
 'use client'
+import { AnimatePresence, motion } from 'framer-motion'
 import { signIn } from 'next-auth/react'
 import Image from 'next/image'
 import { useState } from 'react'
+import Button from '../ui/button'
 import Loader from '../ui/loader'
 
 export function GoogleButton() {
@@ -19,10 +21,11 @@ export function GoogleButton() {
   }
 
   return (
-    <button
+    <Button
+      variant='secondary-light'
+      className='gap-2 h-11'
       onClick={handleGoogleSignIn}
       disabled={isLoading}
-      className="bg-dark-gray text-gray-300 flex gap-2 py-3 cursor-pointer p-2 w-full justify-center items-center disabled:cursor-not-allowed disabled:opacity-50"
     >
       <Image
         alt="google"
@@ -31,11 +34,30 @@ export function GoogleButton() {
         className="size-5"
         src={'/google.png'}
       />
-      {!isLoading ? (
-        <p>Continue with Google</p>
-      ) : (
-        <Loader color="#ffffff" className="" size="sm" />
-      )}
-    </button>
+      <AnimatePresence mode='wait'>
+
+        {!isLoading ? (
+          <motion.p
+            key="continue"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+          >
+            Continue with Google
+          </motion.p>
+        ) : (
+          <motion.span
+            key="loading"
+            className='gap-2 flex items-center justify-center'
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+          >
+            Loading accounts...
+            <Loader color="#ffffff" className="" size="sm" />
+          </motion.span>
+        )}
+      </AnimatePresence>
+    </Button>
   )
 }

@@ -38,9 +38,9 @@ const Input = forwardRef<HTMLInputElement, InputProps>(({
   }
 
   const sizeClasses = {
-    sm: 'text-sm p-1.5 px-3',
-    md: 'text-base p-2 px-4',
-    lg: 'text-base p-3 px-5',
+    sm: 'text-sm p-1.5 h-9 px-3',
+    md: 'text-base p-2 h-11 px-4',
+    lg: 'text-base p-3 h-13 px-5',
   }
   return (
     <input

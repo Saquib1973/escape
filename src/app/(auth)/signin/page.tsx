@@ -12,10 +12,8 @@ export default function SignIn() {
           <h1 className="">Welcome</h1>
           <h1 className="">back</h1>
         </div>
-        {/* Sign-In Component */}
         <SignInForm />
         <div className="">or</div>
-        {/* Google sigin button */}
         <GoogleButton />
         <div className="flex gap-1">
           <p>Don&apos;t have an account?</p>

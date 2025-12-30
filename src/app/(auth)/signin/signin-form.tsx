@@ -1,105 +1,157 @@
 'use client'
 
-import { signIn } from 'next-auth/react'
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Loader from '@/components/ui/loader'
+import Button from '@/components/ui/button'
 import Input from '@/components/ui/input'
+import Loader from '@/components/ui/loader'
+import { AnimatePresence, motion } from 'framer-motion'
+import { signIn } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
 export function SignInForm() {
-  // states
-  const [status, setStatus] = useState({
-    guestLogin: false,
-    login: false,
-  })
-
-  const [data, setData] = useState({
+  const [isLoading, setIsLoading] = useState(false)
+  const [isGuestLoading, setIsGuestLoading] = useState(false)
+  const [formData, setFormData] = useState({
     email: '',
     password: '',
   })
   const [error, setError] = useState('')
   const router = useRouter()
 
-  // form submit function
+  const isFormValid = formData.email.trim() !== '' && formData.password.trim() !== ''
+  const isAnyLoading = isLoading || isGuestLoading
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    setError('')
-    setStatus({ ...status, login: true })
-    const result = await signIn('credentials', {
-      redirect: false,
-      email: data.email,
-      password: data.password,
-    })
+    if (!isFormValid || isAnyLoading) return
 
-    if (result?.error) {
-      setError(result.error)
-      setStatus({ ...status, login: false })
-    } else {
-      setStatus({ ...status, login: false })
-      router.push('/')
+    setError('')
+    setIsLoading(true)
+
+    try {
+      const result = await signIn('credentials', {
+        redirect: false,
+        email: formData.email,
+        password: formData.password,
+      })
+
+      if (result?.error) {
+        setError(result.error)
+      } else {
+        router.push('/')
+      }
+    } catch {
+      setError('An unexpected error occurred')
+    } finally {
+      setIsLoading(false)
     }
   }
+
   const handleGuestLogin = async () => {
-    setError('')
-    setStatus({ ...status, guestLogin: true })
-    const result = await signIn('credentials', {
-      redirect: false,
-      email: 'guest@escape.com',
-      password: 'guest',
-    })
+    if (isAnyLoading) return
 
-    if (result?.error) {
-      setError(result.error)
-      setStatus({ ...status, guestLogin: false })
-    } else {
-      setStatus({ ...status, guestLogin: false })
-      router.push('/')
+    setError('')
+    setIsGuestLoading(true)
+
+    try {
+      const result = await signIn('credentials', {
+        redirect: false,
+        email: 'guest@escape.com',
+        password: 'guest',
+      })
+
+      if (result?.error) {
+        setError(result.error)
+      } else {
+        router.push('/')
+      }
+    } catch {
+      setError('An unexpected error occurred')
+    } finally {
+      setIsGuestLoading(false)
     }
   }
+
+  useEffect(() => {
+    if (!error) return
+
+    const timer = setTimeout(() => {
+      setError('')
+    }, 10000)
+
+    return () => clearTimeout(timer)
+  }, [error])
 
   return (
     <form onSubmit={handleSubmit} className="w-full flex flex-col gap-2">
       <Input
-        disabled={status.login}
+        disabled={isAnyLoading}
         type="email"
-        value={data.email}
-        onChange={(e) => setData({ ...data, email: e.target.value })}
+        value={formData.email}
+        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
         placeholder="Email"
         required
         variant="primary"
       />
       <Input
-        disabled={status.login}
+        disabled={isAnyLoading}
         type="password"
-        value={data.password}
-        onChange={(e) => setData({ ...data, password: e.target.value })}
+        value={formData.password}
+        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
         placeholder="Password"
         required
         variant="primary"
       />
-      {error && <p className="text-red-500">{error}</p>}
-      <button
+      <Button
         type="submit"
-        className="bg-light-green mt-2 text-white cursor-pointer p-2 w-full"
+        variant="primary"
+        className={`mt-2 ${error ? "bg-red-500" : ""}`}
+        onMouseEnter={() => setError("")}
       >
-        {!status.login ? (
-          'Sign In'
-        ) : (
-          <Loader color="#ffffff" className="" size="sm" />
-        )}
-      </button>
-      <button
+        <AnimatePresence mode="wait">
+          {error ? (
+            <motion.p
+              key="error"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+            >
+              {error}
+            </motion.p>
+          ) : isLoading ? (
+            <motion.div
+              key="loader"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <Loader color="#ffffff" size="sm" />
+            </motion.div>
+          ) : (
+            <motion.p
+              key="signin"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+            >
+              Sign In
+            </motion.p>
+          )}
+        </AnimatePresence>
+      </Button>
+      <Button
         type="button"
+        variant="secondary"
+        disabled={isAnyLoading}
         onClick={handleGuestLogin}
-        className="bg-dark-gray-2 text-white cursor-pointer p-2 w-full"
       >
-        {!status.guestLogin ? (
-          'Login as guest'
+        {isGuestLoading ? (
+          <Loader color="#ffffff" size="sm" />
         ) : (
-          <Loader color="#ffffff" className="" size="sm" />
+          'Login as guest'
         )}
-      </button>
+      </Button>
     </form>
   )
 }
