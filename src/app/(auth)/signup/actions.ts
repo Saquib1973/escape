@@ -3,10 +3,10 @@
 import { generateUniqueUsernameFromEmail, prisma } from '@/lib'
 import bcrypt from 'bcryptjs'
 
-interface SignupData{
+interface SignupData {
   name: string
   password: string
-  email:string
+  email: string
 }
 
 export async function signup(data: SignupData) {
@@ -18,12 +18,12 @@ export async function signup(data: SignupData) {
       isDeleted: false, // Only check non-deleted users
     }
   })
+  
   if (existingUser) {
     throw new Error('User already exists')
   }
 
   const username = await generateUniqueUsernameFromEmail(email, prisma)
-
   const hashedPassword = await bcrypt.hash(password, 10)
 
   try {

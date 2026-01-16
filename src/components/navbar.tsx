@@ -1,15 +1,14 @@
 'use client'
 
+import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronDown, LogOut, Search, X } from 'lucide-react'
 import { signOut, useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import Loader from './ui/loader'
 import Input from './ui/input'
-import TypeSelector from './type-selector'
+import Loader from './ui/loader'
 
 const navbarItems = [
   {
@@ -46,7 +45,7 @@ const Navbar = () => {
       }, 50)
     }
 
-    return () => {}
+    return () => { }
   }, [isSearchOpen])
   const container = useRef<HTMLDivElement>(null)
   useEffect(() => {
@@ -87,23 +86,21 @@ const Navbar = () => {
                 </div>
                 <span className="text-xl text-white max-md:hidden">Escape</span>
               </Link>
-              <TypeSelector />
             </div>
 
             <div className="flex items-center gap-1 md:gap-2 min-w-0">
               <div
-                className={`flex items-center gap-2 md:gap-3 font-light transition-all duration-300 ${
-                  isSearchOpen
+                className={`flex items-center gap-2 md:gap-3 font-light transition-all duration-300 ${isSearchOpen
                     ? 'opacity-0 scale-95 translate-x-2 pointer-events-none'
                     : 'opacity-100 scale-100 translate-x-0'
-                }`}
+                  }`}
               >
                 {navbarItems.map((item, index) => {
                   return (
                     <Link
                       key={index + item.name}
                       href={item.link}
-                      className={`text-gray-300 capitalize hover:text-white transition-colors text-sm md:text-base ${isSearchOpen ? "hidden":""}`}
+                      className={`text-gray-300 capitalize hover:text-white transition-colors text-sm md:text-base ${isSearchOpen ? "hidden" : ""}`}
                     >
                       {item.name}
                     </Link>
@@ -114,11 +111,10 @@ const Navbar = () => {
               {/* Search Input */}
               <div
                 ref={container}
-                className={`transition-all duration-300 ease-in-out ${
-                  isSearchOpen
+                className={`transition-all duration-300 ease-in-out ${isSearchOpen
                     ? 'w-48 md:w-64 opacity-100 scale-100'
                     : 'w-0 opacity-0 scale-95 overflow-hidden'
-                }`}
+                  }`}
               >
                 <form onSubmit={handleSearchSubmit} className="relative">
                   <Input
@@ -135,9 +131,8 @@ const Navbar = () => {
               </div>
 
               <button
-                className={`flex gap-1 justify-center h-full items-center p-2 transition-all duration-300 ${
-                  isSearchOpen ? 'bg-light-green text-white' : 'text-gray-300'
-                }`}
+                className={`flex gap-1 justify-center h-full items-center p-2 transition-all duration-300 ${isSearchOpen ? 'bg-light-green text-white' : 'text-gray-300'
+                  }`}
                 onClick={
                   !isSearchOpen ? handleSearchToggle : handleSearchSubmit
                 }
@@ -207,7 +202,7 @@ const RenderAuthSection = () => {
     }
   }, [isDropdownOpen])
 
-  if ( status === 'loading') {
+  if (status === 'loading') {
     return (
       <div className="cursor-not-allowed w-10 max-md:rounded-full md:w-36 h-10 bg-dark-gray-hover flex items-center justify-center text-gray-600 gap-1 animate-pulse">
         <span className='max-md:hidden'>Loading</span>
@@ -257,11 +252,10 @@ const RenderAuthSection = () => {
         tabIndex={-1}
       >
         <button
-          className={`flex w-full max-md:rounded-full h-10 justify-center md:justify-around items-center md:space-x-2  md:p-4 transition-colors ${
-            isDropdownOpen || isHovered
+          className={`flex w-full max-md:rounded-full h-10 justify-center md:justify-around items-center md:space-x-2  md:p-4 transition-colors ${isDropdownOpen || isHovered
               ? 'bg-dark-gray-2'
               : 'bg-dark-gray-hover group-hover:bg-dark-gray-2'
-          }`}
+            }`}
           onClick={() => {
             // Only toggle on mobile devices
             if (window.innerWidth < 768) {
@@ -295,7 +289,7 @@ const RenderAuthSection = () => {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, transition: { delay: innerWidth<768 ? 0.56 : 0 } }}
+              exit={{ opacity: 0, transition: { delay: innerWidth < 768 ? 0.56 : 0 } }}
               transition={{
                 ease: 'easeOut',
                 type: 'spring',

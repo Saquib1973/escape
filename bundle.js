@@ -5,7 +5,7 @@ const path = require('path');
 const targetFolder = process.argv[2];
 
 // Configuration
-const OUTPUT_FILE = 'combine.txt';
+const OUTPUT_FILE = 'bundle.txt';
 const ROOT_DIR = path.join(__dirname, '.');
 
 // Directories and files to exclude

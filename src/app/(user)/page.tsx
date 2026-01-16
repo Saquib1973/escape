@@ -20,7 +20,7 @@ const HomePage = async () => {
       <TrendingMovieComponent />
       <TrendingWebSeriesComponent />
       <InCinemaComponent />
-      
+
       <div className="flex max-md:flex-col gap-4 relative">
         <FeedComponent />
         <VerticalCinemaList
